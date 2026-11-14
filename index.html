@@ -300,7 +300,7 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 .day .dn small{display:block;font-weight:400;font-size:12px;color:var(--text-muted)}
 .day ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;min-width:0}
 .day li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:baseline;font-size:14px}
-.day li .t{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.day li .t{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted);white-space:nowrap;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
 .day li b{font-weight:600;color:var(--ink)}
 .day li .meta{color:var(--text-muted);font-size:12.5px}
 .day li .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-inline-end:6px;vertical-align:1px}
@@ -373,6 +373,9 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph .card{padding:14px;margin-bottom:16px}
 .ph .btn,.ph .chips label,.ph .edit-link,.ph .upgo{min-height:44px}
 .ph .edit-link{min-width:44px}
+.ph .day .edit-link{min-height:32px;display:inline-flex;align-items:center}
+.ph .day .stb{min-height:36px}
+.ph .day li{align-items:center;gap:8px}
 .ph input[type=text],.ph input[type=time],.ph input[type=date],.ph input[type=password],.ph select,.ph textarea{font-size:16px;min-height:44px} /* 16px: iOS Safari zooms into smaller fields */
 .ph input[type=date]{height:46px} /* as tall as the select it stands in for, so the one-off dialog still fits 393x852 */
 .ph input[type=checkbox]{width:20px;height:20px}
@@ -784,6 +787,7 @@ function parseMoodle(txt){ // text of the Moodle month calendar -> [{date,title}
   });
   return out;
 }
+const ltr=t=>'\u2066'+t+'\u2069'; // isolate a range ("10:15–11:45", "15.11–21.11") so Hebrew text around it does not flip it
 const dmy=iso=>dm(iso)+'.'+iso.slice(2,4);
 const YM0=SEM.start.slice(0,7);
 const YM1=SEM.last.slice(0,7);
@@ -1041,8 +1045,8 @@ function render(){
     const evs=evsForWeek(viewSun,items), an=analyze(evs,evsForWeek(addDays(viewSun,7),items).filter(e=>e.d===0));
     if(day)renderDay(evs,an);
     else{
-      $('#gridTitle').textContent='שבוע '+rng;
-      $('#agLead').textContent=`כל מה שמתוכנן בשבוע ${rng}, לפי סדר.`;
+      $('#gridTitle').textContent='שבוע '+ltr(rng);
+      $('#agLead').textContent=`כל מה שמתוכנן בשבוע ${ltr(rng)}, לפי סדר.`;
       renderSum(stats(evs),an); renderAtt(an); renderGrid(evs,an.clash); renderAgenda(evs,an.clash);
     }
   }
@@ -1076,7 +1080,7 @@ function layout(list){
 }
 function dayHead(date,i,base){
   const c=CAL[date],off=offDoc(date,items),edit=canEdit();
-  const sub=base.length?fm(Math.min(...base.map(e=>e.s)))+'–'+fm(Math.max(...base.map(e=>e.e))):off?'לימודים בוטלו':'אין לימודים';
+  const sub=base.length?ltr(fm(Math.min(...base.map(e=>e.s)))+'–'+fm(Math.max(...base.map(e=>e.e)))):off?'לימודים בוטלו':'אין לימודים';
   const tgl=!edit?'':off?`<button type="button" class="hl" data-unoff="${esc(off.id)}">החזרת לימודים</button>`:base.length?`<button type="button" class="hl" data-off="${date}">ביטול לימודים</button>`:'';
   return esc(DAYS[i])+' '+dm(date)+'<small>'+sub+'</small>'+(c?`<span class="cal">${esc(c.label)}</span>`:'')+tgl;
 }
@@ -1148,12 +1152,12 @@ function renderGrid(evs,clash){
 }
 function renderAgenda(evs,clash){
   const edit=canEdit(),wd=DAYS.map((_,i)=>addDays(viewSun,i)),nS=evs.filter(e=>e.src==='user'&&KINDS[e.kind].shift).length,nD=items.filter(x=>x.kind==='due'&&wd.includes(x.date)).length;
-  $('#agSum').textContent=[dm(viewSun)+'–'+dm(wd[6]),...(worksOn()?[nS===1?'משמרת אחת':nS+' משמרות']:[]),nD===1?'הגשה אחת':nD+' הגשות'].join(' · '); // the line next to the title while the card is closed
+  $('#agSum').textContent=[ltr(dm(viewSun)+'–'+dm(wd[6])),...(worksOn()?[nS===1?'משמרת אחת':nS+' משמרות']:[]),nD===1?'הגשה אחת':nD+' הגשות'].join(' · '); // the line next to the title while the card is closed
   $('#agenda').innerHTML=DAYS.map((d,i)=>{
     const date=addDays(viewSun,i),c=CAL[date],off=offDoc(date,items),dn=`${d} ${dm(date)}`;
     const list=evs.filter(e=>e.d===i).sort((a,b)=>a.s-b.s),base=list.filter(e=>e.src==='base'&&!e.cancelled);
     const dues=items.filter(x=>x.kind==='due'&&x.date===date);
-    const sub=base.length?`לימודים ${fm(base[0].s)}–${fm(Math.max(...base.map(e=>e.e)))}`+(c?' · '+c.label:''):off?'לימודים בוטלו':(c?c.label:list.length?'אין לימודים':'');
+    const sub=base.length?`לימודים ${ltr(fm(base[0].s)+'–'+fm(Math.max(...base.map(e=>e.e))))}`+(c?' · '+c.label:''):off?'לימודים בוטלו':(c?c.label:list.length?'אין לימודים':'');
     if(!list.length&&!dues.length)return`<div class="day free"><div class="dn">${dn}${c?`<small>${esc(c.label)}</small>`:''}</div><div class="none">${off?'לימודים בוטלו':'יום פנוי לגמרי'}</div></div>`;
     return`<div class="day"><div class="dn">${dn}<small>${esc(sub)}</small></div><ul>${list.map(e=>{
       const u=e.src==='user',{col,ttl,meta}=lineTxt(e);
