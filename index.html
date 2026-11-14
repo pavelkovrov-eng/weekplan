@@ -172,10 +172,65 @@ button.blk:hover{transform:translateY(-1px);z-index:4}
 .upgo .dl{font-weight:800;color:var(--ink)}
 .upgo .dt{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted)}
 .upgo .tg{font-size:11.5px;font-weight:700;padding:1px 9px;border-radius:999px;border:1px solid var(--border-dark);color:var(--text-muted);white-space:nowrap}
-.chk{display:inline-flex;align-items:center;gap:6px;font-size:inherit;cursor:pointer}
-.uplist .chk{font-size:13px}
-.dh .due{display:block;font-size:10.5px;font-weight:700;color:var(--bad-tx)}
+.shm{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.shm th,.shm td{padding:9px 6px;text-align:start;border-bottom:1px solid var(--border-light)}
+.shm th{font-size:12px;font-weight:600;color:var(--text-muted)}
+.shm td:nth-child(2){font-weight:700;color:var(--ink)}
+.shm tfoot td{font-weight:800;color:var(--ink);border-bottom:0}
+.shm .z{color:var(--text-faint);font-weight:400}
+#shNote{color:var(--text-faint);font-size:13px;margin:10px 0 0}
+.dh .due,.df .due{display:block;font-size:10.5px;font-weight:700;color:var(--bad-tx)}
+.df{text-align:center;padding-top:2px}
+.df .due{margin-bottom:3px}
+/* a deadline with a course: class cd + c-<course> (which sets --cc); text is --cc pulled toward the ink so it reads on light and dark */
+.cd{--cx:color-mix(in srgb,var(--cc) 72%,var(--ink))}
+.dh .due.cd,.df .due.cd,.ml.d.cd,.day li.cd b,.upgo.cd b{color:var(--cx)}
+.upgo.cd{border-inline-start:4px solid var(--cc)}
+.upgo.cd .tg{border-color:var(--cc);color:var(--cx)}
+.day li.cd .dot{background:var(--cc)}
 .done{text-decoration:line-through;opacity:.6}
+details.card>summary{list-style:none;display:flex;align-items:center;gap:10px;flex-wrap:nowrap;cursor:pointer;min-height:32px}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary h2{margin:0;flex:none}
+details.card>summary::after{content:"▾";margin-inline-start:auto;flex:none;color:var(--text-muted);transition:transform .15s}
+details.card[open]>summary::after{transform:rotate(180deg)}
+details.card[open]>summary{margin-bottom:8px}
+details.card>summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
+.upsum{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px;color:var(--text-muted)}
+.upsum .lt{color:var(--bad-tx);font-weight:800}
+details.card[open] .upsum{display:none}
+.stb{flex:none;border:1.5px solid var(--border-dark);background:var(--bg-card);color:var(--text-muted);border-radius:999px;padding:3px 11px;font:700 12px var(--font-body);cursor:pointer;white-space:nowrap}
+.stb:disabled{cursor:default;opacity:.8}
+.stb:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stb.s-done{background:color-mix(in srgb,var(--ok-tx) 14%,var(--bg-card));border-color:var(--ok-tx);color:var(--ok-tx)}
+.stb[aria-haspopup]::after{content:" ▾";font-size:10px}
+.ph .stb{min-height:44px}
+#stMenu[hidden]{display:none}
+#stMenu{position:fixed;z-index:50;display:grid;min-width:128px;padding:4px;background:var(--bg-card);border:1px solid var(--border-dark);border-radius:12px;box-shadow:0 6px 20px var(--shadow)}
+#stMenu button{border:0;background:none;padding:9px 12px;border-radius:8px;font:600 14px var(--font-body);text-align:start;cursor:pointer;color:var(--text-main);min-height:40px}
+#stMenu button:hover,#stMenu button:focus-visible{background:var(--bg-sunk);outline:2px solid var(--accent);outline-offset:-2px}
+#stMenu button[aria-checked="true"]::before{content:"✓ ";color:var(--ok-tx)}
+.upsub{margin-top:14px;border-top:1px solid var(--border-light);padding-top:10px}
+.upsub summary{cursor:pointer;font-weight:700;color:var(--text-muted);font-size:14px;min-height:32px;display:flex;align-items:center}
+.upsub ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.upsub li{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px}
+.upsub .dt{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted)}
+.upsub b{text-decoration:line-through;opacity:.75;font-weight:600}
+.day li.late b,.dli.late .tx>b,.upgo.late b,.upgo.late .dl{color:var(--bad-tx)}
+.upgo.late{border-inline-start:4px solid var(--bad-bd);background:var(--bad-bg)}
+.df .due.late,.ml.d.late{color:var(--bad-tx);font-weight:800}
+.ph .ml.d.late{background:var(--bad-bd);box-shadow:none}
+.pastebtn{margin-top:12px}
+textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark);border-radius:9px;padding:9px 11px;font:inherit;font-size:15px;color:inherit;resize:vertical}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.plist li{display:grid;grid-template-columns:auto 52px minmax(0,1fr) minmax(0,150px);gap:8px;align-items:center;padding:6px 8px;border:1px solid var(--border-light);border-radius:9px;background:var(--bg-sunk);font-size:14px}
+.plist li.skip{opacity:.6}
+.plist .pt{overflow-wrap:anywhere}
+.plist .pd{font-family:var(--font-mono);font-size:13px;color:var(--text-muted)}
+.plist select{padding:6px 8px;font-size:14px}
+.plist .pn{grid-column:2/-1;font-size:12px;color:var(--text-faint)}
+.plist input[type=checkbox]{width:20px;height:20px}
+@media (max-width:640px){.plist li{grid-template-columns:auto 52px minmax(0,1fr)}.plist select{grid-column:2/-1}}
 @media (max-width:640px){.upgo{grid-template-columns:auto auto}.upgo b{grid-column:1/-1}}
 .nav{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;background:var(--bg-card);border:1px solid var(--border-dark);border-radius:12px;padding:4px}
 .nav>button{border:0;background:transparent;padding:7px 12px;border-radius:9px;font-weight:700;cursor:pointer;color:var(--text-muted)}
@@ -250,8 +305,8 @@ dialog::backdrop{background:var(--scrim)}
 .fld{display:grid;gap:6px;min-width:0}
 .fld>label,.fld>.lbl{font-size:12.5px;font-weight:600;color:var(--text-muted)}
 .row2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-input[type=text],input[type=time],input[type=password],select{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark);border-radius:9px;padding:9px 11px;font-size:15px}
-input[type=time]{font-family:var(--font-mono);direction:ltr;text-align:right}
+input[type=text],input[type=time],input[type=date],input[type=password],select{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark);border-radius:9px;padding:9px 11px;font-size:15px}
+input[type=time],input[type=date]{font-family:var(--font-mono);direction:ltr;text-align:right}
 input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips label{position:relative;display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border:1.5px solid var(--border-dark);border-radius:999px;
@@ -282,7 +337,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
   .sum>div:last-child{grid-column:1/-1;border-inline-start:0}}
 @media (max-width:640px){.wrap{padding-inline:16px}.card{padding:16px}
   .day{grid-template-columns:1fr;gap:6px}.day li{grid-template-columns:84px minmax(0,1fr)}
-  .row2{grid-template-columns:1fr 1fr}.row2 .fld:first-child{grid-column:1/-1}}
+  .row2{grid-template-columns:1fr 1fr}.row2 .fld:is(#fDayF,#fDateF){grid-column:1/-1}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 /* phone width (max-width:600px): class ph on <html> (set from JS). A day view, a bottom tab bar, a round add button */
@@ -299,9 +354,10 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph .nav .wkl{flex:1;text-align:center}
 .ph .nav>button{min-width:44px;min-height:44px}
 .ph .card{padding:14px;margin-bottom:16px}
-.ph .btn,.ph .chips label,.ph .edit-link,.ph .chk,.ph .upgo{min-height:44px}
+.ph .btn,.ph .chips label,.ph .edit-link,.ph .upgo{min-height:44px}
 .ph .edit-link{min-width:44px}
-.ph input[type=text],.ph input[type=time],.ph input[type=password],.ph select{font-size:16px;min-height:44px} /* 16px: iOS Safari zooms into smaller fields */
+.ph input[type=text],.ph input[type=time],.ph input[type=date],.ph input[type=password],.ph select,.ph textarea{font-size:16px;min-height:44px} /* 16px: iOS Safari zooms into smaller fields */
+.ph input[type=date]{height:46px} /* as tall as the select it stands in for, so the one-off dialog still fits 393x852 */
 .ph input[type=checkbox]{width:20px;height:20px}
 .ph .add{position:fixed;inset-inline-end:16px;bottom:calc(var(--tabh) + 16px + env(safe-area-inset-bottom,0px));z-index:15;width:56px;height:56px;padding:0;justify-content:center;border-radius:50%}
 .ph .add svg{width:24px;height:24px}
@@ -328,7 +384,6 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .dli{display:flex;align-items:center;gap:4px}
 .dli.cancelled{opacity:.6}
 .dli.cancelled :is(.tm b,.tm span,.tx>b,.meta),.dli.done .tx>b{text-decoration:line-through} /* on the text itself: a decoration does not always reach inside a button */
-.dchk{flex:none;display:grid;place-items:center;width:44px;height:44px;cursor:pointer}
 .dlb{flex:1;min-width:0;display:grid;grid-template-columns:48px 4px minmax(0,1fr);gap:10px;align-items:center;min-height:56px;padding:8px 12px;border:1px solid var(--border-light);border-radius:12px;background:var(--bg-sunk);text-align:start;font:inherit;color:inherit}
 button.dlb{cursor:pointer}
 .dlb>i{align-self:stretch;border-radius:2px}
@@ -349,6 +404,9 @@ button.dlb{cursor:pointer}
 .ph .ml,.ph .ml.k-tut,.ph .ml.x,.ph .ml.x.m2,.ph .ml.d{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:none;overflow:hidden;pointer-events:none}
 .ph .ml>i{width:7px;height:7px}
 .ph .ml.x,.ph .ml.x.m2,.ph .ml.d{background:var(--cc,var(--bad-bd))}
+.ph .ml.d.cd{background:none;box-shadow:inset 0 0 0 2px var(--cc)}
+.ph .ml.d.cd.late{background:var(--bad-bd);box-shadow:none} /* a late deadline is a red dot even with a course */
+.ph .plist li{min-height:44px}.ph .plist input[type=checkbox]{width:26px;height:26px} /* a course deadline is a ring, so it never reads as that course's class/exam dot */
 
 /* print: only the card of the shown view (week grid or month), one A4 landscape page; --ps (set in JS) scales a tall grid down to fit */
 @page{size:A4 landscape;margin:8mm}
@@ -390,14 +448,8 @@ button.dlb{cursor:pointer}
 </div>
 <div class="anc" id="anc" hidden><b>איזה שבוע ברוטציה זה, <span id="ancWk"></span>? המשמרות של שבוע א'/ב' יופיעו אחרי הבחירה.</b><button type="button" class="btn" data-anchor="A">שבוע א'</button><button type="button" class="btn" data-anchor="B">שבוע ב'</button></div>
 
-<section class="card" id="upCard">
-  <h2>מה מתקרב</h2>
-  <p class="lead">מבחנים והגשות לפי סדר. לחיצה עוברת אליהם בלוח.</p>
-  <ol class="uplist" id="up"></ol>
-</section>
+
 <div class="wkbar" id="wkBar" hidden><button type="button" class="btn" id="gridTgl" aria-pressed="false">גריד</button></div>
-<div class="sum" id="sum"></div>
-<div class="att" id="att" aria-live="polite"></div>
 
 <section class="card" id="dayCard" hidden>
   <div class="dstrip" id="dstrip" role="group" aria-label="ימי השבוע"></div>
@@ -434,11 +486,30 @@ button.dlb{cursor:pointer}
   <div class="scroller"><div class="grid" id="grid"></div></div>
 </section>
 
-<section class="card" id="agCard">
-  <h2>פירוט לפי יום</h2>
+
+<div class="sum" id="sum"></div>
+<div class="att" id="att" aria-live="polite"></div>
+
+<details class="card" id="upCard">
+  <summary><h2>מה מתקרב</h2><span class="upsum" id="upSum"></span></summary>
+  <p class="lead">מבחנים והגשות לפי סדר. לחיצה עוברת אליהם בלוח. הגשה שהתאריך שלה עבר ולא סומנה כהוגשה מופיעה באדום בראש הרשימה.</p>
+  <ol class="uplist" id="up"></ol>
+  <details class="upsub" id="upDone" hidden><summary id="upDoneN"></summary><ol id="upDoneL"></ol></details>
+  <button type="button" class="btn pastebtn" id="pasteBtn" hidden>הדבקה מהמודל</button>
+</details>
+
+<details class="card" id="agCard">
+  <summary><h2>פירוט לפי יום</h2><span class="upsum" id="agSum"></span></summary>
   <p class="lead" id="agLead">כל מה שמתוכנן בשבוע א', לפי סדר.</p>
   <div class="agenda" id="agenda"></div>
-</section>
+</details>
+
+<details class="card" id="shCard">
+  <summary><h2>סיכום משמרות</h2><span class="upsum" id="shSum"></span></summary>
+  <p class="lead">שעות המשמרות שלך בכל חודש, לפי שבועות א'/ב' והפריטים החד-פעמיים. מ-1.10.26 עד 13.03.27 (משמרות חד-פעמיות מתחילת אוקטובר, משמרות קבועות מ-18.10); משמרת שמסתיימת אחרי חצות נספרת בחודש שבו היא מתחילה.</p>
+  <table class="shm" id="shTbl"></table>
+  <p id="shNote" hidden></p>
+</details>
 
 <section class="card" id="expCard">
   <h2>ייצוא ליומן</h2>
@@ -482,10 +553,13 @@ button.dlb{cursor:pointer}
       <input type="text" id="fTitle" maxlength="60" autocomplete="off">
     </div>
     <div class="row2">
-      <div class="fld"><label for="fDay">יום</label><select id="fDay"></select></div>
+      <div class="fld" id="fDayF"><label for="fDay">יום</label><select id="fDay"></select></div>
+      <div class="fld" id="fDateF" hidden><label for="fDate">תאריך</label><input type="date" id="fDate"></div>
       <div class="fld"><label for="fStart">התחלה</label><input type="time" id="fStart" step="900" required></div>
       <div class="fld"><label for="fEnd">סיום</label><input type="time" id="fEnd" step="900" required></div>
     </div>
+    <div class="fld" id="fCourseF" hidden><label for="fCourse">מקצוע</label><select id="fCourse"></select></div>
+    <div class="fld" id="fStatusF" hidden><label for="fStatus">סטטוס</label><select id="fStatus"></select></div>
     <div class="fld" id="fWeekF">
       <span class="lbl" id="wkLbl">באיזה שבוע</span>
       <div class="chips" role="radiogroup" aria-labelledby="wkLbl">
@@ -511,6 +585,20 @@ button.dlb{cursor:pointer}
   </form>
 </dialog>
 
+<dialog id="pDlg" aria-labelledby="pTitle">
+  <form class="dlg" id="pFrm" novalidate>
+    <h3 id="pTitle">הדבקה מהמודל</h3>
+    <div class="hint">במודל: לוח שנה, בוחרים חודש, מסמנים את כל הטקסט ומעתיקים. מדביקים כאן, והמתכנן מזהה את ההגשות. אפשר לתקן קורס לכל מטלה לפני ההוספה.</div>
+    <div class="fld"><label for="pTxt">הטקסט מלוח השנה</label><textarea id="pTxt" rows="6" autocomplete="off" spellcheck="false"></textarea></div>
+    <ul class="plist" id="pList"></ul>
+    <div class="hint" id="pSum" aria-live="polite" hidden></div>
+    <div class="actions">
+      <button type="submit" class="btn pri" id="pAdd" disabled>הוספה</button>
+      <button type="button" class="btn" id="pCancel">ביטול</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="ghDlg" aria-labelledby="ghTitle">
   <form class="dlg" id="ghFrm" novalidate>
     <h3 id="ghTitle">חיבור ל-GitHub</h3>
@@ -528,6 +616,7 @@ button.dlb{cursor:pointer}
   </form>
 </dialog>
 
+<div id="stMenu" role="menu" aria-label="סטטוס הגשה" hidden></div>
 <div class="toast" id="toast" aria-live="polite" hidden><span></span></div>
 
 <script id="core">
@@ -543,7 +632,7 @@ const BASE=[
  {d:2,s:'10:15',e:'11:45',t:'מבוא למיקרו',k:'tut',r:'כלכלה 212'},
  {d:2,s:'12:15',e:'14:45',t:'כלי ניתוח נתונים ו-AI',k:'lab',r:'כלכלה 209'},
  {d:2,s:'15:00',e:'16:30',t:'מבוא למיקרו',k:'lec',r:'כלכלה 101'},
- {d:3,s:'10:30',e:'12:00',t:'יסודות התנהגות ארגונית',k:'lec',r:'חדר טרם שובץ'},
+ {d:3,s:'10:30',e:'12:00',t:'יסודות התנהגות ארגונית',k:'lec',r:'זום, לימוד עצמי',self:1}, // self:1 = no frontal class, self-paced on Zoom: never drawn; kept so BASE indices (stored in cancel docs) stay put
  {d:3,s:'12:30',e:'15:00',t:"מתמטיקה א'",k:'lec',r:'כלכלה 107'},
  {d:3,s:'16:00',e:'19:30',t:"אנגלית מתקדמים א'",k:'eng',r:'חדר טרם שובץ'}
 ];
@@ -593,7 +682,8 @@ const EXAMS=[ // mtamn.mta.ac.il exam search, תשפ"ז. Live system: dates can 
  {c:"מתמטיקה א'",m:'א',date:'2027-02-01',s:'09:00'},{c:"מתמטיקה א'",m:'ב',date:'2027-02-26',s:'09:00'},
  {c:'כלי ניתוח נתונים ו-AI',m:'א',date:'2027-02-05',s:'09:00'},{c:'כלי ניתוח נתונים ו-AI',m:'ב',date:'2027-03-01',s:'14:00'},
  {c:"חשבונאות א'",m:'א',date:'2027-02-10',s:'09:00'},{c:"חשבונאות א'",m:'ב',date:'2027-03-05',s:'09:00'},
- {c:'יסודות התנהגות ארגונית',m:'א',date:'2027-02-14',s:'14:00'},{c:'יסודות התנהגות ארגונית',m:'ב',date:'2027-03-08',s:'14:00'}
+ {c:'יסודות התנהגות ארגונית',m:'א',date:'2027-02-14',s:'14:00'},{c:'יסודות התנהגות ארגונית',m:'ב',date:'2027-03-08',s:'14:00'},
+ {c:"אנגלית מתקדמים א'",m:'א',date:'2027-01-18',s:'09:00'},{c:"אנגלית מתקדמים א'",m:'ב',date:'2027-02-08',s:'09:00'} // from the student's own exam list (Yedion "רשימת בחינות לסטודנט")
 ];
 const EXAM_MIN=180; // ponytail: assumed 3h; the listing gives start time only
 const SPECIAL={due:1,off:1,anchor:1,cancel:1};
@@ -603,6 +693,25 @@ const clampSun=s=>s<SEM.start?SEM.start:s>lastSun?lastSun:s; // own line: test.m
 /* ---------- month view helpers: ym = 'YYYY-MM' ---------- */
 const MONTHS=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
 const CSHORT={stat:'הסתברות',math:'מתמטיקה',acc:'חשבונאות',micro:'מיקרו',data:'נתונים ו-AI',ob:'התנהגות ארגונית',eng:'אנגלית'};
+const courseOk=c=>Object.values(COURSE).includes(c); // a known course colour id; anything else (or missing) means no course
+const dueName=x=>{const c=courseOk(x.course)?CSHORT[x.course]:'';return c&&x.title?c+' · '+x.title:c||x.title||''}; // a deadline's name: course short name, then the title
+const dueLbl=x=>{const n=dueName(x);return n?'הגשה: '+n:'הגשה'};
+const dueCls=x=>courseOk(x.course)?'cd c-'+x.course:''; // classes of a deadline drawn in its course colour (c-<course> sets --cc)
+const STAT={todo:'לא התחלתי',done:'הוגש'}; // a deadline's status: the doc stores only done:true/false (exports read it)
+const dueSt=x=>x&&x.done?'done':'todo';
+const dueLate=(x,today)=>x.kind==='due'&&isoOk(x.date)&&x.date<today&&dueSt(x)!=='done'; // past its date and not submitted
+const GUESS=[[/מאזן|פקודות יומן|חשבונ/,'acc'],[/עקומת|גורמי ייצור|תמורה|מיקרו/,'micro'],[/אקסל|excel|קובצי תרגול|מיון|סינון|תרשימים|ניתוח נתונים|עיבוד|\bAI\b/i,'data'],[/סטטיסט|הסתברות/,'stat'],[/מתמטיקה|אינפי/,'math'],[/התנהגות ארגונית/,'ob'],[/אנגלית/,'eng']]; // a first guess at the course from a Moodle title; the paste dialog lets the user fix it
+const guessCourse=t=>{const g=GUESS.find(([r])=>r.test(t||''));return g?g[1]:''};
+function parseMoodle(txt){ // text of the Moodle month calendar -> [{date,title}]: a date line ("אירוע אחד, 15/11/2026") then "יש להגיש את '<name>'" lines (markdown link or plain)
+  const out=[],seen=new Set();let date='';
+  String(txt||'').split(/\r?\n/).forEach(l=>{
+    const t=l.match(/יש להגיש את\s+['"׳״‘’“”]?(.+?)['"׳״‘’“”]?\s*(?:\]\(|\]|$)/),d=(t?l.replace(t[0],''):l).replace(/https?:\/\/\S+/g,'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); // a date inside a title or a link URL is not the day block's date
+    if(d){const iso=d[3]+'-'+pad(Number(d[2]))+'-'+pad(Number(d[1]));date=isoOk(iso)?iso:''} // a day number glued to the year ("20261") is ignored: only 4 digits are read
+    if(t&&date&&t[1].trim()&&!seen.has(date+'|'+t[1].trim())){seen.add(date+'|'+t[1].trim());out.push({date,title:t[1].trim()})}
+  });
+  return out;
+}
+const dmy=iso=>dm(iso)+'.'+iso.slice(2,4);
 const YM0=SEM.start.slice(0,7);
 const YM1=SEM.last.slice(0,7);
 const ymOf=iso=>iso.slice(0,7);
@@ -631,7 +740,7 @@ function evsForWeek(sun,items,skipId){
   const out=[],wk=rot(sun,anchorOf(items));
   for(let d=0;d<7;d++){
     const date=addDays(sun,d),bd=baseDay(date,items);
-    if(bd!=null)BASE.forEach((b,i)=>{if(b.d!==bd)return;const[s,e]=span(b.s,b.e);out.push({src:'base',key:'b'+i,i,d,date,s,e,title:b.t,course:COURSE[b.t],kind:b.k,room:b.r,...(cancelOf(date,i,items)&&{cancelled:true})})});
+    if(bd!=null)BASE.forEach((b,i)=>{if(b.d!==bd||b.self)return;const[s,e]=span(b.s,b.e);out.push({src:'base',key:'b'+i,i,d,date,s,e,title:b.t,course:COURSE[b.t],kind:b.k,room:b.r,...(cancelOf(date,i,items)&&{cancelled:true})})});
     EXAMS.forEach((x,i)=>{if(x.date!==date)return;const s=toMin(x.s);out.push({src:'exam',key:'x'+i,d,date,s,e:s+EXAM_MIN,title:x.c,course:COURSE[x.c],kind:'exam',moed:x.m,room:'מועד '+x.m+"'"})});
   }
   items.forEach(it=>{
@@ -649,19 +758,21 @@ function evsForWeek(sun,items,skipId){
   });
   return out;
 }
-function upcoming(today,items,n=6){
-  return EXAMS.map((x,i)=>({key:'x'+i,date:x.date,time:x.s,title:x.c,tag:'מועד '+x.m+"'",exam:1}))
-    .concat(items.filter(x=>x.kind==='due'&&isoOk(x.date)&&!x.done).map(x=>({key:'u'+x.id,id:x.id,date:x.date,time:okTime(x.start)?x.start:'23:59',title:x.title||'הגשה',tag:'הגשה'})))
-    .filter(x=>x.date>=today).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.time<b.time?-1:a.time>b.time?1:0)
-    .slice(0,n).map(x=>({...x,daysLeft:dayDiff(today,x.date)}));
+const submitted=items=>items.filter(x=>x.kind==='due'&&isoOk(x.date)&&x.done).map(x=>({id:x.id,date:x.date,time:okTime(x.start)?x.start:'23:59',title:dueName(x)||'הגשה',st:'done',...(courseOk(x.course)&&{course:x.course})})).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0); // the submitted deadlines, newest first: the record under "what's coming"
+function upcoming(today,items,n=6){ // the late deadlines (past their date, not submitted: daysLeft < 0, all of them, oldest first), then the next n exams and deadlines
+  const byTime=(a,b)=>a.date<b.date?-1:a.date>b.date?1:a.time<b.time?-1:a.time>b.time?1:0;
+  const dues=items.filter(x=>x.kind==='due'&&isoOk(x.date)&&dueSt(x)!=='done').map(x=>({key:'u'+x.id,id:x.id,date:x.date,time:okTime(x.start)?x.start:'23:59',title:dueName(x)||'הגשה',tag:'הגשה',st:dueSt(x),...(courseOk(x.course)&&{course:x.course})}));
+  const late=dues.filter(x=>x.date<today).sort(byTime).map(x=>({...x,late:1}));
+  return late.concat(EXAMS.map((x,i)=>({key:'x'+i,date:x.date,time:x.s,title:x.c,tag:'מועד '+x.m+"'",exam:1})).concat(dues).filter(x=>x.date>=today).sort(byTime).slice(0,n))
+    .map(x=>({...x,daysLeft:dayDiff(today,x.date)}));
 }
 function dayLines(date,items,evs=evsForWeek(sunOf(date),items)){ // everything on one date, by time: classes (cancelled ones flagged), exams, shifts, and deadlines as src:'due' lines; evs = that week's events if the caller has them
   return evs.filter(e=>e.date===date)
-    .concat(items.filter(x=>x.kind==='due'&&x.date===date).map(x=>{const s=toMin(okTime(x.start)?x.start:'23:59');return{src:'due',key:'d'+x.id,id:x.id,d:dow(date),date,s,e:s,title:x.title||'',note:x.note||'',done:!!x.done}}))
+    .concat(items.filter(x=>x.kind==='due'&&x.date===date).map(x=>{const s=toMin(okTime(x.start)?x.start:'23:59');return{src:'due',key:'d'+x.id,id:x.id,d:dow(date),date,s,e:s,title:x.title||'',note:x.note||'',done:!!x.done,st:dueSt(x),...(courseOk(x.course)&&{course:x.course})}}))
     .sort((a,b)=>a.s-b.s||a.e-b.e);
 }
 function lineTxt(e){ // {col: css var of the line's colour, ttl, meta} for a day-list / agenda line
-  if(e.src==='due')return{col:'--bad-bd',ttl:e.title?'הגשה: '+e.title:'הגשה',meta:e.note||''};
+  if(e.src==='due')return{col:courseOk(e.course)?'--c-'+e.course:'--bad-bd',ttl:dueLbl(e),meta:e.note||''};
   const u=e.src==='user',kl=u?KINDS[e.kind].short:e.src==='exam'?'מבחן':(BKIND[e.kind]||'אנגלית');
   return{col:u?KINDS[e.kind].color:'--c-'+e.course,ttl:u&&e.title===KINDS[e.kind].label?e.title:e.title+' · '+kl,
     meta:u?[e.week==='both'?'כל שבוע':e.week==='date'?'חד-פעמי':'',e.note].filter(Boolean).join(' · '):e.room};
@@ -699,6 +810,12 @@ function analyze(evs,nextSun=[]){ // nextSun: events of the following Sunday (d:
   });
   return{bad,soft,clash};
 }
+function shiftMonths(items){ // monthly totals of the user's own shift blocks (KINDS shift:1) up to SEM.last; one-off shifts count from the 1st of YM0 (past shifts typed in from the attendance report), recurring series only from SEM.start; evsForWeek already drops skipped ones; an overnight shift counts in the month it starts
+  const by={};
+  for(let sun=sunOf(YM0+'-01');sun<=SEM.last;sun=addDays(sun,7))evsForWeek(sun,items).forEach(e=>{if(e.src!=='user'||!KINDS[e.kind].shift||e.date<SEM.start&&e.week!=='date')return;const r=by[ymOf(e.date)]||(by[ymOf(e.date)]={min:0,n:0});r.min+=e.e-e.s;r.n++});
+  const rows=[];for(let ym=YM0;ym<=YM1;ym=addMonths(ym,1))rows.push({ym,min:(by[ym]||{}).min||0,n:(by[ym]||{}).n||0});
+  return{rows,min:rows.reduce((a,r)=>a+r.min,0),n:rows.reduce((a,r)=>a+r.n,0)};
+}
 function stats(evs){
   evs=evs.filter(e=>!e.cancelled);
   let cls=0,ex=0,sh=0,shN=0,st=0,oth=0;
@@ -708,9 +825,9 @@ function stats(evs){
   return{cls,ex,sh,shN,st,oth,studyDays,freeNames,total:cls+ex+sh+st+oth};
 }
 function toDoc(f,sun){
-  const b={kind:f.kind,title:f.title,note:f.note,updated:f.updated};
-  if(f.kind==='due')return{...b,date:addDays(sun,f.day),start:okTime(f.start)?f.start:'23:59',done:!!f.done};
-  if(f.week==='date')return{...b,date:addDays(sun,f.day),start:f.start,end:f.end};
+  const b={kind:f.kind,title:f.title,note:f.note,updated:f.updated},date=()=>isoOk(f.date)?f.date:addDays(sun,f.day); // f.date = the picked date; without one, the weekday in the dialog's week
+  if(f.kind==='due')return{...b,date:date(),start:okTime(f.start)?f.start:'23:59',done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course})}; // f.status (the dialog's select) wins over f.done
+  if(f.week==='date')return{...b,date:date(),start:f.start,end:f.end};
   return{...b,day:f.day,start:f.start,end:f.end,week:f.week,skip:f.skip||[]};
 }
 function detach(prev,f,sun,occ){ // editing one occurrence of a series into a one-off/deadline: new dated doc + skip on the series
@@ -723,7 +840,7 @@ function semEvents(items){
     summary:x.src==='base'?x.title+(BKIND[x.kind]?' · '+BKIND[x.kind]:''):x.src==='exam'?'מבחן: '+x.title+' · '+x.room:x.title,
     location:x.src==='base'?x.room:'',desc:x.note||''}));
   items.filter(x=>x.kind==='due'&&isoOk(x.date)&&!x.done).forEach(x=>{const s=Math.max(30,toMin(okTime(x.start)?x.start:'23:59'));
-    out.push({uid:'u'+x.id+'-'+x.date,date:x.date,s:s-30,e:s,summary:x.title?'הגשה: '+x.title:'הגשה',location:'',desc:x.note||''})});
+    out.push({uid:'u'+x.id+'-'+x.date,date:x.date,s:s-30,e:s,summary:dueLbl(x),location:'',desc:x.note||''})});
   return out;
 }
 const icsEsc=s=>String(s??'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
@@ -788,12 +905,16 @@ function setView(v,date){ // v: day|week|month|up (day and up only on a phone); 
   if(v===view&&date==null)return;
   if(v==='month')viewYm=clampYm(ymOf(view==='day'?viewDay:viewSun));
   if(v==='day'){const m=view==='month';viewDay=date!=null?clampDay(date):pickDay(viewDay,m?viewYm+'-01':viewSun,m?addDays(addMonths(viewYm,1)+'-01',-1):addDays(viewSun,6),todayIso());viewSun=sunOf(viewDay);viewYm=clampYm(ymOf(viewDay))}
-  view=v;if(v!=='up')try{localStorage.setItem('wp.view',v)}catch(e){}render();
+  view=v;if(v==='up')$('#upCard').open=true; // the phone tab is the list itself
+  else try{localStorage.setItem('wp.view',v)}catch(e){}
+  render();
 }
 
 /* ---------- render ---------- */
+let agAuto=0;
 function render(){
-  const ph=PHQ.matches, day=ph&&view==='day', upv=ph&&view==='up', mon=view==='month', wkv=!mon&&!day&&!upv; // phone views: day, week, month, up (what's coming)
+  const ph=PHQ.matches; if(ph&&view==='week'&&!agAuto){agAuto=1;$('#agCard').open=true} // on a phone the agenda is the week tab itself: open once, the user may close it
+  const day=ph&&view==='day', upv=ph&&view==='up', mon=view==='month', wkv=!mon&&!day&&!upv; // phone views: day, week, month, up (what's coming)
   document.documentElement.classList.toggle('ph',ph);
   const anchor=anchorOf(items), wk=rot(viewSun,anchor), rng=dm(viewSun)+'–'+dm(addDays(viewSun,6)), edit=canEdit();
   const lbl=mon?MONTHS[Number(viewYm.slice(5))-1]+' '+viewYm.slice(0,4):day?DAYS[dow(viewDay)]+' · '+dm(viewDay):rng;
@@ -803,11 +924,11 @@ function render(){
   $('#prev').setAttribute('aria-label',mon?'חודש קודם':day?'יום קודם':'שבוע קודם');$('#next').setAttribute('aria-label',mon?'חודש הבא':day?'יום הבא':'שבוע הבא');
   $('#vWeek').setAttribute('aria-pressed',String(!mon));$('#vMonth').setAttribute('aria-pressed',String(mon));
   $('.nav').hidden=upv;$('#anc').hidden=!!anchor||!edit||upv;
-  $('#upCard').hidden=ph&&!upv;$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;$('#expCard').hidden=day||upv;
+  $('#upCard').hidden=ph&&!upv;$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;$('#expCard').hidden=$('#shCard').hidden=day||upv;
   $('#gridCard').hidden=!wkv||ph&&!wkGrid;$('#agCard').hidden=!wkv||ph&&wkGrid;$('#wkBar').hidden=!(ph&&wkv);$('#gridTgl').setAttribute('aria-pressed',String(wkGrid));
   $('#addLbl').textContent=mon?'הוספה':day?'הוספה ליום זה':'הוספה לשבוע';$('#addBtn').hidden=upv;
   document.querySelectorAll('#tabs [data-v]').forEach(b=>b.setAttribute('aria-current',b.dataset.v===view?'page':'false'));
-  renderStore(); renderUp();
+  renderStore(); renderUp(); if(!$('#shCard').hidden)renderShifts();
   const pb=$('.printbar'),gh=$(mon?'#monthCard .ghead':'#gridCard .ghead');if(pb.parentNode!==gh)gh.appendChild(pb); // one print bar, in whichever card is shown
   if(mon)renderMonth();
   else if(!upv){
@@ -819,7 +940,7 @@ function render(){
       renderSum(stats(evs),an); renderAtt(an); renderGrid(evs,an.clash); renderAgenda(evs,an.clash);
     }
   }
-  $('#addBtn').disabled=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
+  $('#addBtn').disabled=!edit;$('#pasteBtn').hidden=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
 }
 function renderStore(){
   const m={loading:['','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
@@ -851,8 +972,14 @@ function dayHead(date,i,base){
   const c=CAL[date],off=offDoc(date,items),edit=canEdit();
   const sub=base.length?fm(Math.min(...base.map(e=>e.s)))+'–'+fm(Math.max(...base.map(e=>e.e))):off?'לימודים בוטלו':'אין לימודים';
   const tgl=!edit?'':off?`<button type="button" class="hl" data-unoff="${esc(off.id)}">החזרת לימודים</button>`:base.length?`<button type="button" class="hl" data-off="${date}">ביטול לימודים</button>`:'';
-  return esc(DAYS[i])+' '+dm(date)+'<small>'+sub+'</small>'+(c?`<span class="cal">${esc(c.label)}</span>`:'')
-    +items.filter(x=>x.kind==='due'&&x.date===date).map(x=>`<span class="due${x.done?' done':''}">${x.title?'הגשה: '+esc(x.title):'הגשה'}</span>`).join('')+tgl;
+  return esc(DAYS[i])+' '+dm(date)+'<small>'+sub+'</small>'+(c?`<span class="cal">${esc(c.label)}</span>`:'')+tgl;
+}
+function dayDue(date){ // a day's deadlines for the foot of its grid column
+  return items.filter(x=>x.kind==='due'&&x.date===date).map(x=>`<span class="due${x.done?' done':''}${dueLate(x,todayIso())?' late':''} ${dueCls(x)}">${esc(dueLbl(x))}</span>`).join('');
+}
+function stBtn(x,edit,name){ // the status pill of a deadline: its state in words; a tap opens a small menu (לא התחלתי / הוגש)
+  const s=x.st||dueSt(x);
+  return`<button type="button" class="stb s-${s}" data-st="${esc(x.id)}" data-s="${s}"${edit?' aria-haspopup="menu" aria-expanded="false"':' disabled'} aria-label="${esc((name||'הגשה')+' · '+STAT[s]+(edit?' · לחיצה לבחירת סטטוס':''))}">${STAT[s]}</button>`;
 }
 function renderGrid(evs,clash){
   let lo=480,hi=1200;
@@ -908,21 +1035,25 @@ function renderGrid(evs,clash){
     });
     g.appendChild(col);
   });
+  if(items.some(x=>x.kind==='due'&&DAYS.some((_,i)=>x.date===addDays(viewSun,i)))){ // the week's deadlines sit under the day columns, not above them
+    g.appendChild(document.createElement('div'));
+    DAYS.forEach((_,i)=>{const f=document.createElement('div');f.className='df';f.innerHTML=dayDue(addDays(viewSun,i));g.appendChild(f)});
+  }
 }
 function renderAgenda(evs,clash){
-  const edit=canEdit();
+  const edit=canEdit(),wd=DAYS.map((_,i)=>addDays(viewSun,i)),nS=evs.filter(e=>e.src==='user'&&KINDS[e.kind].shift).length,nD=items.filter(x=>x.kind==='due'&&wd.includes(x.date)).length;
+  $('#agSum').textContent=[dm(viewSun)+'–'+dm(wd[6]),nS===1?'משמרת אחת':nS+' משמרות',nD===1?'הגשה אחת':nD+' הגשות'].join(' · '); // the line next to the title while the card is closed
   $('#agenda').innerHTML=DAYS.map((d,i)=>{
     const date=addDays(viewSun,i),c=CAL[date],off=offDoc(date,items),dn=`${d} ${dm(date)}`;
     const list=evs.filter(e=>e.d===i).sort((a,b)=>a.s-b.s),base=list.filter(e=>e.src==='base'&&!e.cancelled);
     const dues=items.filter(x=>x.kind==='due'&&x.date===date);
     const sub=base.length?`לימודים ${fm(base[0].s)}–${fm(Math.max(...base.map(e=>e.e)))}`+(c?' · '+c.label:''):off?'לימודים בוטלו':(c?c.label:list.length?'אין לימודים':'');
     if(!list.length&&!dues.length)return`<div class="day free"><div class="dn">${dn}${c?`<small>${esc(c.label)}</small>`:''}</div><div class="none">${off?'לימודים בוטלו':'יום פנוי לגמרי'}</div></div>`;
-    return`<div class="day"><div class="dn">${dn}<small>${esc(sub)}</small></div><ul>${dues.map(x=>
-      `<li><span class="t">עד ${esc(okTime(x.start)?x.start:'23:59')}</span><span><label class="chk${x.done?' done':''}"><input type="checkbox" data-done="${esc(x.id)}"${x.done?' checked':''}${edit?'':' disabled'}><b>${x.title?'הגשה: '+esc(x.title):'הגשה'}</b></label>${x.note?` <span class="meta">· ${esc(x.note)}</span>`:''}${edit?`<button type="button" class="edit-link" data-edit="${esc(x.id)}">עריכה</button>`:''}</span></li>`).join('')
-    }${list.map(e=>{
+    return`<div class="day"><div class="dn">${dn}<small>${esc(sub)}</small></div><ul>${list.map(e=>{
       const u=e.src==='user',{col,ttl,meta}=lineTxt(e);
       return`<li${e.cancelled?' class="cancelled"':''}><span class="t">${tr(e.s,e.e)}</span><span><span class="dot" style="background:var(${col})"></span><b>${esc(ttl)}</b>${clash.has(e.key)?'<span class="tag-clash">התנגשות</span>':''}${meta?` <span class="meta">· ${esc(meta)}</span>`:''}${u&&edit?`<button type="button" class="edit-link" data-edit="${esc(e.id)}">עריכה</button>`:''}${e.src==='base'&&edit?`<button type="button" class="edit-link" data-cancel="${e.date}|${e.i}">${e.cancelled?'החזרה':'ביטול'}</button>`:''}</span></li>`;
-    }).join('')}</ul></div>`;
+    }).join('')}${dues.map(x=>
+      `<li class="${dueCls(x)}${dueLate(x,todayIso())?' late':''}"><span class="t">עד ${esc(okTime(x.start)?x.start:'23:59')}</span><span>${stBtn(x,edit,dueName(x))} ${dueCls(x)?'<span class="dot"></span>':''}<b${x.done?' class="done"':''}>${esc(dueLbl(x))}</b>${dueLate(x,todayIso())?' <span class="meta">· באיחור</span>':''}${x.note?` <span class="meta">· ${esc(x.note)}</span>`:''}${edit?`<button type="button" class="edit-link" data-edit="${esc(x.id)}">עריכה</button>`:''}</span></li>`).join('')}</ul></div>`;
   }).join('');
 }
 function renderDay(evs,an){ // phone day view: the week strip, the day's notes, then its lines by time
@@ -931,9 +1062,9 @@ function renderDay(evs,an){ // phone day view: the week strip, the day's notes, 
   $('#dayHead').innerHTML=`<h2>${DAYS[dow(date)]} ${dm(date)}</h2>`+(c?`<small>${esc(c.label)}</small>`:'')+(off?'<small>לימודים בוטלו</small>':'');
   dayL=dayLines(date,items,evs);
   $('#dayList').innerHTML=dayL.length?dayL.map(l=>{
-    const t=lineTxt(l),due=l.src==='due',tap=l.src!=='exam'&&(l.src!=='base'||edit),hit=an.clash.has(l.key),meta=[l.cancelled?'בוטל':'',l.e>1440?'עד '+fm(l.e)+' (למחרת)':'',t.meta].filter(Boolean).join(' · ');
+    const t=lineTxt(l),due=l.src==='due',tap=l.src!=='exam'&&(l.src!=='base'||edit),hit=an.clash.has(l.key),meta=[l.cancelled?'בוטל':'',due&&l.st!=='done'&&l.date<today?'באיחור':'',l.e>1440?'עד '+fm(l.e)+' (למחרת)':'',t.meta].filter(Boolean).join(' · ');
     const when=due?'עד '+fm(l.s):tr(l.s,l.e),act=l.src==='base'?l.cancelled?'החזרה':'ביטול':'עריכה';
-    return`<li class="dli${l.cancelled?' cancelled':''}${due&&l.done?' done':''}">${due?`<label class="dchk"><input type="checkbox" data-done="${esc(l.id)}" aria-label="הוגש: ${esc(l.title||'הגשה')}"${l.done?' checked':''}${edit?'':' disabled'}></label>`:''}`
+    return`<li class="dli${l.cancelled?' cancelled':''}${due&&l.done?' done':''}${due&&l.st!=='done'&&l.date<today?' late':''}">${due?stBtn(l,edit,dueName(l)):''}`
       +`<${tap?`button type="button" data-key="${esc(l.key)}" aria-label="${esc(t.ttl+' · '+when+(meta?' · '+meta:'')+(edit?' · לחיצה ל'+act:''))}"`:'div'} class="dlb">`
       +`<span class="tm">${due?`<span>עד</span><b>${fm(l.s)}</b>`:`<b>${fm(l.s)}</b><span>${fm(l.e)}</span>`}</span><i style="background:var(${t.col})"></i>`
       +`<span class="tx"><b>${esc(t.ttl)}</b>${meta||hit?`<span class="meta">${esc(meta)}${hit?'<span class="tag-clash">התנגשות</span>':''}</span>`:''}</span></${tap?'button':'div'}></li>`;
@@ -957,7 +1088,7 @@ function monthCell(date,evs,today){
     const nm=e.title===KINDS[e.kind].label?KINDS[e.kind].short:e.title;
     return{s:e.s,h:`<button type="button" class="ml" data-kind="user" ${at} data-id="${esc(e.id)}" ${ta(e.title+' · '+tr(e.s,e.e)+(e.note?' · '+e.note:''),edit&&'לחיצה לעריכה')}><i style="background:var(${KINDS[e.kind].color})"></i><span><b>${fm(e.s)}</b> ${esc(nm)}</span></button>`};
   }).concat(items.filter(x=>x.kind==='due'&&x.date===date).map(x=>({s:toMin(okTime(x.start)?x.start:'23:59'),
-    h:`<button type="button" class="ml d${x.done?' done':''}" data-kind="due" data-date="${date}" data-id="${esc(x.id)}" ${ta((x.title?'הגשה: '+x.title:'הגשה')+' · עד '+(okTime(x.start)?x.start:'23:59'),edit&&'לחיצה לעריכה')}><span>${x.title?'הגשה: '+esc(x.title):'הגשה'}</span></button>`})))
+    h:`<button type="button" class="ml d${x.done?' done':''}${dueLate(x,today)?' late':''} ${dueCls(x)}" data-kind="due" data-date="${date}" data-id="${esc(x.id)}" ${ta(dueLbl(x)+' · עד '+(okTime(x.start)?x.start:'23:59')+(dueLate(x,today)?' · באיחור':''),edit&&'לחיצה לעריכה')}><span>${esc(dueLbl(x))}</span></button>`})))
     .sort((a,b)=>a.s-b.s);
   return`<div class="mc${ymOf(date)!==viewYm?' out':''}${date===today?' today':''}" data-date="${date}"><div class="mtop"><button type="button" class="mn" aria-label="${esc(dn+' · מעבר ל'+(PHQ.matches?'יום':'שבוע'))}">${Number(date.slice(8))}</button>${lab?`<small>${esc(lab)}</small>`:''}</div>`
     +L.slice(0,5).map(x=>x.h).join('')+(L.length>5?`<button type="button" class="ml more" data-kind="more" data-date="${date}" aria-label="${esc(dn+' · '+(L.length===6?'עוד פריט אחד':'עוד '+(L.length-5)+' פריטים')+' · מעבר לשבוע')}"><bdi dir="ltr">+${L.length-5}</bdi> עוד</button>`:'')+'</div>';
@@ -976,16 +1107,53 @@ $('#month').addEventListener('click',x=>{ // one listener: a line acts by kind, 
   }
   dayClick(date);
 });
-function renderUp(){
-  const L=upcoming(todayIso(),items,PHQ.matches?30:6),edit=canEdit();
-  $('#up').innerHTML=L.length?L.map(x=>`<li><button type="button" class="upgo" data-go="${x.date}"><span class="dl">${x.daysLeft===0?'היום':x.daysLeft===1?'מחר':'עוד '+x.daysLeft+' ימים'}</span><span class="dt">${dm(x.date)} · ${esc(x.time)}</span><b>${esc(x.title)}</b><span class="tg">${esc(x.tag)}</span></button>${x.id&&edit?`<label class="chk"><input type="checkbox" data-done="${esc(x.id)}" aria-label="הוגש: ${esc(x.title)}">הוגש</label>`:''}</li>`).join(''):'<li class="none">אין מבחנים או הגשות קרובים.</li>';
+function renderShifts(){
+  const S=shiftMonths(items),anchor=anchorOf(items),cm=S.rows.find(r=>r.ym===ymOf(todayIso()))||S.rows[0];
+  $('#shSum').textContent=cm?MONTHS[Number(cm.ym.slice(5))-1]+': '+hrs(cm.min)+' שעות · '+(cm.n===1?'משמרת אחת':cm.n+' משמרות'):''; // this month's line while the card is closed
+  $('#shTbl').innerHTML='<thead><tr><th>חודש</th><th>שעות</th><th>משמרות</th></tr></thead><tbody>'
+    +S.rows.map(r=>`<tr><td>${MONTHS[Number(r.ym.slice(5))-1]} ${r.ym.slice(0,4)}</td>${r.n?`<td>${hrs(r.min)}</td><td>${r.n}</td>`:'<td class="z">—</td><td class="z">0</td>'}</tr>`).join('')
+    +`</tbody><tfoot><tr><td>סה"כ בסמסטר</td><td>${hrs(S.min)}</td><td>${S.n}</td></tr></tfoot>`;
+  const hasAB=items.some(x=>KINDS[x.kind]&&KINDS[x.kind].shift&&(x.week==='A'||x.week==='B')); // A/B shifts show up only once the rotation anchor is set
+  $('#shNote').hidden=!(hasAB&&!anchor&&canEdit()); // the anchor banner exists only in editable modes
+  $('#shNote').textContent='משמרות של שבוע א\' או ב\' ייספרו אחרי שתבחר איזה שבוע ברוטציה זה, בבאנר שבראש העמוד.';
 }
-async function toggleDone(id,checked){
-  const it=items.find(x=>x.id===id);if(!it)return;
-  const{id:_,...rest}=it;if(!await saveItem(id,{...rest,done:checked,updated:Date.now()},checked?'סומן כהוגש':'סומן כלא הוגש'))render();
+function renderUp(){
+  const L=upcoming(todayIso(),items,PHQ.matches?30:6),edit=canEdit(),S=submitted(items);
+  const late=L.filter(x=>x.late).length,nx=L.find(x=>!x.late);
+  $('#upSum').innerHTML=(late?`<b class="lt">${late} באיחור</b>`:'')+(late&&nx?' · ':'')+(nx?'הבא: '+dm(nx.date)+' · '+esc(nx.title):'')||'אין הגשות קרובות'; // the line next to the title while the card is closed
+  $('#upDone').hidden=!S.length;$('#upDoneN').textContent='הוגשו ('+S.length+')';
+  $('#upDoneL').innerHTML=S.map(x=>`<li><span class="dt">${dm(x.date)}</span><b>${esc(x.title)}</b>${stBtn(x,edit,x.title)}</li>`).join('');
+  $('#up').innerHTML=L.length?L.map(x=>`<li><button type="button" class="upgo${x.late?' late':''} ${dueCls(x)}" data-go="${x.date}"><span class="dl">${x.daysLeft===0?'היום':x.daysLeft===1?'מחר':x.daysLeft===-1?'אתמול':x.daysLeft<0?'באיחור של '+(-x.daysLeft)+' ימים':'עוד '+x.daysLeft+' ימים'}</span><span class="dt">${dm(x.date)} · ${esc(x.time)}</span><b>${esc(x.title)}</b><span class="tg">${esc(x.tag)}</span></button>${x.id?stBtn(x,edit,x.title):''}</li>`).join(''):'<li class="none">אין מבחנים או הגשות קרובים.</li>';
+}
+const stBusy=new Set(); // deadlines whose status save is still running
+async function setSt(id,s){
+  const it=items.find(x=>x.id===id);if(!it||stBusy.has(id)||dueSt(it)===s)return;
+  stBusy.add(id);
+  try{
+    const{id:_,status:__,...rest}=it; // status: a leftover field of an earlier build
+    if(!await saveItem(id,{...rest,done:s==='done',updated:Date.now()},s==='done'?'סומן כהוגש':'סומן כלא התחלתי'))render();
+  }finally{stBusy.delete(id)}
+  const b=document.querySelector(`[data-st="${id}"]`);if(b)b.focus(); // the lists are redrawn: keep the keyboard on the same button
+}
+let stOpen=null; // the status pill whose menu is open
+function stClose(focus){const m=$('#stMenu');if(!m.hidden){m.hidden=true;if(stOpen){stOpen.setAttribute('aria-expanded','false');if(focus)stOpen.focus()}}stOpen=null}
+function stShow(btn){ // a small menu under the pill: לא התחלתי / הוגש
+  const m=$('#stMenu'),cur=btn.dataset.s;
+  stClose();stOpen=btn;btn.setAttribute('aria-expanded','true');m.dataset.id=btn.dataset.st;
+  m.innerHTML=Object.entries(STAT).map(([k,v])=>`<button type="button" role="menuitemradio" aria-checked="${k===cur}" data-pick="${k}">${v}</button>`).join('');
+  m.hidden=false;const r=btn.getBoundingClientRect(),mh=m.offsetHeight,mw=m.offsetWidth;
+  m.style.top=(r.bottom+4+mh>innerHeight&&r.top-4-mh>0?r.top-4-mh:r.bottom+4)+'px';m.style.left=Math.max(8,Math.min(innerWidth-mw-8,r.right-mw))+'px'; // RTL: the menu's right edge lines up with the pill's
+  (m.querySelector(`[data-pick="${cur}"]`)||m.firstElementChild).focus({preventScroll:true});
 }
 $('#up').addEventListener('click',x=>{const b=x.target.closest('[data-go]');if(!b)return;if(PHQ.matches){setView('day',b.dataset.go);scrollTo(0,0);return}if(view==='month')viewYm=clampYm(ymOf(b.dataset.go));go(sunOf(b.dataset.go))});
-document.addEventListener('change',x=>{const c=x.target.closest('[data-done]');if(c)toggleDone(c.dataset.done,c.checked)});
+document.addEventListener('click',x=>{
+  const p=x.target.closest('#stMenu [data-pick]'),b=x.target.closest('[data-st]');
+  if(p){const id=$('#stMenu').dataset.id;stClose();setSt(id,p.dataset.pick);return}
+  if(b&&!b.disabled){if(stOpen===b)stClose(true);else stShow(b);return}
+  stClose();
+});
+document.addEventListener('keydown',x=>{if(x.key==='Escape'&&stOpen){x.preventDefault();stClose(true)}else if((x.key==='ArrowDown'||x.key==='ArrowUp')&&x.target.closest('#stMenu')){x.preventDefault();const o=[...$('#stMenu').children],i=o.indexOf(document.activeElement);o[(i+(x.key==='ArrowDown'?1:-1)+o.length)%o.length].focus()}});
+addEventListener('scroll',()=>stClose(),{passive:true});addEventListener('resize',()=>stClose());
 $('#agenda').addEventListener('click',x=>{
   const b=x.target.closest('[data-edit]'),c=x.target.closest('[data-cancel]');
   if(b)openEdit(b.dataset.edit);
@@ -1018,10 +1186,17 @@ const getWeek=()=>(frm.querySelector('input[name=fWeek]:checked')||{}).value||'b
 function lastOf(kind){return items.filter(it=>it.kind===kind&&okTime(it.start)&&okTime(it.end)).sort((a,b)=>(b.updated||0)-(a.updated||0))[0]}
 function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true}
 function setWeek(w){const r=frm.querySelector(`input[name=fWeek][value="${w}"]`);if(r)r.checked=true}
+const COURSE_OPTS=Object.entries(COURSE).map(([t,c])=>`<option value="${esc(c)}">${esc(t)}</option>`).join('');
+$('#fCourse').innerHTML='<option value="">ללא</option>'+COURSE_OPTS;
+$('#fStatus').innerHTML=Object.entries(STAT).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+$('#fDate').min=SEM.start;$('#fDate').max=SEM.last;
+let dated=false; // true while the date field (not the weekday select) is the one in use: a deadline, or "only on this date"
+const isDated=()=>getKind()==='due'||getWeek()==='date';
 function syncFields(){
-  const due=getKind()==='due';
-  $('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due;
-  $('#fwDateTxt').textContent='רק ב-'+dm(addDays(editSun,Number($('#fDay').value)));
+  const due=getKind()==='due',dt=isDated(),fd=$('#fDate'),fy=$('#fDay'),rp=()=>isoOk(fd.value)&&dow(fd.value)===Number(fy.value)?fd.value:clampDay(addDays(editSun,Number(fy.value))); // rp: the date "only on this date" takes from a recurring form (the picked date while its weekday still matches)
+  if(dt!==dated){dated=dt;if(dt)fd.value=rp();else if(isoOk(fd.value))fy.value=String(dow(fd.value))} // switching mode keeps the day and the date in step (a picked date survives a round trip)
+  $('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due;$('#fCourseF').hidden=$('#fStatusF').hidden=!due;$('#fDayF').hidden=dt;$('#fDateF').hidden=!dt;
+  $('#fwDateTxt').textContent='רק ב-'+dm(dt&&isoOk(fd.value)?fd.value:rp());
 }
 function openAdd(pre={}){
   const sun=pre.sun||viewSun; // the week to add to (month view passes its own)
@@ -1034,6 +1209,7 @@ function openAdd(pre={}){
   else{$('#fStart').value='18:00';$('#fEnd').value='21:00'}
   addTimes={s:$('#fStart').value,e:$('#fEnd').value};
   setWeek(rot(sun,anchorOf(items))||'both');
+  dated=isDated();$('#fDate').value=clampDay(addDays(sun,Number($('#fDay').value)));$('#fCourse').value='';$('#fStatus').value='todo';
   $('#dlgTitle').textContent='הוספה';$('#fDel').hidden=true;$('#fSkip').hidden=true;resetDel();$('#fErr').hidden=true;
   syncFields();hint();dlg.showModal();
 }
@@ -1045,15 +1221,17 @@ function openEdit(id,sun=viewSun){ // sun: the week of the clicked occurrence
   $('#fDay').value=String(it.date?dow(it.date):it.day);$('#fStart').value=it.start||'';$('#fEnd').value=it.end||'';$('#fNote').value=it.note||'';
   const rec=isRec(it),date=rec?addDays(sun,Number(it.day)):'';
   setWeek(rec?it.week:'date');
+  dated=isDated();$('#fDate').value=it.date||date;$('#fCourse').value=courseOk(it.course)?it.course:'';$('#fStatus').value=dueSt(it);
   $('#fSkip').hidden=!rec;$('#fSkip').dataset.date=date;$('#fSkip').textContent=rec?'דילוג ב-'+dm(date):'';
   $('#dlgTitle').textContent='עריכה';$('#fDel').hidden=false;resetDel();$('#fErr').hidden=true;
   syncFields();hint();dlg.showModal();
 }
 function readForm(){
-  const kind=getKind();
-  return{kind,title:$('#fTitle').value.trim(),day:Number($('#fDay').value),start:$('#fStart').value,end:$('#fEnd').value,week:getWeek(),note:$('#fNote').value.trim(),updated:Date.now()};
+  const kind=getKind(),date=isDated()?$('#fDate').value:'';
+  return{kind,title:$('#fTitle').value.trim(),day:isoOk(date)?dow(date):Number($('#fDay').value),date,course:$('#fCourse').value,status:$('#fStatus').value,start:$('#fStart').value,end:$('#fEnd').value,week:getWeek(),note:$('#fNote').value.trim(),updated:Date.now()};
 }
 function validate(d){
+  if((d.kind==='due'||d.week==='date')&&!(isoOk(d.date)&&d.date>=SEM.start&&d.date<=SEM.last))return`בחר תאריך בין ${dmy(SEM.start)} ל-${dmy(SEM.last)}`;
   if(d.kind==='due')return'';
   if(!okTime(d.start)||!okTime(d.end))return'צריך שעת התחלה ושעת סיום.';
   if(d.start===d.end)return'שעת הסיום זהה לשעת ההתחלה.';
@@ -1062,12 +1240,13 @@ function validate(d){
 }
 function hint(){
   const d=readForm(),h=$('#fHint');
-  if(d.kind==='due'){h.className='hint';h.textContent=`הגשה ב-${dm(addDays(editSun,d.day))} עד ${okTime(d.start)?d.start:'23:59'}`;return}
+  if(isDated()&&!isoOk(d.date)){h.className='hint';h.textContent='בחר תאריך';return}
+  if(d.kind==='due'){h.className='hint';h.textContent=`הגשה ב-${dm(d.date)} עד ${okTime(d.start)?d.start:'23:59'}`;return}
   if(!okTime(d.start)||!okTime(d.end)||d.start===d.end){h.className='hint';h.textContent='בחר שעת התחלה וסיום. סיום מוקדם מההתחלה נחשב עד אחרי חצות.';return}
   const[s,e]=span(d.start,d.end);
-  const anchor=anchorOf(items),hits=[];
-  const suns=d.week==='date'?[editSun]:[editSun,addDays(editSun,7)].filter(w=>d.week==='both'||rot(w,anchor)===d.week);
-  suns.forEach(w=>evsForWeek(w,items,editing).forEach(o=>{if(!o.cancelled&&o.d===d.day&&s<o.e&&o.s<e){const t=`${o.title} (${tr(o.s,o.e)})`;if(!hits.includes(t))hits.push(t)}}));
+  const anchor=anchorOf(items),hits=[],pv=editing&&items.find(x=>x.id===editing),det=pv&&isRec(pv)&&d.week==='date',its=det?items.map(x=>x===pv?{...x,skip:[...(x.skip||[]),$('#fSkip').dataset.date]}:x):items; // detaching one occurrence: compare with the items as they will be saved (the series stays, minus that date); otherwise the edited item itself is left out
+  const suns=d.week==='date'?[sunOf(d.date)]:[editSun,addDays(editSun,7)].filter(w=>d.week==='both'||rot(w,anchor)===d.week);
+  suns.forEach(w=>evsForWeek(w,its,det?null:editing).forEach(o=>{if(!o.cancelled&&o.d===d.day&&s<o.e&&o.s<e){const t=`${o.title} (${tr(o.s,o.e)})`;if(!hits.includes(t))hits.push(t)}}));
   const len=hrs(e-s)+' שעות'+(e>1440?' · נגמר אחרי חצות':'');
   if(hits.length){h.className='hint bad';h.textContent=`${len} · חפיפה עם ${hits.join(', ')}`}
   else{h.className='hint ok';h.textContent=`${len} · אין חפיפה`}
@@ -1083,17 +1262,20 @@ $('#fDel').addEventListener('click',async()=>{
   if(!delArmed){delArmed=Date.now();const b=$('#fDel');b.classList.add('armed');b.textContent='לחץ שוב למחיקה';setTimeout(()=>{if(delArmed&&Date.now()-delArmed>=3900)resetDel()},4000);return}
   const id=editing;dlg.close();await removeItem(id);
 });
+const outOfView=date=>view==='month'?ymOf(date)!==viewYm:sunOf(date)!==viewSun; // the view never jumps to a saved date
+const dMsg=(date,dflt,sfx='')=>(outOfView(date)?'נשמר ל-'+dm(date):dflt)+sfx;
 frm.addEventListener('submit',async x=>{
   x.preventDefault();const d=readForm(),err=validate(d);
   if(err){$('#fErr').textContent=err;$('#fErr').hidden=false;return}
   const prev=editing&&items.find(it=>it.id===editing);
   $('#fSave').disabled=true;let ok;
   if(prev&&isRec(prev)&&(d.week==='date'||d.kind==='due')){
-    const{one,series}=detach(prev,{...d,done:false},editSun,$('#fSkip').dataset.date);
-    ok=await saveItem(null,one,'נוסף ל-'+dm(one.date))&&await saveItem(prev.id,series,'הועבר ל-'+dm(one.date)+' · הסדרה נשארה');
+    const{one,series}=detach(prev,d,editSun,$('#fSkip').dataset.date);
+    ok=await saveItem(null,one,dMsg(one.date,'נוסף ל-'+dm(one.date)))&&await saveItem(prev.id,series,dMsg(one.date,'הועבר ל-'+dm(one.date),' · הסדרה נשארה'));
   }else{
-    const doc=toDoc({...d,skip:prev&&isRec(prev)?prev.skip:undefined,done:prev&&prev.done},editSun);
-    ok=await saveItem(editing,doc,editing?'עודכן':doc.date?'נוסף ל-'+dm(doc.date):'נוסף ל'+WKN[doc.week]);
+    const doc=toDoc({...d,skip:prev&&isRec(prev)?prev.skip:undefined},editSun);
+    const m=editing?'עודכן':doc.date?'נוסף ל-'+dm(doc.date):'נוסף ל'+WKN[doc.week];
+    ok=await saveItem(editing,doc,doc.date?dMsg(doc.date,m):m);
   }
   $('#fSave').disabled=false;if(ok)dlg.close();
 });
@@ -1101,6 +1283,44 @@ $('#fSkip').addEventListener('click',async()=>{
   const it=items.find(x=>x.id===editing),date=$('#fSkip').dataset.date;if(!it||!date)return;
   const{id,...rest}=it;dlg.close();
   await saveItem(id,{...rest,skip:[...(it.skip||[]),date],updated:Date.now()},'דילוג ב-'+dm(date));
+});
+
+/* ---------- paste deadlines from the Moodle calendar ---------- */
+let pRows=[]; // parsed rows: {date,title,dup,course,on}
+const pOk=r=>r.date>=SEM.start&&r.date<=SEM.last;
+function pBtn(){const n=pRows.filter(r=>r.on).length;$('#pAdd').disabled=!n;$('#pAdd').textContent=n?n===1?'הוספת מטלה אחת':'הוספת '+n+' מטלות':'הוספה'}
+function pRender(){
+  $('#pList').innerHTML=pRows.map((r,i)=>{const off=r.dup||!pOk(r);
+    return`<li class="${off?'skip':''}"><input type="checkbox" data-pi="${i}" aria-label="${esc(r.title)}"${r.on?' checked':''}${off?' disabled':''}><span class="pd">${dm(r.date)}</span><span class="pt">${esc(r.title)}</span><select data-pc="${i}" aria-label="קורס: ${esc(r.title)}"><option value="">ללא קורס</option>${COURSE_OPTS}</select>${r.dup?'<span class="pn">כבר קיימת במתכנן</span>':!pOk(r)?`<span class="pn">מחוץ לסמסטר (${dmy(SEM.start)} עד ${dmy(SEM.last)})</span>`:''}</li>`}).join('');
+  $('#pList').querySelectorAll('select').forEach(sel=>sel.value=pRows[Number(sel.dataset.pc)].course);
+  const h=$('#pSum');h.hidden=!$('#pTxt').value.trim();
+  h.textContent=pRows.length?`זוהו ${pRows.length} מטלות${pRows.some(r=>r.dup)?', חלקן כבר במתכנן':''}. מסומנות יתווספו עם סטטוס "לא התחלתי" ועד 23:59.`:'לא זוהו מטלות. צריכות להיות שורות כמו "אירוע אחד, 15/11/2026" ואחריהן "יש להגיש את \'שם המטלה\'".';
+  pBtn();
+}
+function pParse(){
+  const old=new Map(pRows.map(r=>[r.date+'|'+r.title,r])); // re-reading the text keeps what the user already picked
+  pRows=parseMoodle($('#pTxt').value).map(r=>{
+    const dup=items.some(x=>x.kind==='due'&&x.date===r.date&&x.title===r.title),p=old.get(r.date+'|'+r.title);
+    return{...r,dup,course:p?p.course:guessCourse(r.title),on:!dup&&pOk(r)&&(p?p.on:true)};
+  });
+  pRender();
+}
+$('#pasteBtn').addEventListener('click',()=>{pRows=[];$('#pTxt').value='';pRender();$('#pDlg').showModal()});
+$('#pTxt').addEventListener('input',pParse);
+$('#pList').addEventListener('change',x=>{const c=x.target;
+  if(c.dataset.pi!=null)pRows[Number(c.dataset.pi)].on=c.checked;else if(c.dataset.pc!=null)pRows[Number(c.dataset.pc)].course=c.value;
+  pBtn();
+});
+$('#pCancel').addEventListener('click',()=>$('#pDlg').close());
+$('#pFrm').addEventListener('submit',async x=>{
+  x.preventDefault();const L=pRows.filter(r=>r.on);if(!L.length)return;
+  $('#pAdd').disabled=true;let n=0;
+  for(const r of L){ // one after another: each save refreshes the list
+    if(!await saveItem(null,toDoc({kind:'due',title:r.title,note:'',updated:Date.now(),date:r.date,start:'23:59',course:r.course,status:'todo'},SEM.start),'נוספה מטלה'))break;
+    n++;
+  }
+  toast(n===L.length?n===1?'נוספה מטלה אחת':'נוספו '+n+' מטלות':'נוספו '+n+' מתוך '+L.length+' מטלות');
+  if(n===L.length)$('#pDlg').close();else pParse();
 });
 
 /* ---------- storage ---------- */
@@ -1277,7 +1497,7 @@ async function setAnchor(w){
   const cur=items.filter(x=>x.kind==='anchor').sort((p,q)=>(q.updated||0)-(p.updated||0))[0];
   await saveItem(cur?cur.id:null,{kind:'anchor',date:w==='A'?viewSun:addDays(viewSun,-7),updated:Date.now()},`השבוע ${dm(viewSun)} הוא ${WKN[w]}`);
 }
-$('#addBtn').addEventListener('click',()=>{const t=todayIso(),d=ymOf(t)===viewYm?t:viewYm+'-01';openAdd(view==='month'?{sun:sunOf(d),day:dow(d)}:view==='day'?{day:dow(viewDay)}:{})}); // month: today if it is in the shown month, else the 1st (its week and weekday). day: viewSun is the picked day's week
+$('#addBtn').addEventListener('click',()=>{const t=todayIso(),d=clampDay(ymOf(t)===viewYm?t:viewYm+'-01');openAdd(view==='month'?{sun:sunOf(d),day:dow(d)}:view==='day'?{day:dow(viewDay)}:{})}); // month: today if it is in the shown month, else the 1st (its week and weekday). day: viewSun is the picked day's week
 
 try{if(location.protocol==='https:'&&navigator.serviceWorker)navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){} // offline shell; https only (not localhost, not file)
 render();

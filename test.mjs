@@ -62,14 +62,14 @@ test('evsForWeek',()=>{
   assert.equal(w1.find(e=>e.id==='o1').date,'2026-10-24');
   assert.equal(w1.find(e=>e.id==='o1').week,'date');
   assert.equal(w1.find(e=>e.id==='o1').kind,'other'); // retired kind:'gm' falls back to other
-  assert.equal(w1.filter(e=>e.src==='base').length,13);
+  assert.equal(w1.filter(e=>e.src==='base').length,12);assert.ok(!w1.some(e=>e.key==='b10')); // BASE[10] OB lecture is self:1 (self-paced on Zoom), never drawn; indices stay put
   const w2=core.evsForWeek('2026-10-25',items);
   assert.deepEqual(w2.filter(e=>e.src==='user').map(e=>e.id).sort(),['r2','r3']);
   assert.equal(w2.filter(e=>e.src==='base'&&e.d===2).length,0);
   const mk=core.evsForWeek('2027-01-17',items);
   assert.deepEqual(mk.filter(e=>e.src==='base').map(e=>e.d),[0,0,0]);
   const ex=core.evsForWeek('2027-01-17',[]).filter(e=>e.src==='exam');
-  assert.equal(ex.length,1);assert.equal(ex[0].date,'2027-01-22');assert.equal(ex[0].e-ex[0].s,180);assert.equal(ex[0].room,"מועד א'");
+  assert.equal(ex.length,2);const mi=ex.find(e=>e.date==='2027-01-22');assert.equal(mi.e-mi.s,180);assert.equal(mi.room,"מועד א'");assert.ok(ex.some(e=>e.date==='2027-01-18'&&e.course==='eng')); // English moed A 18.01 + micro 22.01
 });
 test('tolerates old and malformed docs',()=>{
   const w=core.evsForWeek('2026-10-18',[{id:'old',kind:'weird',day:1,start:'10:00',end:'11:00',week:'both'},
@@ -90,7 +90,7 @@ test('upcoming',()=>{
 });
 test('stats + analyze with exams',()=>{
   const s=core.stats(core.evsForWeek('2027-01-17',[]));
-  assert.equal(s.cls,330);assert.equal(s.ex,180);assert.equal(s.total,510);assert.equal(s.studyDays,1);
+  assert.equal(s.cls,330);assert.equal(s.ex,360);assert.equal(s.total,690);assert.equal(s.studyDays,1);
   const an=core.analyze(core.evsForWeek('2027-01-17',[{id:'s',kind:'open',date:'2027-01-22',start:'08:00',end:'12:00'}]));
   assert.equal(an.bad.length,1);assert.ok(an.bad[0].includes("מועד א'"));assert.ok(an.clash.has('x0'));
 });
@@ -125,7 +125,7 @@ test('ics',()=>{
   assert.ok(ics.includes('SUMMARY:הגשה: מטלה\\, 1'));
   assert.ok(ics.includes('DTSTART;TZID=Asia/Jerusalem:20261105T232900'));
   assert.ok(!ics.includes('DTSTART;TZID=Asia/Jerusalem:20261027T'),'no classes on election day');
-  assert.equal(ics.match(/BEGIN:VEVENT/g).length,169+12+21+1);
+  assert.equal(ics.match(/BEGIN:VEVENT/g).length,156+14+21+1);
   const early=core.semEvents([{id:'e',kind:'due',date:'2026-11-05',start:'00:15'}]).find(x=>x.uid==='ue-2026-11-05');
   assert.ok(early.s>=0&&early.e>early.s);
 });
@@ -145,7 +145,7 @@ test('csv',()=>{
   assert.equal(lines[0],'Subject,Start Date,Start Time,End Date,End Time,Description,Location');
   assert.ok(lines.includes('"סגירה ""ערב""","10/22/2026","6:00 PM","10/23/2026","2:00 AM","",""'));
   assert.ok(lines.includes('"מבחן: מבוא למיקרו · מועד א\'","01/22/2027","9:00 AM","01/22/2027","12:00 PM","",""'));
-  assert.equal(lines.length,1+169+12+21);
+  assert.equal(lines.length,1+156+14+21);
   assert.equal(core.ampm(0),'12:00 AM');assert.equal(core.ampm(720),'12:00 PM');
 });
 test('detach',()=>{
@@ -174,7 +174,7 @@ test('every course maps to a color class',()=>{
   [...core.BASE.map(b=>b.t),...core.EXAMS.map(x=>x.c)].forEach(t=>assert.ok(core.COURSE[t],'no COURSE entry for '+t));
   const evs=core.evsForWeek('2027-01-17',[]);
   assert.ok(evs.filter(e=>e.src==='base'||e.src==='exam').every(e=>e.course===core.COURSE[e.title]));
-  assert.equal(evs.find(e=>e.src==='exam').course,'micro');
+  assert.equal(evs.find(e=>e.src==='exam'&&e.date==='2027-01-22').course,'micro');assert.equal(evs.find(e=>e.src==='exam'&&e.date==='2027-01-18').course,'eng');
   assert.ok(core.evsForWeek('2026-10-18',[]).filter(e=>e.src==='base').every(e=>ids.has(e.course)));
 });
 const cx=(date,base)=>({id:'c'+date+base,kind:'cancel',date,base,updated:1});
@@ -182,7 +182,7 @@ test('cancel flags only that date and base index',()=>{
   const items=[cx('2026-10-19',5)];
   const w=core.evsForWeek('2026-10-18',items);
   assert.deepEqual(w.filter(e=>e.cancelled).map(e=>e.key),['b5']);
-  assert.equal(w.filter(e=>e.src==='base').length,13);
+  assert.equal(w.filter(e=>e.src==='base').length,12);
   assert.equal(core.evsForWeek('2026-10-25',items).filter(e=>e.cancelled).length,0);
   assert.equal(core.evsForWeek('2026-10-18',[cx('2026-10-19',4)]).filter(e=>e.cancelled).map(e=>e.key).join(),'b4');
   assert.equal(core.cancelOf('2026-10-19',5,items).id,items[0].id);
@@ -218,8 +218,8 @@ test('export omits a cancelled class',()=>{
   const items=[cx('2026-10-19',5)];
   assert.equal(core.semEvents(items).length,core.semEvents([]).length-1);
   assert.ok(!core.semEvents(items).some(x=>x.uid==='b5-2026-10-19'));assert.ok(core.semEvents([]).some(x=>x.uid==='b5-2026-10-19'));
-  assert.equal(core.buildIcs(items,'20261008T000000Z').match(/BEGIN:VEVENT/g).length,169+12-1);
-  assert.equal(core.buildCsv(items).trim().split('\r\n').length,1+169+12-1);
+  assert.equal(core.buildIcs(items,'20261008T000000Z').match(/BEGIN:VEVENT/g).length,156+14-1);
+  assert.equal(core.buildCsv(items).trim().split('\r\n').length,1+156+14-1);
 });
 test('cancel works on the make-up day with the base index',()=>{
   const items=[cx('2027-01-17',7)];                         // BASE[7] = Tuesday micro tutorial
@@ -316,7 +316,7 @@ test('lineTxt: colour, title and meta of a list line',()=>{
   assert.deepEqual(core.lineTxt(ev(e=>e.key==='b12')),{col:'--c-eng',ttl:"אנגלית מתקדמים א' · אנגלית",meta:'חדר טרם שובץ'});
   assert.deepEqual(core.lineTxt(ev(e=>e.id==='u')),{col:'--open-bd',ttl:'משמרת פתיחה',meta:'כל שבוע · חנות'});
   assert.deepEqual(core.lineTxt(ev(e=>e.id==='v')),{col:'--study-bd',ttl:'למידה עצמית',meta:'חד-פעמי'});
-  const x=core.evsForWeek('2027-01-17',[]).find(e=>e.src==='exam');
+  const x=core.evsForWeek('2027-01-17',[]).find(e=>e.src==='exam'&&e.date==='2027-01-22');
   assert.deepEqual(core.lineTxt(x),{col:'--c-micro',ttl:'מבוא למיקרו · מבחן',meta:"מועד א'"});
   const d=core.dayLines('2026-10-27',[{id:'d1',kind:'due',date:'2026-10-27',title:'מטלה',note:'n'},{id:'d2',kind:'due',date:'2026-10-27'}]); // election day: only deadlines
   assert.deepEqual(core.lineTxt(d[0]),{col:'--bad-bd',ttl:'הגשה: מטלה',meta:'n'});
@@ -338,4 +338,181 @@ test('opNoop: an op that changes nothing needs no commit',()=>{
   assert.ok(!core.opNoop(st,{id:'c',doc:{kind:'open',day:4}}));
   assert.ok(!core.opNoop(st,{id:'a',doc:null}));
   assert.ok(core.opNoop({v:1,items:{}},{id:'a',doc:null}));
+});
+test('dmy + courseOk + dueLbl: course short name precedes the deadline title',()=>{
+  assert.equal(core.dmy('2026-10-18'),'18.10.26');assert.equal(core.dmy('2027-03-13'),'13.03.27');
+  assert.ok(core.courseOk('micro'));assert.ok(core.courseOk('eng'));
+  for(const bad of ['','nope',undefined,null,3,'constructor','__proto__','toString'])assert.ok(!core.courseOk(bad),String(bad));
+  assert.equal(core.dueName({title:'מטלה 1',course:'micro'}),'מיקרו · מטלה 1');
+  assert.equal(core.dueName({title:'',course:'micro'}),'מיקרו');
+  assert.equal(core.dueName({title:'מטלה 1'}),'מטלה 1');assert.equal(core.dueName({title:'מטלה 1',course:'nope'}),'מטלה 1');assert.equal(core.dueName({}),'');
+  assert.equal(core.dueLbl({title:'מטלה 1',course:'micro'}),'הגשה: מיקרו · מטלה 1');
+  assert.equal(core.dueLbl({title:'',course:'micro'}),'הגשה: מיקרו');
+  assert.equal(core.dueLbl({title:'מטלה 1'}),'הגשה: מטלה 1');assert.equal(core.dueLbl({}),'הגשה');
+  assert.equal(core.dueCls({course:'micro'}),'cd c-micro');assert.equal(core.dueCls({course:'nope'}),'');assert.equal(core.dueCls({}),'');
+});
+test('toDoc with a picked date: due and one-off follow f.date, not the shown week',()=>{
+  const due={kind:'due',title:'מטלה',day:4,date:'2026-11-10',start:'',end:'',week:'A',note:'',updated:1};
+  assert.equal(core.toDoc(due,'2026-10-25').date,'2026-11-10');                              // a date three weeks past the dialog's week
+  const one=core.toDoc({kind:'open',title:'',day:4,date:'2027-03-13',start:'07:00',end:'15:00',week:'date',note:'',updated:5},'2026-10-25');
+  assert.equal(one.date,'2027-03-13');assert.deepEqual(Object.keys(one).sort(),['date','end','kind','note','start','title','updated']);
+  assert.equal(core.toDoc({...due,date:'2026-02-30'},'2026-10-25').date,'2026-10-29');         // not a valid ISO date: the old weekday-in-week rule
+  assert.equal(core.toDoc({...due,date:''},'2026-10-25').date,'2026-10-29');assert.equal(core.toDoc({...due,date:undefined},'2026-10-25').date,'2026-10-29');
+  const rec=core.toDoc({kind:'open',title:'',day:2,date:'2026-12-01',start:'07:00',end:'15:00',week:'A',note:'',updated:5},'2026-10-25');
+  assert.equal(rec.date,undefined);assert.equal(rec.day,2);                                    // recurring ignores the date
+});
+test('toDoc: course on a deadline, omitted when none or unknown',()=>{
+  const f={kind:'due',title:'מטלה',day:4,start:'23:59',week:'A',note:'',updated:1};
+  assert.equal(core.toDoc({...f,course:'micro'},'2026-10-25').course,'micro');
+  for(const c of ['',undefined,'nope','constructor'])assert.ok(!('course' in core.toDoc({...f,course:c},'2026-10-25')),String(c));
+  assert.deepEqual(core.toDoc({...f,course:'math'},'2026-10-25'),{kind:'due',title:'מטלה',note:'',updated:1,date:'2026-10-29',start:'23:59',done:false,course:'math'});
+  assert.ok(!('course' in core.toDoc({kind:'open',title:'',day:2,start:'07:00',end:'15:00',week:'date',note:'',updated:5,course:'micro'},'2026-10-25')));  // only a deadline has a course
+  assert.ok(!('course' in core.toDoc({kind:'open',title:'',day:2,start:'07:00',end:'15:00',week:'both',note:'',updated:5,course:'micro'},'2026-10-25')));
+});
+test('detach with a picked date: the new doc gets it, the series skips the occurrence',()=>{
+  const prev={id:'r1',kind:'close',title:'סגירה',day:4,start:'15:00',end:'23:00',week:'A',note:'',skip:[],updated:1};
+  const f={kind:'close',title:'סגירה',day:2,date:'2026-12-08',start:'16:00',end:'23:00',week:'date',note:'',updated:9};
+  const{one,series}=core.detach(prev,f,'2026-11-01','2026-11-05');
+  assert.equal(one.date,'2026-12-08');assert.deepEqual(series.skip,['2026-11-05']);assert.equal(series.week,'A');
+  const due=core.detach(prev,{...f,kind:'due',course:'acc',done:false},'2026-11-01','2026-11-05');
+  assert.equal(due.one.date,'2026-12-08');assert.equal(due.one.course,'acc');assert.equal(due.one.kind,'due');
+  assert.equal(core.detach(prev,{...f,date:undefined},'2026-11-01','2026-11-05').one.date,'2026-11-03');   // fallback: sun + day
+});
+test('detach clash check: the series stays in the compared items, minus the moved occurrence',()=>{ // what hint() does for "only on this date" on a series occurrence
+  const series={id:'r1',kind:'close',title:'',day:4,start:'15:00',end:'23:00',week:'both',note:'',updated:1},occ='2026-11-05';
+  const hits=(its,skip)=>core.evsForWeek('2026-11-08',its,skip).filter(o=>o.d===4&&900<o.e&&o.s<1380);              // a 16:00-23:00 block on Thu 12.11
+  const its=[{...series,skip:[occ]}];                                                                                   // the series as it is after the save
+  assert.equal(hits([series],'r1').length,0);                                                                           // old check: the whole series dropped, no clash seen
+  assert.equal(hits(its,null).length,1);                                                                                // fixed check: the series' own 12.11 occurrence clashes
+  const{one,series:ser}=core.detach(series,{kind:'close',title:'',day:4,date:'2026-11-12',start:'16:00',end:'23:00',week:'date',note:'',updated:2,done:false},'2026-11-01',occ);
+  assert.ok(core.analyze(core.evsForWeek('2026-11-08',[{...one,id:'n1'},{...ser,id:'r1'}])).bad.length>0);             // and the saved result really does clash
+  assert.equal(core.evsForWeek('2026-11-01',its).filter(o=>o.d===4).length,0);                                          // the moved occurrence itself (05.11) is gone, so moving it within its own week is no false clash
+});
+test('upcoming carries the course of a deadline',()=>{
+  const items=[{id:'d1',kind:'due',date:'2027-01-20',start:'23:59',title:'מטלה 3',course:'micro'},{id:'d2',kind:'due',date:'2027-01-20',start:'23:58',course:'math'},
+    {id:'d3',kind:'due',date:'2027-01-20',start:'23:57',title:'בלי',course:'nope'},{id:'d4',kind:'due',date:'2027-01-20',start:'23:56'}];
+  const L=core.upcoming('2027-01-19',items,10),by=id=>L.find(x=>x.id===id);
+  assert.equal(by('d1').course,'micro');assert.equal(by('d1').title,'מיקרו · מטלה 3');assert.equal(by('d1').tag,'הגשה');
+  assert.equal(by('d2').course,'math');assert.equal(by('d2').title,"מתמטיקה");                // no title: just the short name
+  assert.ok(!by('d3').course);assert.equal(by('d3').title,'בלי');                             // unknown id: treated as none
+  assert.ok(!by('d4').course);assert.equal(by('d4').title,'הגשה');                             // as before
+  assert.ok(L.filter(x=>x.exam).every(x=>!x.course));
+});
+test('dayLines + lineTxt: a deadline with a course takes its colour and name',()=>{
+  const d=core.dayLines('2026-10-27',[{id:'a',kind:'due',date:'2026-10-27',title:'מטלה',note:'n',course:'micro'},{id:'b',kind:'due',date:'2026-10-27',course:'ob'},
+    {id:'c',kind:'due',date:'2026-10-27',title:'x',course:'nope'},{id:'e',kind:'due',date:'2026-10-27',title:'y'}]);
+  const L=Object.fromEntries(d.map(l=>[l.id,l]));
+  assert.equal(L.a.title,'מטלה');assert.equal(L.a.course,'micro');
+  assert.deepEqual(core.lineTxt(L.a),{col:'--c-micro',ttl:'הגשה: מיקרו · מטלה',meta:'n'});
+  assert.deepEqual(core.lineTxt(L.b),{col:'--c-ob',ttl:'הגשה: התנהגות ארגונית',meta:''});
+  assert.deepEqual(core.lineTxt(L.c),{col:'--bad-bd',ttl:'הגשה: x',meta:''});
+  assert.deepEqual(core.lineTxt(L.e),{col:'--bad-bd',ttl:'הגשה: y',meta:''});
+});
+test('export: the course short name goes into the deadline title',()=>{
+  const items=[{id:'d',kind:'due',date:'2026-11-05',start:'23:59',title:'מטלה, 1',course:'micro'},{id:'e',kind:'due',date:'2026-11-06',start:'23:59',course:'acc'},{id:'f',kind:'due',date:'2026-11-07',start:'23:59',title:'בלי',course:'nope'}];
+  const sm=id=>core.semEvents(items).find(x=>x.uid.startsWith('u'+id+'-')).summary;
+  assert.equal(sm('d'),'הגשה: מיקרו · מטלה, 1');assert.equal(sm('e'),'הגשה: חשבונאות');assert.equal(sm('f'),'הגשה: בלי');
+  assert.ok(core.buildIcs(items,'20261008T000000Z').includes('SUMMARY:הגשה: מיקרו · מטלה\\, 1'));
+  assert.ok(core.buildCsv(items).split('\r\n').includes('"הגשה: מיקרו · מטלה, 1","11/05/2026","11:29 PM","11/05/2026","11:59 PM","",""'));
+});
+
+test('shiftMonths: monthly shift hours over the semester',()=>{
+  const A={id:'a',kind:'anchor',date:'2026-10-18',updated:1};
+  const sh=(id,o)=>({id,kind:'open',title:'',start:'08:00',end:'16:00',note:'',updated:1,...o});
+  const none=core.shiftMonths([]);
+  assert.deepEqual(none.rows.map(r=>r.ym),['2026-10','2026-11','2026-12','2027-01','2027-02','2027-03']);
+  assert.equal(none.min,0);assert.equal(none.n,0);assert.ok(none.rows.every(r=>r.min===0&&r.n===0));
+  // a "both" shift on Mondays: Mondays from 19.10.26 to 08.03.27
+  const mon=core.shiftMonths([sh('m',{day:1,week:'both'})]);
+  assert.equal(mon.rows.find(r=>r.ym==='2026-10').n,2);   // 19.10, 26.10
+  assert.equal(mon.rows.find(r=>r.ym==='2026-11').n,5);   // 2,9,16,23,30
+  assert.equal(mon.n,mon.rows.reduce((a,r)=>a+r.n,0));assert.equal(mon.min,mon.n*480);
+  // week A only: needs the anchor; without it A/B shifts are not counted
+  assert.equal(core.shiftMonths([sh('x',{day:1,week:'A'})]).n,0);
+  const ab=core.shiftMonths([A,sh('x',{day:1,week:'A'}),sh('y',{day:2,week:'B'})]);
+  let want=0;for(let sun='2026-10-18';sun<='2027-03-13';sun=core.addDays(sun,7))want+=1; // one shift per week, A on Monday or B on Tuesday
+  assert.equal(ab.n,want);
+  assert.ok(ab.rows.find(r=>r.ym==='2026-10').n===2);      // 19.10 (A) + 27.10 (B)
+  // skipped, one-off, non-shift kinds, overnight
+  const sk=core.shiftMonths([sh('m',{day:1,week:'both',skip:['2026-10-19']})]);
+  assert.equal(sk.rows.find(r=>r.ym==='2026-10').n,1);
+  const one=core.shiftMonths([sh('o',{date:'2026-12-31',end:'02:00',kind:'close',start:'18:00'})]);
+  assert.equal(one.rows.find(r=>r.ym==='2026-12').n,1);assert.equal(one.rows.find(r=>r.ym==='2026-12').min,480);assert.equal(one.rows.find(r=>r.ym==='2027-01').n,0); // counted in the month it starts
+  assert.equal(core.shiftMonths([sh('s',{day:1,week:'both',kind:'study'}),sh('d',{day:1,week:'both',kind:'other'})]).n,0);
+  assert.equal(core.shiftMonths([sh('late',{date:'2027-03-20'}),sh('early',{date:'2026-09-30'})]).n,0); // outside the counted range
+  const pre=core.shiftMonths([sh('p1',{date:'2026-10-01',start:'20:18',end:'03:23'}),sh('p2',{date:'2026-10-17'}),sh('r',{day:1,week:'both'})]);
+  assert.equal(pre.rows[0].n,2+2);assert.equal(pre.rows[0].min,(425+480)+480*2); // one-offs from 1.10 (20:18-03:23 = 7h05); the recurring Monday series only from 19.10, so 19.10 + 26.10
+});
+
+const MOODLE=`נובמבר 2026דצמבר   ◀︎
+אירוע אחד, 1/11/20261
+  [יש להגיש את 'תרגיל 1 - מאזן'](https://mama.mta.ac.il/mod/assign/view.php?id=31872)
+אין אירועים, 3/11/20263
+3 אירועים, 9/11/20269
+  [יש להגיש את 'הגשת תעודת סיום קורס אקסל למתחילים קמפוס IL - הגשת חובה'](https://mama.mta.ac.il/mod/assign/view.php?id=28781)
+  [יש להגיש את 'הגשת 2 קובצי תרגול'](https://mama.mta.ac.il/mod/assign/view.php?id=29563)
+  [יש להגיש את 'הגשת תרגיל 1'](https://mama.mta.ac.il/mod/assign/view.php?id=33609)
+אירוע אחד, 12/11/202612
+  [יש להגיש את 'מטלה 3- המשך עקומת התמורה'](https://mama.mta.ac.il/mod/assign/view.php?id=34072)
+אירוע אחד, 19/11/202619
+  יש להגיש את 'מטלה א''`;
+test('parseMoodle: dates glued to a day number, several events a day, links or plain text',()=>{
+  const L=core.parseMoodle(MOODLE);
+  assert.deepEqual(L.map(x=>x.date+' '+x.title),[
+    '2026-11-01 תרגיל 1 - מאזן',
+    '2026-11-09 הגשת תעודת סיום קורס אקסל למתחילים קמפוס IL - הגשת חובה',
+    '2026-11-09 הגשת 2 קובצי תרגול',
+    '2026-11-09 הגשת תרגיל 1',
+    '2026-11-12 מטלה 3- המשך עקומת התמורה',
+    "2026-11-19 מטלה א'"]);                                  // "20261" -> 2026; a title that ends in an apostrophe survives
+  assert.deepEqual(core.parseMoodle(''),[]);assert.deepEqual(core.parseMoodle(undefined),[]);
+  assert.deepEqual(core.parseMoodle("יש להגיש את 'x'"),[]);                  // no date line yet: nothing to attach it to
+  assert.deepEqual(core.parseMoodle("אירוע אחד, 31/02/2026\nיש להגיש את 'x'"),[]); // an impossible date
+  assert.equal(core.parseMoodle("1/12/2026\nיש להגיש את 'x'\nיש להגיש את 'x'").length,1); // the same line twice on a day is one deadline
+  assert.deepEqual(core.parseMoodle("2/12/2026 יש להגיש את 'y'"),[{date:'2026-12-02',title:'y'}]); // date and title on one line
+});
+test('guessCourse: from the title, empty when unknown',()=>{
+  const g=core.guessCourse;
+  assert.equal(g('תרגיל 1 - מאזן'),'acc');assert.equal(g('תרגיל 4 - פקודות יומן'),'acc');
+  assert.equal(g('מטלה 3- המשך עקומת התמורה'),'micro');assert.equal(g('מטלה 4- גורמי ייצור משלימים'),'micro');
+  assert.equal(g('הגשת תעודת סיום קורס אקסל למתחילים'),'data');assert.equal(g('הגשה מיון, סינון, תרשימים'),'data');
+  assert.equal(g('הגשת קובץ אתגר סדנת כלי עיבוד וניתוח נתונים'),'data');assert.equal(g('הגשת קובץ אתגר סדנת אקסל מתקדמים'),'data');
+  assert.equal(g('מטלה 1'),'');assert.equal(g(''),'');assert.equal(g(undefined),'');
+});
+test('deadline status: two states, done is the only stored flag',()=>{
+  const d=core.dueSt;
+  assert.equal(d({}),'todo');assert.equal(d({done:true}),'done');assert.equal(d({status:'doing'}),'todo');assert.equal(d({status:'done'}),'todo');assert.equal(d(undefined),'todo');
+  assert.deepEqual(Object.keys(core.STAT),['todo','done']);
+  const f={kind:'due',title:'מטלה',day:4,start:'23:59',week:'A',note:'',updated:1};
+  assert.deepEqual(core.toDoc({...f,status:'done'},'2026-10-25'),{kind:'due',title:'מטלה',note:'',updated:1,date:'2026-10-29',start:'23:59',done:true});
+  assert.deepEqual(core.toDoc({...f,status:'todo'},'2026-10-25'),{kind:'due',title:'מטלה',note:'',updated:1,date:'2026-10-29',start:'23:59',done:false});
+  assert.equal(core.toDoc({...f,status:'todo',done:true},'2026-10-25').done,false);   // the dialog's status wins over a carried done flag
+  assert.equal(core.toDoc({...f,status:'zzz',done:true},'2026-10-25').done,true);     // an unknown status falls back to the done flag
+  assert.ok(!('status' in core.toDoc({...f,status:'done'},'2026-10-25')));
+  const dl={kind:'due',date:'2026-11-10'};
+  assert.equal(core.dueLate(dl,'2026-11-11'),true);assert.equal(core.dueLate(dl,'2026-11-10'),false);
+  assert.equal(core.dueLate({...dl,done:true},'2026-11-11'),false);
+  assert.equal(core.dueLate({kind:'open',date:'2026-11-10'},'2026-11-11'),false);
+  assert.equal(core.dayLines('2026-11-10',[{id:'a',kind:'due',date:'2026-11-10',title:'x',done:true}]).find(l=>l.id==='a').st,'done');
+});
+test('submitted: the record under what is coming, newest first',()=>{
+  const items=[{id:'a',kind:'due',date:'2026-11-01',title:'ישנה',done:true},{id:'b',kind:'due',date:'2026-11-12',title:'חדשה',done:true,course:'micro'},
+    {id:'c',kind:'due',date:'2026-11-05',title:'פתוחה'},{id:'d',kind:'open',date:'2026-11-06',done:true},{id:'e',kind:'due',date:'bad',done:true}];
+  const S=core.submitted(items);
+  assert.deepEqual(S.map(x=>x.id),['b','a']);assert.equal(S[0].title,'מיקרו · חדשה');assert.equal(S[0].course,'micro');assert.equal(S[0].st,'done');
+  assert.deepEqual(core.submitted([]),[]);
+});
+test('upcoming: late deadlines first (all of them), then the next n',()=>{
+  const items=[
+    {id:'l1',kind:'due',date:'2026-11-12',title:'ישנה'},{id:'l2',kind:'due',date:'2026-11-01',title:'ישנה מאוד'},
+    {id:'ok',kind:'due',date:'2026-11-05',title:'הוגשה',done:true},{id:'f1',kind:'due',date:'2026-11-15',title:'קרובה'},{id:'f2',kind:'due',date:'2026-11-16',title:'אחריה'}];
+  const L=core.upcoming('2026-11-14',items,1);
+  assert.deepEqual(L.map(x=>x.id||x.key),['l2','l1','f1']);                    // late oldest first, then n=1 upcoming (the exams are in 2027)
+  assert.deepEqual(L.map(x=>x.daysLeft),[-13,-2,1]);assert.deepEqual(L.map(x=>!!x.late),[true,true,false]);
+  assert.equal(L[0].st,'todo');assert.equal(core.upcoming('2026-11-14',[{id:'z',kind:'due',date:'2026-11-01',done:true}],6).some(x=>x.id==='z'),false);
+});
+test('parseMoodle: a date inside a title or a link URL does not move the day block; CRLF',()=>{
+  const t=`אירוע אחד, 15/11/2026\r\n  [יש להגיש את 'דוח עד 1/12/2026'](https://x/3/4/2026/y)\r\nאירוע אחד, 16/11/2026\r\n  [יש להגיש את 'ב'](https://x)`;
+  assert.deepEqual(core.parseMoodle(t),[{date:'2026-11-15',title:'דוח עד 1/12/2026'},{date:'2026-11-16',title:'ב'}]);
+  assert.equal(core.parseMoodle("1/12/2026\n"+Array.from({length:3000},(_,i)=>"יש להגיש את 'a"+i+"'").join('\n')).length,3000); // many rows: no quadratic dedupe
 });
