@@ -1880,6 +1880,18 @@ $('#mHandle').addEventListener('touchstart',x=>{dragStart(x.touches[0].clientY);
 $('#mHandle').addEventListener('touchmove',x=>dragMove(x.touches[0].clientY),{passive:true});
 $('#mHandle').addEventListener('touchend',dragEnd,{passive:true});
 $('#mHandle').addEventListener('mousedown',x=>{dragStart(x.clientY);const mv=e=>dragMove(e.clientY),up=()=>{dragEnd();removeEventListener('mousemove',mv);removeEventListener('mouseup',up)};addEventListener('mousemove',mv);addEventListener('mouseup',up)});
+/* phone: pull a dialog down (from its top) to close it; it follows the finger and snaps back after a short pull */
+(()=>{let d=null,y0=0,dy=0,t0=0;
+  addEventListener('touchstart',x=>{const e=x.target.closest&&x.target.closest('dialog[open]');if(!PHQ.matches||!e||x.touches.length!==1){d=null;return}d=e;y0=x.touches[0].clientY;dy=0;t0=Date.now()},{passive:true});
+  addEventListener('touchmove',x=>{if(!d)return;const m=x.touches[0].clientY-y0;if(m<=0||d.scrollTop>0){if(dy>0){dy=0;d.style.transform=''}return}dy=m;d.style.transition='none';d.style.transform=`translateY(${dy}px)`},{passive:true});
+  addEventListener('touchend',()=>{if(!d)return;const e=d,m=dy,fast=m/(Date.now()-t0||1)>0.6;d=null;dy=0;
+    e.style.transition='transform .18s ease';
+    if(m>110||(m>40&&fast)){ // a first-run onboarding cannot be dismissed
+      if(e.id==='obDlg'&&ob&&ob.first){e.style.transform='';return}
+      e.style.transform='translateY(100%)';setTimeout(()=>{e.close();e.style.transform='';e.style.transition=''},170)}
+    else{e.style.transform='';setTimeout(()=>{e.style.transition=''},200)}
+  },{passive:true});
+})();
 let swipe0=null; // swipe on the day card: a finger moving right is the next day (RTL, see swipeDir)
 $('#dayCard').addEventListener('touchstart',x=>{swipe0=x.touches.length===1?[x.touches[0].clientX,x.touches[0].clientY]:null},{passive:true});
 $('#dayCard').addEventListener('touchend',x=>{if(!swipe0)return;const t=x.changedTouches[0],d=swipeDir(t.clientX-swipe0[0],t.clientY-swipe0[1]);swipe0=null;if(d)step(d)},{passive:true});
