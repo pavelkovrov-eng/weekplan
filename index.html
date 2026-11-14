@@ -178,12 +178,19 @@ button.blk:hover{transform:translateY(-1px);z-index:4}
 .shm td:nth-child(2){font-weight:700;color:var(--ink)}
 .shm tfoot td{font-weight:800;color:var(--ink);border-bottom:0}
 .shm .z{color:var(--text-faint);font-weight:400}
-.dh .due,.df .due{display:block;font-size:10.5px;font-weight:700;color:var(--bad-tx)}
-.df{text-align:center;padding-top:2px}
-.df .due{margin-bottom:3px}
+.dh .due{display:block;font-size:10.5px;font-weight:700;color:var(--bad-tx)}
+.dfl{align-self:start;padding-top:8px;border-top:1px solid var(--border-light);font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--text-faint);text-align:center}
+.df{display:flex;flex-direction:column;align-items:stretch;gap:4px;padding-top:8px;border-top:1px solid var(--border-light);min-width:0}
+.dchip{display:flex;align-items:center;gap:6px;min-width:0;padding:2px 9px;border:1px solid var(--border-light);border-radius:999px;background:var(--bg-sunk);font-size:11.5px;font-weight:600;color:var(--text-main)}
+.dchip>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dchip>i{flex:none;width:7px;height:7px;border-radius:50%;background:var(--cc,var(--bad-bd))}
+.dchip.done{opacity:.6;font-weight:400;text-decoration:none}
+.dchip.late{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad-tx)}
+.dchip.late>i{background:var(--bad-bd)}
+.dmore{border:0;background:none;padding:2px 4px;font:600 11.5px var(--font-body);color:var(--accent-text);cursor:pointer;text-align:center}
 /* a deadline with a course: class cd + c-<course> (which sets --cc); text is --cc pulled toward the ink so it reads on light and dark */
 .cd{--cx:color-mix(in srgb,var(--cc) 72%,var(--ink))}
-.dh .due.cd,.df .due.cd,.ml.d.cd,.day li.cd b,.upgo.cd b{color:var(--cx)}
+.dh .due.cd,.ml.d.cd,.day li.cd b,.upgo.cd b{color:var(--cx)}
 .upgo.cd{border-inline-start:4px solid var(--cc)}
 .upgo.cd .tg{border-color:var(--cc);color:var(--cx)}
 .day li.cd .dot{background:var(--cc)}
@@ -217,7 +224,7 @@ details.card[open] .upsum{display:none}
 .upsub b{text-decoration:line-through;opacity:.75;font-weight:600}
 .day li.late b,.dli.late .tx>b,.upgo.late b,.upgo.late .dl{color:var(--bad-tx)}
 .upgo.late{border-inline-start:4px solid var(--bad-bd);background:var(--bad-bg)}
-.df .due.late,.ml.d.late{color:var(--bad-tx);font-weight:800}
+.ml.d.late{color:var(--bad-tx);font-weight:800}
 .ph .ml.d.late{background:var(--bad-bd);box-shadow:none}
 .pastebtn{margin-top:12px}
 .ph .printbar{display:none!important}
@@ -1086,8 +1093,11 @@ function dayHead(date,i,base){
   const tgl=!edit?'':off?`<button type="button" class="hl" data-unoff="${esc(off.id)}">החזרת לימודים</button>`:base.length?`<button type="button" class="hl" data-off="${date}">ביטול לימודים</button>`:'';
   return esc(DAYS[i])+' '+dm(date)+'<small>'+sub+'</small>'+(c?`<span class="cal">${esc(c.label)}</span>`:'')+tgl;
 }
-function dayDue(date){ // a day's deadlines for the foot of its grid column
-  return items.filter(x=>x.kind==='due'&&x.date===date).map(x=>`<span class="due${x.done?' done':''}${dueLate(x,todayIso())?' late':''} ${dueCls(x)}">${esc(dueLbl(x))}</span>`).join('');
+const dueMore=new Set(); // dates whose "+N" overflow is open in the grid foot
+function dayDue(date){ // a day's deadlines as quiet chips for the foot of its grid column: course dot, short name, a tick when submitted, red when late; two shown, the rest behind "+N"
+  const L=items.filter(x=>x.kind==='due'&&x.date===date),open=dueMore.has(date),shown=open?L:L.slice(0,2),t=todayIso();
+  return shown.map(x=>`<span class="dchip${x.done?' done':''}${dueLate(x,t)?' late':''} ${dueCls(x)}" title="${esc(dueLbl(x))}${x.done?' · הוגש':''}"><i></i><span>${x.done?'✓ ':''}${esc(dueName(x)||'הגשה')}</span></span>`).join('')
+    +(L.length>2?`<button type="button" class="dmore" data-more="${date}">${open?'פחות':'+'+(L.length-2)+' עוד'}</button>`:'');
 }
 function stBtn(x,edit,name){ // the status pill of a deadline: its state in words; a tap opens a small menu (לא התחלתי / הוגש)
   const s=x.st||dueSt(x);
@@ -1129,11 +1139,11 @@ function renderGrid(evs,clash){
       b.style.cssText=`top:${(s-lo)*PPM}px;height:${hgt}px;width:calc(${w} - 3px);inset-inline-start:calc(4px + ${ev.lane} * (${w}))`;
       if(ev.src!=='user'){
         const kl=ev.src==='exam'?'מבחן':BKIND[ev.kind];
-        b.title=`${ev.cancelled?'בוטל · ':''}${ev.title}${kl?' · '+kl:''} · ${tr(ev.s,ev.e)} · ${ev.room}`;if(ev.cancelled)b.classList.add('cancelled');
+        b.title=`${ev.cancelled?'בוטל · ':''}${ev.title}${kl?' · '+kl:''} · ${ltr(tr(ev.s,ev.e))} · ${ev.room}`;if(ev.cancelled)b.classList.add('cancelled');
         b.innerHTML=`<div class="nm"><span>${esc(ev.title)}${kl?' · '+kl:''}</span>${LOCK}</div><div class="tm">${tr(ev.s,ev.e)}</div><div class="rm">${esc(ev.room)}</div>`;
       }else{
         const showTitle=ev.title!==KINDS[ev.kind].label;
-        b.title=`${ev.title} · ${tr(ev.s,ev.e)}${ev.note?' · '+ev.note:''} · ${WKN[ev.week]} · לחיצה לעריכה`;
+        b.title=`${ev.title} · ${ltr(tr(ev.s,ev.e))}${ev.note?' · '+ev.note:''} · ${WKN[ev.week]} · לחיצה לעריכה`;
         b.innerHTML=`<span class="kd">${KINDS[ev.kind].short}${ev.week!=='date'?' <span class="wk">· כל שבוע</span>':''}</span>`+
           `<div class="nm"><span>${esc(showTitle?ev.title:KINDS[ev.kind].label)}</span></div><div class="tm">${tr(ev.s,ev.e)}</div>`+
           (ev.note?`<div class="rm">${esc(ev.note)}</div>`:'');
@@ -1148,7 +1158,7 @@ function renderGrid(evs,clash){
     g.appendChild(col);
   });
   if(items.some(x=>x.kind==='due'&&DAYS.some((_,i)=>x.date===addDays(viewSun,i)))){ // the week's deadlines sit under the day columns, not above them
-    g.appendChild(document.createElement('div'));
+    {const l=document.createElement('div');l.className='dfl';l.textContent='הגשות';g.appendChild(l)} // the row's label sits in the hour-axis column
     DAYS.forEach((_,i)=>{const f=document.createElement('div');f.className='df';f.innerHTML=dayDue(addDays(viewSun,i));g.appendChild(f)});
   }
 }
@@ -1798,6 +1808,7 @@ $('#prev').addEventListener('click',()=>step(-1));$('#next').addEventListener('c
 $('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?goDay(todayIso()):go(sunOf(todayIso())));
 $('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(b){setView(b.dataset.v);scrollTo(0,0)}});
 $('#gridTgl').addEventListener('click',()=>{wkGrid=!wkGrid;render()});
+$('#grid').addEventListener('click',x=>{const b=x.target.closest('[data-more]');if(!b)return;x.stopPropagation();const d=b.dataset.more;dueMore.has(d)?dueMore.delete(d):dueMore.add(d);render()});
 $('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b){goDay(b.dataset.day);$('#dstrip [aria-pressed=true]').focus({preventScroll:true})}}); // the strip is redrawn: keep the focus on the picked day
 $('#dayList').addEventListener('click',x=>{ // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
   const b=x.target.closest('[data-key]'),l=b&&dayL.find(e=>e.key===b.dataset.key);if(!l)return;
