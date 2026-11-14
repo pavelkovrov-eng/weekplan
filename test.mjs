@@ -59,14 +59,14 @@ test('evsForWeek',()=>{
   assert.equal(w1.find(e=>e.id==='o1').date,'2026-10-24');
   assert.equal(w1.find(e=>e.id==='o1').week,'date');
   assert.equal(w1.find(e=>e.id==='o1').kind,'other'); // retired kind:'gm' falls back to other
-  assert.equal(w1.filter(e=>e.src==='base').length,12);assert.ok(!w1.some(e=>e.key==='b10')); // BASE[10] OB lecture is self:1 (self-paced on Zoom), never drawn; indices stay put
+  assert.equal(w1.filter(e=>e.src==='base').length,11);assert.ok(!w1.some(e=>e.key==='b10')); // BASE[10] OB lecture is self:1 (self-paced on Zoom), never drawn; indices stay put
   const w2=core.evsForWeek('2026-10-25',items);
   assert.deepEqual(w2.filter(e=>e.src==='user').map(e=>e.id).sort(),['r1','r2','r3']);
   assert.equal(w2.filter(e=>e.src==='base'&&e.d===2).length,0);
   const mk=core.evsForWeek('2027-01-17',items);
   assert.deepEqual(mk.filter(e=>e.src==='base').map(e=>e.d),[0,0,0]);
   const ex=core.evsForWeek('2027-01-17',[]).filter(e=>e.src==='exam');
-  assert.equal(ex.length,2);const mi=ex.find(e=>e.date==='2027-01-22');assert.equal(mi.e-mi.s,180);assert.equal(mi.room,"מועד א'");assert.ok(ex.some(e=>e.date==='2027-01-18'&&e.course==='eng')); // English moed A 18.01 + micro 22.01
+  assert.equal(ex.length,1);const mi=ex.find(e=>e.date==='2027-01-22');assert.equal(mi.e-mi.s,180);assert.equal(mi.room,"מועד א'"); // no English exams in the base: micro 22.01 only
 });
 test('tolerates old and malformed docs',()=>{
   const w=core.evsForWeek('2026-10-18',[{id:'old',kind:'weird',day:1,start:'10:00',end:'11:00',week:'both'},
@@ -89,7 +89,7 @@ test('upcoming',()=>{
 });
 test('stats + analyze with exams',()=>{
   const s=core.stats(core.evsForWeek('2027-01-17',[]));
-  assert.equal(s.cls,330);assert.equal(s.ex,360);assert.equal(s.total,690);assert.equal(s.studyDays,1);
+  assert.equal(s.cls,330);assert.equal(s.ex,180);assert.equal(s.total,510);assert.equal(s.studyDays,1);
   const an=core.analyze(core.evsForWeek('2027-01-17',[{id:'s',kind:'open',date:'2027-01-22',start:'08:00',end:'12:00'}]));
   assert.equal(an.bad.length,1);assert.ok(an.bad[0].includes("מועד א'"));assert.ok(an.clash.has('x0'));
 });
@@ -124,7 +124,7 @@ test('ics',()=>{
   assert.ok(ics.includes('SUMMARY:הגשה: מטלה\\, 1'));
   assert.ok(ics.includes('DTSTART;TZID=Asia/Jerusalem:20261105T232900'));
   assert.ok(!ics.includes('DTSTART;TZID=Asia/Jerusalem:20261027T'),'no classes on election day');
-  assert.equal(ics.match(/BEGIN:VEVENT/g).length,156+14+21+1);
+  assert.equal(ics.match(/BEGIN:VEVENT/g).length,143+12+21+1);
   const early=core.semEvents([{id:'e',kind:'due',date:'2026-11-05',start:'00:15'}]).find(x=>x.uid==='ue-2026-11-05');
   assert.ok(early.s>=0&&early.e>early.s);
 });
@@ -144,7 +144,7 @@ test('csv',()=>{
   assert.equal(lines[0],'Subject,Start Date,Start Time,End Date,End Time,Description,Location');
   assert.ok(lines.includes('"סגירה ""ערב""","10/22/2026","6:00 PM","10/23/2026","2:00 AM","",""'));
   assert.ok(lines.includes('"מבחן: מבוא למיקרו · מועד א\'","01/22/2027","9:00 AM","01/22/2027","12:00 PM","",""'));
-  assert.equal(lines.length,1+156+14+21);
+  assert.equal(lines.length,1+143+12+21);
   assert.equal(core.ampm(0),'12:00 AM');assert.equal(core.ampm(720),'12:00 PM');
 });
 test('detach',()=>{
@@ -173,7 +173,7 @@ test('every course maps to a color class',()=>{
   [...core.BASE.map(b=>b.t),...core.EXAMS.map(x=>x.c)].forEach(t=>assert.ok(core.COURSE[t],'no COURSE entry for '+t));
   const evs=core.evsForWeek('2027-01-17',[]);
   assert.ok(evs.filter(e=>e.src==='base'||e.src==='exam').every(e=>e.course===core.COURSE[e.title]));
-  assert.equal(evs.find(e=>e.src==='exam'&&e.date==='2027-01-22').course,'micro');assert.equal(evs.find(e=>e.src==='exam'&&e.date==='2027-01-18').course,'eng');
+  assert.equal(evs.find(e=>e.src==='exam'&&e.date==='2027-01-22').course,'micro');
   assert.ok(core.evsForWeek('2026-10-18',[]).filter(e=>e.src==='base').every(e=>ids.has(e.course)));
 });
 const cx=(date,base)=>({id:'c'+date+base,kind:'cancel',date,base,updated:1});
@@ -181,7 +181,7 @@ test('cancel flags only that date and base index',()=>{
   const items=[cx('2026-10-19',5)];
   const w=core.evsForWeek('2026-10-18',items);
   assert.deepEqual(w.filter(e=>e.cancelled).map(e=>e.key),['b5']);
-  assert.equal(w.filter(e=>e.src==='base').length,12);
+  assert.equal(w.filter(e=>e.src==='base').length,11);
   assert.equal(core.evsForWeek('2026-10-25',items).filter(e=>e.cancelled).length,0);
   assert.equal(core.evsForWeek('2026-10-18',[cx('2026-10-19',4)]).filter(e=>e.cancelled).map(e=>e.key).join(),'b4');
   assert.equal(core.cancelOf('2026-10-19',5,items).id,items[0].id);
@@ -217,8 +217,8 @@ test('export omits a cancelled class',()=>{
   const items=[cx('2026-10-19',5)];
   assert.equal(core.semEvents(items).length,core.semEvents([]).length-1);
   assert.ok(!core.semEvents(items).some(x=>x.uid==='b5-2026-10-19'));assert.ok(core.semEvents([]).some(x=>x.uid==='b5-2026-10-19'));
-  assert.equal(core.buildIcs(items,'20261008T000000Z').match(/BEGIN:VEVENT/g).length,156+14-1);
-  assert.equal(core.buildCsv(items).trim().split('\r\n').length,1+156+14-1);
+  assert.equal(core.buildIcs(items,'20261008T000000Z').match(/BEGIN:VEVENT/g).length,143+12-1);
+  assert.equal(core.buildCsv(items).trim().split('\r\n').length,1+143+12-1);
 });
 test('cancel works on the make-up day with the base index',()=>{
   const items=[cx('2027-01-17',7)];                         // BASE[7] = Tuesday micro tutorial
@@ -312,7 +312,7 @@ test('dayLines: one day, ordered by time, deadlines included',()=>{
 test('lineTxt: colour, title and meta of a list line',()=>{
   const ev=d=>core.evsForWeek('2026-10-18',[{id:'a',kind:'anchor',date:A,updated:1},{id:'u',kind:'open',day:4,start:'07:00',end:'15:00',week:'both',note:'חנות'},{id:'v',kind:'study',date:'2026-10-24',start:'10:00',end:'12:00'}]).find(d);
   assert.deepEqual(core.lineTxt(ev(e=>e.key==='b0')),{col:'--c-stat',ttl:'הסתברות וסטטיסטיקה · תרגיל',meta:'כלכלה 103'});
-  assert.deepEqual(core.lineTxt(ev(e=>e.key==='b12')),{col:'--c-eng',ttl:"אנגלית מתקדמים א' · אנגלית",meta:'חדר טרם שובץ'});
+  assert.deepEqual(core.lineTxt(ev(e=>e.key==='b11')),{col:'--c-math',ttl:"מתמטיקה א' · שיעור",meta:'כלכלה 107'});
   assert.deepEqual(core.lineTxt(ev(e=>e.id==='u')),{col:'--open-bd',ttl:'משמרת פתיחה',meta:'כל שבוע · חנות'});
   assert.deepEqual(core.lineTxt(ev(e=>e.id==='v')),{col:'--study-bd',ttl:'למידה עצמית',meta:'חד-פעמי'});
   const x=core.evsForWeek('2027-01-17',[]).find(e=>e.src==='exam'&&e.date==='2027-01-22');
@@ -547,4 +547,45 @@ test('Supabase helpers: OAuth hash, JWT expiry, rows <-> items, failure reasons'
   assert.deepEqual(core.sbItems(null),[]);
   assert.equal(core.sbWhy(401,''),'auth');assert.equal(core.sbWhy(404,'PGRST205'),'table');assert.equal(core.sbWhy(403,'42501'),'grant');assert.equal(core.sbWhy(500,''),'');
   assert.match(core.sbMsg('table'),/SQL/);assert.equal(core.sbMsg(''),'');
+});
+
+test('tracks: the profile picks the timetable, track ב\' is the default',()=>{
+  assert.deepEqual(Object.keys(core.TRACKS),['a','b']);
+  const tue=(items)=>Math.min(...core.evsForWeek('2026-10-18',items).filter(e=>e.src==='base'&&e.d===2).map(e=>e.s));
+  assert.equal(tue([]),10*60+15);                                                        // no profile: track ב'
+  assert.equal(tue([{id:'p',kind:'profile',track:'a',updated:1}]),9*60+30);              // track א' starts Tuesday at 09:30
+  assert.equal(tue([{id:'p',kind:'profile',track:'b',updated:1}]),10*60+15);
+  assert.equal(tue([{id:'p',kind:'profile',track:'zzz',updated:1}]),10*60+15);           // unknown track -> default
+  assert.equal(core.trackOf([{id:'p1',kind:'profile',track:'a',updated:1},{id:'p2',kind:'profile',track:'b',updated:2}]),'b'); // the newest profile wins
+  assert.equal(core.profileOf([]),null);
+  for(const t of ['a','b']){const e=core.evsForWeek('2026-10-18',[{id:'p',kind:'profile',track:t,updated:1}]);
+    assert.equal(e.filter(x=>x.src==='base').length,11);assert.ok(!e.some(x=>x.src==='user'));}  // a profile doc is never drawn; both tracks have 11 classes a week (OB is self-paced)
+  assert.equal(core.TRACKS.b.base,core.BASE);                                              // BASE (indices in cancel docs) is track ב'
+  for(const t of ['a','b'])core.TRACKS[t].base.forEach(b=>assert.ok(core.COURSE[b.t],'no COURSE entry for '+b.t));
+  assert.equal(core.shiftMonths([{id:'p',kind:'profile',track:'a',updated:1}]).n,0);
+});
+test('onboardDocs: answers -> profile + a personal English class',()=>{
+  const d=core.onboardDocs({track:'a',name:'  נבו  ',works:false,eng:{d:3,s:'16:00',e:'19:30',level:"מתקדמים א'"}},5);
+  assert.deepEqual(d.profile,{kind:'profile',track:'a',works:false,name:'נבו',updated:5});
+  assert.deepEqual(d.items,[{kind:'other',title:"אנגלית מתקדמים א'",day:3,start:'16:00',end:'19:30',week:'both',note:'',updated:5,skip:[]}]);
+  const e=core.onboardDocs({},7);
+  assert.deepEqual(e.profile,{kind:'profile',track:'b',works:true,updated:7});assert.deepEqual(e.items,[]);            // empty answers: safe defaults
+  assert.deepEqual(core.onboardDocs(undefined,1).items,[]);
+  assert.equal(core.onboardDocs({track:'x'},1).profile.track,'b');
+  for(const bad of [{d:9,s:'16:00',e:'19:30'},{d:3,s:'16:00',e:'16:00'},{d:3,s:'',e:'19:30'},{d:'3',s:'16:00',e:'19:30'},null])
+    assert.deepEqual(core.onboardDocs({eng:bad},1).items,[],JSON.stringify(bad));
+  assert.equal(core.onboardDocs({eng:{d:1,s:'10:00',e:'11:00'}},1).items[0].title,'אנגלית');                              // no level
+  assert.equal(core.onboardDocs({name:'x'.repeat(50)},1).profile.name.length,30);
+  assert.ok(!('name' in core.onboardDocs({name:'   '},1).profile));
+});
+
+test('cancel docs belong to a track: changing the track does not re-point them',()=>{
+  const c={id:'c',kind:'cancel',date:'2026-11-01',base:0,updated:1};                    // legacy doc without a track = track ב'
+  const b=core.evsForWeek('2026-11-01',[c]).find(e=>e.src==='base'&&e.i===0);
+  assert.equal(b.cancelled,true);assert.equal(b.title,'הסתברות וסטטיסטיקה');            // track ב' index 0
+  const a=core.evsForWeek('2026-11-01',[c,{id:'p',kind:'profile',track:'a',updated:1}]).find(e=>e.src==='base'&&e.i===0);
+  assert.ok(!a.cancelled);assert.equal(a.title,"מתמטיקה א'");                           // on track א' the legacy cancel does not hit its index 0
+  const ca={...c,id:'c2',track:'a'};
+  assert.equal(core.evsForWeek('2026-11-01',[ca,{id:'p',kind:'profile',track:'a',updated:1}]).find(e=>e.src==='base'&&e.i===0).cancelled,true);
+  assert.ok(!core.evsForWeek('2026-11-01',[ca]).find(e=>e.src==='base'&&e.i===0).cancelled); // and track ב' ignores a track-א' cancel
 });

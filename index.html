@@ -220,6 +220,21 @@ details.card[open] .upsum{display:none}
 .df .due.late,.ml.d.late{color:var(--bad-tx);font-weight:800}
 .ph .ml.d.late{background:var(--bad-bd);box-shadow:none}
 .pastebtn{margin-top:12px}
+.welcome{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:var(--bg-app)}
+.welcome[hidden]{display:none}
+.wcard{max-width:420px;text-align:center;display:grid;gap:14px}
+.wcard h1{margin:0;font-size:34px;font-weight:800;color:var(--ink)}
+.wcard p{margin:0;color:var(--text-muted)}
+.wcard .btn{font-size:16px;padding:12px 20px;min-height:48px}
+.wnote{font-size:13px}.wnote a{color:inherit}
+.obprog{font-size:12.5px;font-weight:700;color:var(--text-muted)}
+.obopt{display:grid;gap:6px;padding:12px 14px;border:1.5px solid var(--border-dark);border-radius:12px;background:var(--bg-card);cursor:pointer;text-align:start}
+.obopt b{color:var(--ink)}.obopt small{color:var(--text-muted);font-size:12.5px;line-height:1.5}
+.obopt:has(input:checked){border-color:var(--ink);background:var(--bg-sunk)}
+.obopt input{position:absolute;opacity:0;pointer-events:none}
+.obopt:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+#obBody{display:grid;gap:10px}
+.ph .obopt{min-height:56px}
 textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark);border-radius:9px;padding:9px 11px;font:inherit;font-size:15px;color:inherit;resize:vertical}
 .plist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .plist li{display:grid;grid-template-columns:auto 52px minmax(0,1fr) minmax(0,150px);gap:8px;align-items:center;padding:6px 8px;border:1px solid var(--border-light);border-radius:9px;background:var(--bg-sunk);font-size:14px}
@@ -463,14 +478,13 @@ button.dlb{cursor:pointer}
     <span class="c-micro"><i style="background:var(--cc);border-color:var(--cc)"></i>מיקרו</span>
     <span class="c-data"><i style="background:var(--cc);border-color:var(--cc)"></i>ניתוח נתונים ו-AI</span>
     <span class="c-ob"><i style="background:var(--cc);border-color:var(--cc)"></i>התנהגות ארגונית</span>
-    <span class="c-eng"><i style="background:var(--cc);border-color:var(--cc)"></i>אנגלית</span>
     <span class="sep"></span>
     <span class="nu"><i style="background:color-mix(in srgb,var(--cc) 14%,var(--bg-card));border-color:var(--cc)"></i>שיעור</span>
     <span class="nu"><i style="background:color-mix(in srgb,var(--cc) 6%,var(--bg-card));border-color:var(--cc);border-style:dashed"></i>תרגיל</span>
     <span class="nu"><i style="background:var(--cc);border-color:var(--cc)"></i>מבחן</span>
     <span class="sep"></span>
-    <span><i style="background:var(--open-bg);border-color:var(--open-bd)"></i>משמרת פתיחה</span>
-    <span><i style="background:var(--close-bg);border-color:var(--close-bd)"></i>משמרת סגירה</span>
+    <span class="lg-sh"><i style="background:var(--open-bg);border-color:var(--open-bd)"></i>משמרת פתיחה</span>
+    <span class="lg-sh"><i style="background:var(--close-bg);border-color:var(--close-bd)"></i>משמרת סגירה</span>
     <span><i style="background:var(--study-bg);border-color:var(--study-bd)"></i>למידה עצמית</span>
     <span><i style="background:var(--other-bg);border-color:var(--other-bd);border-style:dashed"></i>אחר</span>
     <span><i style="background:var(--bad-bg);border-color:var(--bad-bd)"></i>הגשה</span>
@@ -511,7 +525,7 @@ button.dlb{cursor:pointer}
   </div>
 </section>
 
-<footer>בסיס נעול: מקבץ ב' + אנגלית מתקדמים א' · לוח שנה ומועדי בחינות: האקדמית ת"א-יפו תשפ"ז (מועדים עלולים להשתנות) · מבחן מוצג כ-3 שעות · <button type="button" class="edit-link" id="ghLink">חיבור ל-GitHub</button> · <button type="button" class="edit-link" id="sbLink">חשבון Google</button></footer>
+<footer>בסיס נעול: מקבץ ב' + אנגלית מתקדמים א' · לוח שנה ומועדי בחינות: האקדמית ת"א-יפו תשפ"ז (מועדים עלולים להשתנות) · מבחן מוצג כ-3 שעות · <button type="button" class="edit-link" id="ghLink">חיבור ל-GitHub</button> · <button type="button" class="edit-link" id="sbLink">חשבון Google</button> · <button type="button" class="edit-link" id="obLink" hidden>ההגדרות שלי</button></footer>
 </div>
 
 <nav class="tabs" id="tabs" aria-label="תצוגות">
@@ -587,6 +601,31 @@ button.dlb{cursor:pointer}
   </form>
 </dialog>
 
+<div class="welcome" id="welcome" hidden>
+  <div class="wcard">
+    <h1>WeekPlan</h1>
+    <p>המתכנן השבועי לסטודנטים: מערכת השעות, משמרות והגשות במקום אחד.</p>
+    <div class="err" id="wErr" hidden></div>
+    <button type="button" class="btn pri" id="wIn">התחברות עם Google</button>
+    <p class="wnote">הנתונים נשמרים בענן, ורק אתה רואה אותם. <a href="privacy.html">מדיניות פרטיות</a></p>
+  </div>
+</div>
+
+<dialog id="obDlg" aria-labelledby="obTitle">
+  <form class="dlg" id="obFrm" novalidate>
+    <div class="obprog" id="obProg"></div>
+    <h3 id="obTitle"></h3>
+    <div id="obBody"></div>
+    <div class="err" id="obErr" hidden></div>
+    <div class="actions">
+      <button type="button" class="btn" id="obBack">חזרה</button>
+      <button type="submit" class="btn pri" id="obNext">הבא</button>
+      <span class="sp"></span>
+      <button type="button" class="btn" id="obSkip">דלג</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="sbDlg" aria-labelledby="sbTitle">
   <form class="dlg" id="sbFrm" novalidate>
     <h3 id="sbTitle">חשבון Google</h3>
@@ -636,9 +675,23 @@ const BASE=[
  {d:2,s:'12:15',e:'14:45',t:'כלי ניתוח נתונים ו-AI',k:'lab',r:'כלכלה 209'},
  {d:2,s:'15:00',e:'16:30',t:'מבוא למיקרו',k:'lec',r:'כלכלה 101'},
  {d:3,s:'10:30',e:'12:00',t:'יסודות התנהגות ארגונית',k:'lec',r:'זום, לימוד עצמי',self:1}, // self:1 = no frontal class, self-paced on Zoom: never drawn; kept so BASE indices (stored in cancel docs) stay put
- {d:3,s:'12:30',e:'15:00',t:"מתמטיקה א'",k:'lec',r:'כלכלה 107'},
- {d:3,s:'16:00',e:'19:30',t:"אנגלית מתקדמים א'",k:'eng',r:'חדר טרם שובץ'}
+ {d:3,s:'12:30',e:'15:00',t:"מתמטיקה א'",k:'lec',r:'כלכלה 107'}
+]; // track ב' (BASE keeps its name and indices: cancel docs store them). English is not in the base: each student adds theirs
+const BASE_A=[ // track א', semester א'
+ {d:0,s:'10:15',e:'11:45',t:"מתמטיקה א'",k:'tut',r:'כלכלה 208'},
+ {d:0,s:'12:00',e:'13:30',t:"חשבונאות א'",k:'tut',r:'כלכלה 205'},
+ {d:0,s:'14:00',e:'15:30',t:'הסתברות וסטטיסטיקה',k:'tut',r:'כלכלה 103'},
+ {d:0,s:'16:00',e:'17:30',t:"חשבונאות א'",k:'lec',r:'כלכלה 205'},
+ {d:1,s:'08:30',e:'10:00',t:'הסתברות וסטטיסטיקה',k:'lec',r:'כלכלה 101'},
+ {d:1,s:'10:30',e:'12:00',t:'מבוא למיקרו',k:'lec',r:'כלכלה 108'},
+ {d:1,s:'14:00',e:'15:30',t:"מתמטיקה א'",k:'lec',r:'כלכלה 101'},
+ {d:2,s:'09:30',e:'12:00',t:'כלי ניתוח נתונים ו-AI',k:'lab',r:'כלכלה 209'},
+ {d:2,s:'12:30',e:'14:00',t:'מבוא למיקרו',k:'tut',r:'כלכלה 212'},
+ {d:2,s:'15:00',e:'16:30',t:'מבוא למיקרו',k:'lec',r:'כלכלה 101'},
+ {d:3,s:'10:30',e:'12:00',t:'יסודות התנהגות ארגונית',k:'lec',r:'זום, לימוד עצמי',self:1},
+ {d:3,s:'12:30',e:'15:00',t:"מתמטיקה א'",k:'lec',r:'כלכלה 107'}
 ];
+const TRACKS={a:{label:"מקבץ א'",base:BASE_A},b:{label:"מקבץ ב'",base:BASE}};
 const COURSE={'הסתברות וסטטיסטיקה':'stat',"מתמטיקה א'":'math',"חשבונאות א'":'acc','מבוא למיקרו':'micro','כלי ניתוח נתונים ו-AI':'data','יסודות התנהגות ארגונית':'ob',"אנגלית מתקדמים א'":'eng'};
 const BKIND={lec:'שיעור',tut:'תרגיל',lab:'מעבדה',eng:''};
 const KINDS={
@@ -686,10 +739,19 @@ const EXAMS=[ // mtamn.mta.ac.il exam search, תשפ"ז. Live system: dates can 
  {c:'כלי ניתוח נתונים ו-AI',m:'א',date:'2027-02-05',s:'09:00'},{c:'כלי ניתוח נתונים ו-AI',m:'ב',date:'2027-03-01',s:'14:00'},
  {c:"חשבונאות א'",m:'א',date:'2027-02-10',s:'09:00'},{c:"חשבונאות א'",m:'ב',date:'2027-03-05',s:'09:00'},
  {c:'יסודות התנהגות ארגונית',m:'א',date:'2027-02-14',s:'14:00'},{c:'יסודות התנהגות ארגונית',m:'ב',date:'2027-03-08',s:'14:00'},
- {c:"אנגלית מתקדמים א'",m:'א',date:'2027-01-18',s:'09:00'},{c:"אנגלית מתקדמים א'",m:'ב',date:'2027-02-08',s:'09:00'} // from the student's own exam list (Yedion "רשימת בחינות לסטודנט")
 ];
 const EXAM_MIN=180; // ponytail: assumed 3h; the listing gives start time only
-const SPECIAL={due:1,off:1,anchor:1,cancel:1};
+const SPECIAL={due:1,off:1,anchor:1,cancel:1,profile:1};
+const profileOf=items=>items.filter(x=>x.kind==='profile').sort((p,q)=>(q.updated||0)-(p.updated||0))[0]||null; // the newest profile doc: {track,name,works}
+const trackOf=items=>{const p=profileOf(items);return p&&TRACKS[p.track]?p.track:'b'}; // the timetable of the signed-in student; track ב' is the default (the owner's data has no profile)
+const baseOf=items=>TRACKS[trackOf(items)].base;
+function onboardDocs(a,now){ // the answers of the opening screens -> {profile, items:[personal English class]}; invalid answers fall back to safe defaults
+  a=a||{};const t=TRACKS[a.track]?a.track:'b',name=String(a.name||'').trim().slice(0,30),e=a.eng;
+  const profile={kind:'profile',track:t,works:a.works!==false,...(name&&{name}),updated:now};
+  const ok=e&&Number.isInteger(e.d)&&e.d>=0&&e.d<=6&&okTime(e.s)&&okTime(e.e)&&e.s!==e.e;
+  const lv=ok?String(e.level||'').trim().slice(0,30):'';
+  return{profile,items:ok?[{kind:'other',title:'אנגלית'+(lv?' '+lv:''),day:e.d,start:e.s,end:e.e,week:'both',note:'',updated:now,skip:[]}]:[]};
+}
 const isRec=x=>x.week==='A'||x.week==='B'||x.week==='both'; // recurring every week (A/B are docs of the retired rotation)
 const lastSun=sunOf(SEM.last);
 const clampSun=s=>s<SEM.start?SEM.start:s>lastSun?lastSun:s; // own line: test.mjs exports only the first name per const
@@ -729,7 +791,7 @@ const swipeDir=(dx,dy)=>Math.abs(dx)>=50&&Math.abs(dx)>=1.5*Math.abs(dy)?(dx>0?1
 
 /* ---------- model ---------- */
 function offDoc(iso,items){return items.find(x=>x.kind==='off'&&x.date===iso)}
-function cancelOf(date,i,items){return items.find(x=>x.kind==='cancel'&&x.date===date&&x.base===i)} // i = BASE index; one cancelled occurrence
+function cancelOf(date,i,items){const t=trackOf(items);return items.find(x=>x.kind==='cancel'&&x.date===date&&x.base===i&&(x.track||'b')===t)} // i = index in the student's track; one cancelled occurrence (a cancel doc without a track is track ב')
 function baseDay(iso,items){
   if(offDoc(iso,items))return null;
   const c=CAL[iso];
@@ -741,7 +803,7 @@ function evsForWeek(sun,items,skipId){
   const out=[];
   for(let d=0;d<7;d++){
     const date=addDays(sun,d),bd=baseDay(date,items);
-    if(bd!=null)BASE.forEach((b,i)=>{if(b.d!==bd||b.self)return;const[s,e]=span(b.s,b.e);out.push({src:'base',key:'b'+i,i,d,date,s,e,title:b.t,course:COURSE[b.t],kind:b.k,room:b.r,...(cancelOf(date,i,items)&&{cancelled:true})})});
+    if(bd!=null)baseOf(items).forEach((b,i)=>{if(b.d!==bd||b.self)return;const[s,e]=span(b.s,b.e);out.push({src:'base',key:'b'+i,i,d,date,s,e,title:b.t,course:COURSE[b.t],kind:b.k,room:b.r,...(cancelOf(date,i,items)&&{cancelled:true})})});
     EXAMS.forEach((x,i)=>{if(x.date!==date)return;const s=toMin(x.s);out.push({src:'exam',key:'x'+i,d,date,s,e:s+EXAM_MIN,title:x.c,course:COURSE[x.c],kind:'exam',moed:x.m,room:'מועד '+x.m+"'"})});
   }
   items.forEach(it=>{
@@ -958,10 +1020,11 @@ function render(){
   $('#prev').setAttribute('aria-label',mon?'חודש קודם':day?'יום קודם':'שבוע קודם');$('#next').setAttribute('aria-label',mon?'חודש הבא':day?'יום הבא':'שבוע הבא');
   $('#vWeek').setAttribute('aria-pressed',String(!mon));$('#vMonth').setAttribute('aria-pressed',String(mon));
   $('.nav').hidden=upv;
-  $('#upCard').hidden=ph&&!upv;$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;$('#expCard').hidden=$('#shCard').hidden=day||upv;
+  $('#upCard').hidden=ph&&!upv;$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;document.querySelectorAll('.lg-sh').forEach(l=>l.hidden=!worksOn());$('#expCard').hidden=day||upv;$('#shCard').hidden=day||upv||!worksOn();
   $('#gridCard').hidden=!wkv||ph&&!wkGrid;$('#agCard').hidden=!wkv||ph&&wkGrid;$('#wkBar').hidden=!(ph&&wkv);$('#gridTgl').setAttribute('aria-pressed',String(wkGrid));
   $('#addLbl').textContent=mon?'הוספה':day?'הוספה ליום זה':'הוספה לשבוע';$('#addBtn').hidden=upv;
   document.querySelectorAll('#tabs [data-v]').forEach(b=>b.setAttribute('aria-current',b.dataset.v===view?'page':'false'));
+  {const pf=profileOf(items);$('.top h1').textContent=pf&&pf.name?'השבוע של '+pf.name:'השבוע שלי'}
   renderStore(); renderUp(); if(!$('#shCard').hidden)renderShifts();
   const pb=$('.printbar'),gh=$(mon?'#monthCard .ghead':'#gridCard .ghead');if(pb.parentNode!==gh)gh.appendChild(pb); // one print bar, in whichever card is shown
   if(mon)renderMonth();
@@ -978,12 +1041,12 @@ function render(){
 }
 function renderStore(){
   const m={loading:['','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],sb:['db','נשמר בחשבון Google'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
-  const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent=m[1];$('#ghLink').hidden=mode==='srv'||mode==='db'||mode==='sb';$('#sbLink').hidden=mode==='srv'||mode==='db';
+  const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent=m[1];$('#obLink').hidden=mode!=='sb';$('#ghLink').hidden=mode==='srv'||mode==='db'||mode==='sb';$('#sbLink').hidden=mode==='srv'||mode==='db';
 }
 function renderSum(s,an){
   const cells=[
     ['שעות הוראה',hrs(s.cls),s.studyDays===1?'יום לימודים אחד':s.studyDays?`${s.studyDays} ימי לימודים`:'אין לימודים השבוע'],
-    ['שעות משמרת',hrs(s.sh),s.shN?`${s.shN} משמרות`:'עוד לא נוספו'],
+    ...(worksOn()?[['שעות משמרת',hrs(s.sh),s.shN?`${s.shN} משמרות`:'עוד לא נוספו']]:[]),
     ['למידה עצמית',hrs(s.st),s.st?'מתוכננת':'אין בלוקים מתוכננים'],
     ['סה"כ מחויב',hrs(s.total),[s.ex?`${hrs(s.ex)} ש' מבחנים`:'',s.oth?`${hrs(s.oth)} ש' אחר`:''].filter(Boolean).join(' · ')||'שעות בשבוע'],
     ['ימים פנויים לגמרי',String(s.freeNames.length),s.freeNames.length?s.freeNames.join(', '):'אין יום בלי כלום']
@@ -1076,7 +1139,7 @@ function renderGrid(evs,clash){
 }
 function renderAgenda(evs,clash){
   const edit=canEdit(),wd=DAYS.map((_,i)=>addDays(viewSun,i)),nS=evs.filter(e=>e.src==='user'&&KINDS[e.kind].shift).length,nD=items.filter(x=>x.kind==='due'&&wd.includes(x.date)).length;
-  $('#agSum').textContent=[dm(viewSun)+'–'+dm(wd[6]),nS===1?'משמרת אחת':nS+' משמרות',nD===1?'הגשה אחת':nD+' הגשות'].join(' · '); // the line next to the title while the card is closed
+  $('#agSum').textContent=[dm(viewSun)+'–'+dm(wd[6]),...(worksOn()?[nS===1?'משמרת אחת':nS+' משמרות']:[]),nD===1?'הגשה אחת':nD+' הגשות'].join(' · '); // the line next to the title while the card is closed
   $('#agenda').innerHTML=DAYS.map((d,i)=>{
     const date=addDays(viewSun,i),c=CAL[date],off=offDoc(date,items),dn=`${d} ${dm(date)}`;
     const list=evs.filter(e=>e.d===i).sort((a,b)=>a.s-b.s),base=list.filter(e=>e.src==='base'&&!e.cancelled);
@@ -1191,7 +1254,7 @@ $('#agenda').addEventListener('click',x=>{
   if(c&&!c.disabled){c.disabled=true;const[date,i]=c.dataset.cancel.split('|');toggleCancel(date,Number(i))}
 });
 async function toggleCancel(date,i){
-  const c=cancelOf(date,i,items),ok=await(c?removeItem(c.id,'השיעור הוחזר'):saveItem(null,{kind:'cancel',date,base:i,updated:Date.now()},'השיעור בוטל ב-'+dm(date)));
+  const c=cancelOf(date,i,items),ok=await(c?removeItem(c.id,'השיעור הוחזר'):saveItem(null,{kind:'cancel',date,base:i,track:trackOf(items),updated:Date.now()},'השיעור בוטל ב-'+dm(date)));
   if(!ok)render();return ok;
 }
 const cdlg=$('#cdlg');let cEv;
@@ -1210,12 +1273,12 @@ $('#grid').addEventListener('click',async x=>{
 
 /* ---------- dialog ---------- */
 const dlg=$('#dlg'),frm=$('#frm');
-$('#kindChips').innerHTML=Object.entries(KINDS).map(([k,v])=>`<label><input type="radio" name="fKind" value="${k}" id="fk_${k}"><i style="background:var(${v.color})"></i>${v.short}</label>`).join('');
+$('#kindChips').innerHTML=Object.entries(KINDS).map(([k,v])=>`<label data-shift="${v.shift?1:0}"><input type="radio" name="fKind" value="${k}" id="fk_${k}"><i style="background:var(${v.color})"></i>${v.short}</label>`).join('');
 $('#fDay').innerHTML=DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
 const getKind=()=>(frm.querySelector('input[name=fKind]:checked')||{}).value||'open';
 const getWeek=()=>$('#fRec').checked?'both':'date'; // "חוזר כל שבוע": a weekly item, otherwise one date
 function lastOf(kind){return items.filter(it=>it.kind===kind&&okTime(it.start)&&okTime(it.end)).sort((a,b)=>(b.updated||0)-(a.updated||0))[0]}
-function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true}
+function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true;if(!worksOn()&&!(KINDS[k]&&KINDS[k].shift))$('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=true);else $('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=false)} // a student who works no shifts does not see the shift types (an existing shift keeps its own)
 function setWeek(w){$('#fRec').checked=w==='A'||w==='B'||w==='both'} // A/B docs of the retired rotation open as weekly
 const COURSE_OPTS=Object.entries(COURSE).map(([t,c])=>`<option value="${esc(c)}">${esc(t)}</option>`).join('');
 $('#fCourse').innerHTML='<option value="">ללא</option>'+COURSE_OPTS;
@@ -1231,7 +1294,7 @@ function syncFields(){
 function openAdd(pre={}){
   const sun=pre.sun||viewSun; // the week to add to (month view passes its own)
   editing=null;timesTouched=pre.start!=null;editSun=sun;
-  const kind=pre.kind||'open',last=lastOf(kind);
+  const kind=pre.kind||(worksOn()?'open':'study'),last=lastOf(kind); // a student without shifts starts from a study block
   setKind(kind);$('#fTitle').value='';$('#fNote').value='';
   $('#fDay').value=String(pre.day!=null?pre.day:4);
   if(pre.start!=null){const dur=last?span(last.start,last.end).reduce((a,b)=>b-a):180;$('#fStart').value=fm(pre.start);$('#fEnd').value=fm(pre.start+dur)}
@@ -1495,7 +1558,7 @@ $('#ghFrm').addEventListener('submit',x=>{
 });
 /* ---------- Supabase (signed in with Google): each user's items are rows {id,doc} guarded by Row Level Security ---------- */
 const SB_URL='https://yemvjkopkeheshifunbu.supabase.co', SB_KEY='sb_publishable_GaBUBHImwih_fS5pl8yM7Q_zDTUUsjg', SB_LS='wp.sb', SB_CACHE='wp.sb.cache'; // the publishable key is public by design; RLS protects the data
-let sbs=null, sbOn=false, sbNew=false; // sbs = {access,refresh}
+let sbs=null, sbOn=false, sbNew=false, sbErr=''; // sbErr: a failed OAuth redirect, shown on the welcome screen // sbs = {access,refresh}
 const sbHas=()=>{try{return!!JSON.parse(localStorage.getItem(SB_LS)).refresh}catch(e){return false}};
 const sbCachePut=v=>{try{v?localStorage.setItem(SB_CACHE,JSON.stringify(v)):localStorage.removeItem(SB_CACHE)}catch(e){}};
 const sbPut=v=>{sbs=v;try{v?localStorage.setItem(SB_LS,JSON.stringify(v)):localStorage.removeItem(SB_LS)}catch(e){}if(!v)sbCachePut(null)}; // ending the session also drops the cached items
@@ -1506,7 +1569,7 @@ function sbTake(){ // the page was just opened by the OAuth redirect: keep the t
   if(t||/error_description=/.test(location.hash)){try{sessionStorage.removeItem('wp.sb.go')}catch(e){}}
   if(t&&own){sbPut(t);sbCachePut(null);sbNew=true;history.replaceState(null,'',location.pathname+location.search);return true}
   if(t){history.replaceState(null,'',location.pathname+location.search);return false}
-  if(/error_description=/.test(location.hash)){history.replaceState(null,'',location.pathname+location.search);toast('הכניסה עם Google לא הצליחה.')}
+  if(/error_description=/.test(location.hash)){history.replaceState(null,'',location.pathname+location.search);sbErr='הכניסה עם Google לא הצליחה. נסה שוב.';toast(sbErr)}
   return false;
 }
 let sbRef=null; // the refresh in flight: callers share it
@@ -1551,7 +1614,7 @@ async function sbLoad(){
   try{
     const rows=[];for(let i=0;;i+=1000){const r=await sbFetch('/rest/v1/items?select=id,doc&order=id',{headers:{'Range-Unit':'items',Range:i+'-'+(i+999)}}),pg=await r.json();rows.push(...pg);if(pg.length<1000)break} // PostgREST returns at most 1000 rows per request
     if(q!==sbSeq)return;
-    items=sbItems(rows);mode='sb';sbCacheSave();render();
+    items=sbItems(rows);mode='sb';sbCacheSave();render();maybeOnboard();
     if(sbNew){sbNew=false;toast('מחובר עם Google · '+(items.length===1?'פריט אחד':items.length+' פריטים'))}
   }catch(e){if(q===sbSeq)sbFail(e,mode==='sb'||mode==='ro')}
 }
@@ -1581,7 +1644,13 @@ function openSb(err){
 $('#sbLink').addEventListener('click',()=>openSb());
 $('#sbClose').addEventListener('click',()=>sbDlg.close());
 sbDlg.addEventListener('click',x=>{if(x.target===sbDlg)sbDlg.close()});
-$('#sbIn').addEventListener('click',()=>{try{sessionStorage.setItem('wp.sb.go','1')}catch(e){}location.href=SB_URL+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(location.origin+location.pathname)});
+function showWelcome(){
+  $('#welcome').hidden=false;$('#wErr').textContent=sbErr;$('#wErr').hidden=!sbErr;
+  document.querySelectorAll('body>:not(#welcome):not(script)').forEach(e=>e.inert=true); // nothing behind the sign-in screen is reachable by keyboard
+}
+function sbSignIn(){try{sessionStorage.setItem('wp.sb.go','1')}catch(e){}location.href=SB_URL+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(location.origin+location.pathname)}
+$('#sbIn').addEventListener('click',sbSignIn);
+$('#wIn').addEventListener('click',sbSignIn);
 $('#sbOut').addEventListener('click',async()=>{
   try{if(sbs||sbHas()){if(!sbs)sbs=JSON.parse(localStorage.getItem(SB_LS));await fetch(SB_URL+'/auth/v1/logout',{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+sbs.access}})}}catch(e){} // best effort: also ends the session on the server
   sbPut(null);location.reload();
@@ -1596,6 +1665,75 @@ $('#sbMove').addEventListener('click',async()=>{ // one-time: copy the items of 
   }catch(e){const m=e&&e.why&&(sbMsg(e.why)||ghMsg(e.why,(ghc||{}).owner,(ghc||{}).repo,e.status))||'ההעברה לא הצליחה. נסה שוב.';openSb(m)} // openSb recomputes the buttons (the session may be gone)
   b.disabled=false;
 });
+/* ---------- opening screens (first sign-in): track, name, shifts, English; later editable from the footer ---------- */
+function worksOn(){const p=profileOf(items);return!p||p.works!==false} // a student who answered "no" to shifts does not see the shift UI
+function trackDesc(t){ // "א 10:15–17:30 · ב …": the days of a track
+  const m={};
+  TRACKS[t].base.filter(b=>!b.self).forEach(b=>{const a=m[b.d]||(m[b.d]={s:1e9,e:0});a.s=Math.min(a.s,toMin(b.s));a.e=Math.max(a.e,toMin(b.e))});
+  return Object.keys(m).sort().map(d=>DAYI[d]+' '+fm(m[d].s)+'–'+fm(m[d].e)).join(' · ');
+}
+let ob=null,obAsked=false; // ob = {first,i,steps,a,id}
+const obDlg=$('#obDlg');
+function openOb(first){
+  const p=profileOf(items);
+  ob={first,i:0,steps:first?['track','name','works','eng']:['track','name','works'],id:p?p.id:newId(),saved:{profile:!!p},a:{track:p&&TRACKS[p.track]?p.track:(items.length?trackOf(items):''),name:p&&p.name||'',works:p||items.length?worksOn():null,eng:null}}; // an account with data but no profile starts from its effective track and shifts; the id is fixed up front so a retry updates the same doc
+  obRender();if(!obDlg.open)obDlg.showModal();
+}
+function obRender(){
+  const st=ob.steps[ob.i],a=ob.a,last=ob.i===ob.steps.length-1;
+  $('#obProg').textContent='שלב '+(ob.i+1)+' מתוך '+ob.steps.length;$('#obErr').hidden=true;
+  $('#obBack').hidden=!ob.i;$('#obSkip').hidden=!(st==='name'||st==='eng');$('#obNext').textContent=last?'סיום':'הבא';
+  const T=Object.keys(TRACKS).map(k=>`<label class="obopt"><input type="radio" name="obT" value="${k}"${a.track===k?' checked':''}><b>${esc(TRACKS[k].label)}</b><small>${esc(trackDesc(k))}</small></label>`).join('');
+  const W=[[true,'כן, אני עובד במשמרות','יוצגו סיכום שעות המשמרות וסוגי המשמרות.'],[false,'לא','המתכנן יהיה פשוט יותר, בלי משמרות.']].map(([v,t,d])=>`<label class="obopt"><input type="radio" name="obW" value="${v}"${a.works===v?' checked':''}><b>${t}</b><small>${d}</small></label>`).join('');
+  const e=a.eng||{};
+  const html={
+    track:()=>{$('#obTitle').textContent='באיזה מקבץ אתה?';return T+'<p class="hint">לא בטוח? זה כתוב במידע-נט, ליד מערכת השעות שלך. אפשר לשנות אחר כך.</p>'},
+    name:()=>{$('#obTitle').textContent='איך לקרוא לך?';return`<div class="fld"><label for="obName">שם או כינוי (לא חובה)</label><input type="text" id="obName" maxlength="30" autocomplete="off" value="${esc(a.name)}"></div>`},
+    works:()=>{$('#obTitle').textContent='האם אתה עובד במשמרות?';return W},
+    eng:()=>{$('#obTitle').textContent='יש לך שיעור אנגלית?';return`<p class="hint">האנגלית לא נכללת במערכת הקבועה, כי כל אחד לומד בשעה אחרת. הוסף אותה פעם אחת, והיא תופיע כל שבוע. אפשר לדלג.</p>
+      <div class="row2"><div class="fld"><label for="obEd">יום</label><select id="obEd"><option value="">—</option>${DAYS.slice(0,6).map((d,i)=>`<option value="${i}"${e.d===i?' selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="fld"><label for="obEs">התחלה</label><input type="time" id="obEs" step="900" value="${e.s||''}"></div>
+      <div class="fld"><label for="obEe">סיום</label><input type="time" id="obEe" step="900" value="${e.e||''}"></div></div>
+      <div class="fld"><label for="obEl">רמה (לא חובה)</label><input type="text" id="obEl" maxlength="30" placeholder="למשל: מתקדמים א'" autocomplete="off" value="${esc(e.level||'')}"></div>`}
+  }[st];
+  $('#obBody').innerHTML=html();
+}
+function obRead(){ // the current step's answers into ob.a; returns an error text or ''
+  const st=ob.steps[ob.i],a=ob.a,f=n=>(obDlg.querySelector(`input[name=${n}]:checked`)||{}).value;
+  if(st==='track'){a.track=f('obT')||'';return a.track?'':'בחר מקבץ.'}
+  if(st==='name'){a.name=$('#obName').value.trim();return''}
+  if(st==='works'){const v=f('obW');a.works=v==null?null:v==='true';return v==null?'בחר אחת מהאפשרויות.':''}
+  const d=$('#obEd').value,s0=$('#obEs').value,e0=$('#obEe').value,l=$('#obEl').value.trim();
+  if(!d&&!s0&&!e0){a.eng=null;return''}
+  if(d===''||!okTime(s0)||!okTime(e0)||s0===e0)return'כדי להוסיף אנגלית צריך יום, שעת התחלה ושעת סיום (או לדלג).';
+  a.eng={d:Number(d),s:s0,e:e0,level:l};return'';
+}
+let obBusy=false;
+async function obFinish(){
+  if(obBusy)return;obBusy=true;
+  const btns=['#obNext','#obBack','#obSkip'].map($);btns.forEach(b=>b.disabled=true);
+  const d=onboardDocs(ob.a,Date.now());let ok=true;
+  if(!ob.saved.profile)ok=await saveItem(ob.id,d.profile,'נשמר');
+  if(ok)ob.saved.profile=true;
+  if(ok&&ob.first&&!ob.saved.eng){for(const it of d.items)ok=ok&&await saveItem(newId(),it,'נוסף שיעור אנגלית');if(ok)ob.saved.eng=true}
+  btns.forEach(b=>b.disabled=false);obBusy=false;
+  if(ok){ob=null;obDlg.close();toast('שלום'+(d.profile.name?', '+d.profile.name:'')+'!')}
+  else{$('#obErr').textContent='השמירה לא הצליחה. בדוק את החיבור ולחץ שוב.';$('#obErr').hidden=false} // a toast would sit under the modal
+}
+$('#obFrm').addEventListener('submit',async x=>{
+  x.preventDefault();if(obBusy)return;const err=obRead();
+  if(err){$('#obErr').textContent=err;$('#obErr').hidden=false;return}
+  if(ob.i<ob.steps.length-1){ob.i++;obRender();return}
+  await obFinish();
+});
+$('#obBack').addEventListener('click',()=>{if(obBusy)return;obRead();ob.i--;obRender()});
+$('#obSkip').addEventListener('click',()=>{if(obBusy)return;const st=ob.steps[ob.i];if(st==='name')ob.a.name='';else ob.a.eng=null;if(ob.i<ob.steps.length-1){ob.i++;obRender()}else obFinish()});
+obDlg.addEventListener('cancel',x=>{if(ob&&ob.first)x.preventDefault()}); // the first run cannot be dismissed with Esc
+$('#obLink').addEventListener('click',()=>openOb(false));
+function maybeOnboard(){ // a new account with no data: ask the opening questions once
+  if(obAsked||mode!=='sb'||profileOf(items)||items.length||obDlg.open)return;
+  obAsked=true;openOb(true);
+}
 async function saveItem(id,data,msg){
   if(mode==='sb'){const ok=await sbSave({id:id||newId(),doc:data});if(ok)toast(msg||(id?'עודכן':'נוסף'));return ok}
   if(mode==='gh'){const ok=await ghSave({id:id||newId(),doc:data});if(ok)toast(msg||(id?'עודכן':'נוסף'));return ok}
@@ -1643,7 +1781,8 @@ render();
   sbTake();
   if(sbHas()){sbStart();return}
   if(location.protocol==='http:'&&/^(127\.0\.0\.1|localhost)$/.test(location.hostname)){try{await srvLoad();mode='srv';render();return}catch(e){}}
-  if(/\.github\.io$/.test(location.hostname)||ghHas()){ghStart();return}
+  if(ghHas()){ghStart();return} // devices already connected to the GitHub store
+  if(/\.github\.io$/.test(location.hostname)){showWelcome();return} // a new visitor: sign in first, then the opening questions
   const c=window.claude;
   if(!c||typeof c.use!=='function'){useLocal();return}
   let d=null,u=null;
