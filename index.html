@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* Layout: header, a dated week bar (prev · range · A/B tag · next · today · add), an upcoming exams/deadlines card, one summary strip, an attention list, the 7-day grid (Sun→Sat, right to left, past midnight when needed), a day-by-day agenda, then the calendar-export card. The course base is locked; personal blocks layer on top per A/B week or per date. */
+/* Layout: header, a dated week bar (prev · range · next · today · add), an upcoming exams/deadlines card, one summary strip, an attention list, the 7-day grid (Sun→Sat, right to left, past midnight when needed), a day-by-day agenda, then the calendar-export card. The course base is locked; personal blocks layer on top, weekly or on one date. */
 :root{
   --bg-app:#f4f7f9; --bg-card:#ffffff; --bg-sunk:#f8fafc;
   --ink:#0f172a; --text-main:#1e293b; --text-muted:#64748b; --text-faint:#94a3b8;
@@ -178,7 +178,6 @@ button.blk:hover{transform:translateY(-1px);z-index:4}
 .shm td:nth-child(2){font-weight:700;color:var(--ink)}
 .shm tfoot td{font-weight:800;color:var(--ink);border-bottom:0}
 .shm .z{color:var(--text-faint);font-weight:400}
-#shNote{color:var(--text-faint);font-size:13px;margin:10px 0 0}
 .dh .due,.df .due{display:block;font-size:10.5px;font-weight:700;color:var(--bad-tx)}
 .df{text-align:center;padding-top:2px}
 .df .due{margin-bottom:3px}
@@ -237,10 +236,6 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 .nav>button:hover{background:var(--bg-sunk);color:var(--ink)}
 .nav>button:disabled{opacity:.35;cursor:not-allowed;background:transparent}
 .nav .wkl{font-family:var(--font-mono);font-weight:600;font-size:14px;color:var(--ink);padding-inline:6px;font-variant-numeric:tabular-nums}
-.nav>.rot,.nav>.rot:hover{background:var(--ink);color:var(--bg-card)}
-.nav>.rot:disabled{opacity:1;background:var(--ink);color:var(--bg-card);cursor:default}
-.anc{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;margin-bottom:18px;background:var(--accent-soft);color:var(--accent-text);border:1px solid var(--accent);font-size:14px}
-.anc b{flex:1 1 220px}
 .blk.clash{outline:2px solid var(--bad-bd);outline-offset:-1px;z-index:3}
 .blk.cancelled{opacity:.6;text-decoration:line-through}
 .seg{display:inline-flex;border:1px solid var(--border-dark);border-radius:9px;overflow:hidden;margin-inline-start:4px}
@@ -251,11 +246,9 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 .blk .wk{font-family:var(--font-mono);font-size:9.5px;opacity:.7}
 
 /* month */
-.month{min-width:760px;display:grid;grid-template-columns:30px repeat(7,minmax(0,1fr));gap:6px}
+.month{min-width:760px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .mh{text-align:center;padding-bottom:4px;font-weight:700;font-size:13px;color:var(--ink)}
 .mh.wk{color:var(--text-muted)}
-.mt{display:flex;justify-content:center;padding-top:6px}
-.mt span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg-card);font-size:11px;font-weight:700}
 .mc{min-height:110px;min-width:0;display:flex;flex-direction:column;gap:2px;padding:5px 6px;background:var(--bg-sunk);border:1px solid var(--border-light);border-radius:8px;cursor:pointer}
 .mc:hover{border-color:var(--border-dark)}
 .mc.out{opacity:.45}
@@ -313,6 +306,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
   font-size:13.5px;font-weight:600;cursor:pointer;background:var(--bg-card)}
 .chips input{position:absolute;opacity:0;pointer-events:none}
 .chips label:has(input:checked){border-color:var(--ink);background:var(--bg-sunk);color:var(--ink)}
+.chips label:has(#fRec:checked)::before{content:"✓";font-weight:800} /* a toggle, not a radio: show that it is on */
 .chips label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
 .chips i{width:10px;height:10px;border-radius:50%}
 .hint{font-size:13px;padding:9px 12px;border-radius:9px;background:var(--bg-sunk);color:var(--text-muted)}
@@ -394,9 +388,9 @@ button.dlb{cursor:pointer}
 .dlb .meta{font-size:12.5px;color:var(--text-muted)}
 /* month on a phone: day number plus one dot per line; a tap anywhere in a cell opens that day */
 .ph #monthCard{padding:10px 6px}
-.ph .month{min-width:0;grid-template-columns:20px repeat(7,minmax(0,1fr));gap:3px}
+.ph .month{min-width:0;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
 .ph .mh{font-size:12px}
-.ph .mt span{width:18px;height:18px;font-size:10px}
+
 .ph .mc{min-height:60px;flex-direction:row;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:3px;padding:4px 2px}
 .ph .mtop{flex:0 0 100%;justify-content:center;margin:0}
 .ph .mtop small,.ph .ml>span,.ph .ml.more{display:none}
@@ -427,7 +421,7 @@ button.dlb{cursor:pointer}
   <div>
     <div class="eyebrow">סמסטר א' · תשפ"ז · 18.10.26–15.01.27</div>
     <h1>השבוע שלי</h1>
-    <p class="sub">מערכת הלימודים קבועה ונעולה. משמרות, אימונים ושעות למידה מוסיפים מעליה, קבוע לפי שבוע א'/ב' או לתאריך אחד.</p>
+    <p class="sub">מערכת הלימודים קבועה ונעולה. משמרות, אימונים ושעות למידה מוסיפים מעליה, כל שבוע או לתאריך אחד.</p>
   </div>
   <span class="store" id="store"><i></i><span>מתחבר…</span></span>
 </header>
@@ -436,7 +430,6 @@ button.dlb{cursor:pointer}
   <div class="nav" role="group" aria-label="בחירת שבוע">
     <button type="button" id="prev" aria-label="שבוע קודם">→</button>
     <span class="wkl" id="wkLabel" aria-live="polite"></span>
-    <button type="button" class="rot" id="rotBtn" title="החלפה בין שבוע א' לשבוע ב'"></button>
     <button type="button" id="next" aria-label="שבוע הבא">←</button>
     <button type="button" id="todayBtn">היום</button>
     <div class="seg" role="group" aria-label="תצוגה"><button type="button" id="vWeek" aria-pressed="true">שבוע</button><button type="button" id="vMonth" aria-pressed="false">חודש</button></div>
@@ -446,7 +439,6 @@ button.dlb{cursor:pointer}
     <span id="addLbl">הוספה לשבוע</span>
   </button>
 </div>
-<div class="anc" id="anc" hidden><b>איזה שבוע ברוטציה זה, <span id="ancWk"></span>? המשמרות של שבוע א'/ב' יופיעו אחרי הבחירה.</b><button type="button" class="btn" data-anchor="A">שבוע א'</button><button type="button" class="btn" data-anchor="B">שבוע ב'</button></div>
 
 
 <div class="wkbar" id="wkBar" hidden><button type="button" class="btn" id="gridTgl" aria-pressed="false">גריד</button></div>
@@ -462,7 +454,7 @@ button.dlb{cursor:pointer}
   <div class="scroller"><div class="month" id="month"></div></div>
 </section>
 <section class="card" id="gridCard">
-  <div class="ghead"><h2 id="gridTitle">שבוע א'</h2><div class="printbar"><button type="button" class="btn" id="printBtn">הדפסה</button><button type="button" class="edit-link" id="printFile">קובץ להדפסה</button></div></div>
+  <div class="ghead"><h2 id="gridTitle">השבוע</h2><div class="printbar"><button type="button" class="btn" id="printBtn">הדפסה</button><button type="button" class="edit-link" id="printFile">קובץ להדפסה</button></div></div>
   <p class="lead">לחיצה על שטח פנוי ביום פותחת הוספה בשעה הזו. לחיצה על פריט שהוספת פותחת עריכה. הלימודים לא ניתנים לשינוי.</p>
   <div class="legend">
     <span class="c-stat"><i style="background:var(--cc);border-color:var(--cc)"></i>הסתברות</span>
@@ -500,20 +492,19 @@ button.dlb{cursor:pointer}
 
 <details class="card" id="agCard">
   <summary><h2>פירוט לפי יום</h2><span class="upsum" id="agSum"></span></summary>
-  <p class="lead" id="agLead">כל מה שמתוכנן בשבוע א', לפי סדר.</p>
+  <p class="lead" id="agLead">כל מה שמתוכנן בשבוע, לפי סדר.</p>
   <div class="agenda" id="agenda"></div>
 </details>
 
 <details class="card" id="shCard">
   <summary><h2>סיכום משמרות</h2><span class="upsum" id="shSum"></span></summary>
-  <p class="lead">שעות המשמרות שלך בכל חודש, לפי שבועות א'/ב' והפריטים החד-פעמיים. מ-1.10.26 עד 13.03.27 (משמרות חד-פעמיות מתחילת אוקטובר, משמרות קבועות מ-18.10); משמרת שמסתיימת אחרי חצות נספרת בחודש שבו היא מתחילה.</p>
+  <p class="lead">שעות המשמרות שלך בכל חודש, לפי המשמרות הקבועות והחד-פעמיות. מ-1.10.26 עד 13.03.27 (משמרות חד-פעמיות מתחילת אוקטובר, משמרות קבועות מ-18.10); משמרת שמסתיימת אחרי חצות נספרת בחודש שבו היא מתחילה.</p>
   <table class="shm" id="shTbl"></table>
-  <p id="shNote" hidden></p>
-</details>
+  </details>
 
 <section class="card" id="expCard">
   <h2>ייצוא ליומן</h2>
-  <p class="lead">כל הסמסטר עד סוף המבחנים: שיעורים, משמרות לפי שבוע א'/ב', פריטים חד-פעמיים, מבחנים והגשות. ייבוא חוזר יוצר כפילויות, אז כדאי לייבא ליומן נפרד ולמחוק אותו לפני ייבוא מחדש.</p>
+  <p class="lead">כל הסמסטר עד סוף המבחנים: שיעורים, משמרות קבועות, פריטים חד-פעמיים, מבחנים והגשות. ייבוא חוזר יוצר כפילויות, אז כדאי לייבא ליומן נפרד ולמחוק אותו לפני ייבוא מחדש.</p>
   <div class="exp">
     <div><button type="button" class="btn pri" id="expCsv">Google Calendar · CSV</button><p>ב-Google Calendar: הגדרות ← ייבוא וייצוא ← ייבוא. בוחרים את הקובץ ואת היומן.</p></div>
     <div><button type="button" class="btn pri" id="expIcs">Apple ויומנים אחרים · ics בתוך zip</button><p>פותחים את ה-zip ולוחצים פעמיים על weekplan-semA.ics.</p></div>
@@ -561,12 +552,9 @@ button.dlb{cursor:pointer}
     <div class="fld" id="fCourseF" hidden><label for="fCourse">מקצוע</label><select id="fCourse"></select></div>
     <div class="fld" id="fStatusF" hidden><label for="fStatus">סטטוס</label><select id="fStatus"></select></div>
     <div class="fld" id="fWeekF">
-      <span class="lbl" id="wkLbl">באיזה שבוע</span>
-      <div class="chips" role="radiogroup" aria-labelledby="wkLbl">
-        <label><input type="radio" name="fWeek" value="A" id="fwA">שבוע א'</label>
-        <label><input type="radio" name="fWeek" value="B" id="fwB">שבוע ב'</label>
-        <label><input type="radio" name="fWeek" value="both" id="fwBoth">שני השבועות</label>
-        <label><input type="radio" name="fWeek" value="date" id="fwDate"><span id="fwDateTxt">רק בתאריך הזה</span></label>
+      <span class="lbl" id="wkLbl">האם זה חוזר על עצמו?</span>
+      <div class="chips" role="group" aria-labelledby="wkLbl">
+        <label><input type="checkbox" id="fRec">חוזר כל שבוע</label>
       </div>
     </div>
     <div class="fld">
@@ -645,7 +633,7 @@ const KINDS={
   due:{label:'הגשה',short:'הגשה',color:'--bad-bd'},
   other:{label:'אחר',short:'אחר',color:'--other-bd'}
 };
-const WKN={A:"שבוע א'",B:"שבוע ב'",both:'שני השבועות',date:'תאריך אחד'};
+const WKN={A:'כל שבוע',B:'כל שבוע',both:'כל שבוע',date:'תאריך אחד'}; // A/B: docs of the retired week-A/B rotation, now weekly
 const PPM=0.8, LS_ITEMS='wp.items.v1';
 const LOCK='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5"/></svg>';
 
@@ -687,7 +675,7 @@ const EXAMS=[ // mtamn.mta.ac.il exam search, תשפ"ז. Live system: dates can 
 ];
 const EXAM_MIN=180; // ponytail: assumed 3h; the listing gives start time only
 const SPECIAL={due:1,off:1,anchor:1,cancel:1};
-const isRec=x=>x.week==='A'||x.week==='B'||x.week==='both';
+const isRec=x=>x.week==='A'||x.week==='B'||x.week==='both'; // recurring every week (A/B are docs of the retired rotation)
 const lastSun=sunOf(SEM.last);
 const clampSun=s=>s<SEM.start?SEM.start:s>lastSun?lastSun:s; // own line: test.mjs exports only the first name per const
 /* ---------- month view helpers: ym = 'YYYY-MM' ---------- */
@@ -725,8 +713,6 @@ const pickDay=(cur,lo,hi,today)=>clampDay(cur>=lo&&cur<=hi?cur:today>=lo&&today<
 const swipeDir=(dx,dy)=>Math.abs(dx)>=50&&Math.abs(dx)>=1.5*Math.abs(dy)?(dx>0?1:-1):0; // +1 next day / -1 previous / 0 none; Hebrew/RTL, as on iOS: a swipe to the right is the next day (the strip puts it on the left)
 
 /* ---------- model ---------- */
-function anchorOf(items){const a=items.filter(x=>x.kind==='anchor'&&isoOk(x.date)).sort((p,q)=>(q.updated||0)-(p.updated||0))[0];return a?a.date:null}
-function rot(sun,anchor){return anchor?(((wkDiff(sunOf(anchor),sun)%2)+2)%2?'B':'A'):null}
 function offDoc(iso,items){return items.find(x=>x.kind==='off'&&x.date===iso)}
 function cancelOf(date,i,items){return items.find(x=>x.kind==='cancel'&&x.date===date&&x.base===i)} // i = BASE index; one cancelled occurrence
 function baseDay(iso,items){
@@ -737,7 +723,7 @@ function baseDay(iso,items){
   return dow(iso);
 }
 function evsForWeek(sun,items,skipId){
-  const out=[],wk=rot(sun,anchorOf(items));
+  const out=[];
   for(let d=0;d<7;d++){
     const date=addDays(sun,d),bd=baseDay(date,items);
     if(bd!=null)BASE.forEach((b,i)=>{if(b.d!==bd||b.self)return;const[s,e]=span(b.s,b.e);out.push({src:'base',key:'b'+i,i,d,date,s,e,title:b.t,course:COURSE[b.t],kind:b.k,room:b.r,...(cancelOf(date,i,items)&&{cancelled:true})})});
@@ -748,7 +734,6 @@ function evsForWeek(sun,items,skipId){
     if(!okTime(it.start)||!okTime(it.end))return;
     let d,date;
     if(isRec(it)){
-      if(!(it.week==='both'||it.week===wk))return;
       d=Number(it.day);if(!(d>=0&&d<=6))return;date=addDays(sun,d);
       if(Array.isArray(it.skip)&&it.skip.includes(date))return;
     }else if(isoOk(it.date)&&sunOf(it.date)===sun){date=it.date;d=dow(date)}
@@ -775,7 +760,7 @@ function lineTxt(e){ // {col: css var of the line's colour, ttl, meta} for a day
   if(e.src==='due')return{col:courseOk(e.course)?'--c-'+e.course:'--bad-bd',ttl:dueLbl(e),meta:e.note||''};
   const u=e.src==='user',kl=u?KINDS[e.kind].short:e.src==='exam'?'מבחן':(BKIND[e.kind]||'אנגלית');
   return{col:u?KINDS[e.kind].color:'--c-'+e.course,ttl:u&&e.title===KINDS[e.kind].label?e.title:e.title+' · '+kl,
-    meta:u?[e.week==='both'?'כל שבוע':e.week==='date'?'חד-פעמי':'',e.note].filter(Boolean).join(' · '):e.room};
+    meta:u?[e.week==='date'?'חד-פעמי':'כל שבוע',e.note].filter(Boolean).join(' · '):e.room};
 }
 function analyze(evs,nextSun=[]){ // nextSun: events of the following Sunday (d:0), used for Saturday late nights
   evs=evs.filter(e=>!e.cancelled);nextSun=nextSun.filter(e=>!e.cancelled);
@@ -899,13 +884,14 @@ function ghWhy(stage,status,limited){ // why a GitHub call failed: stage = 'read
   if(stage==='write'&&(status===403||status===404))return'write';
   return'';
 }
-const GH_AUTH=['token','repo','perm','write']; // the reasons that mean "fix the key"
+const GH_AUTH=['token','repo','perm','write','public']; // the reasons that mean "fix the key"
 function ghMsg(why,owner,repo,status){ // the Hebrew line in the connect dialog: what to change when creating the key
   const c=status?` (קוד ${status})`:'';
   return why==='token'?'GitHub לא מכיר את המפתח: הוא שגוי, נמחק או שפג תוקפו. צור מפתח חדש והדבק אותו.'+c
     :why==='repo'?`למפתח אין גישה למאגר ${owner}/${repo}. ביצירת המפתח, תחת Repository access, בחר Only select repositories ואת ${repo}. בדוק גם ששם המשתמש והמאגר כאן נכונים.`+c
     :why==='perm'?'למפתח יש גישה למאגר אבל לא לקבצים. תחת Permissions ← Repository permissions ← Contents בחר Read and write.'+c
     :why==='write'?'המפתח יכול לקרוא אבל לא לשמור. תחת Permissions ← Repository permissions ← Contents בחר Read and write, לא Read-only.'+c
+    :why==='public'?`המאגר ${owner}/${repo} ציבורי, וכל מי שנכנס ל-GitHub יכול לקרוא אותו. הנתונים נשמרים רק במאגר פרטי: כתוב כאן weekplan-data.`
     :why==='rate'?'GitHub חוסם זמנית בגלל יותר מדי בקשות. נסה שוב בעוד כמה דקות.'+c:'';
 }
 function opNoop(store,op){return JSON.stringify(applyOp(store,op))===JSON.stringify(store)} // store must be normalised ({v:1,items} as itemsToStore makes it)
@@ -933,14 +919,13 @@ function render(){
   const ph=PHQ.matches; if(ph&&view==='week'&&!agAuto){agAuto=1;$('#agCard').open=true} // on a phone the agenda is the week tab itself: open once, the user may close it
   const day=ph&&view==='day', upv=ph&&view==='up', mon=view==='month', wkv=!mon&&!day&&!upv; // phone views: day, week, month, up (what's coming)
   document.documentElement.classList.toggle('ph',ph);
-  const anchor=anchorOf(items), wk=rot(viewSun,anchor), rng=dm(viewSun)+'–'+dm(addDays(viewSun,6)), edit=canEdit();
+  const rng=dm(viewSun)+'–'+dm(addDays(viewSun,6)), edit=canEdit();
   const lbl=mon?MONTHS[Number(viewYm.slice(5))-1]+' '+viewYm.slice(0,4):day?DAYS[dow(viewDay)]+' · '+dm(viewDay):rng;
-  if($('#wkLabel').textContent!==lbl)$('#wkLabel').textContent=lbl;$('#ancWk').textContent=rng;
-  $('#rotBtn').textContent=wk?WKN[wk]:'';$('#rotBtn').hidden=mon||!wk;$('#rotBtn').disabled=!edit;$('#rotBtn').setAttribute('aria-label',wk?edit?`${WKN[wk]} · לחיצה מחליפה ל${WKN[wk==='A'?'B':'A']}`:WKN[wk]:'');
+  if($('#wkLabel').textContent!==lbl)$('#wkLabel').textContent=lbl;
   $('#prev').disabled=mon?viewYm<=YM0:day?viewDay<=SEM.start:viewSun<=SEM.start;$('#next').disabled=mon?viewYm>=YM1:day?viewDay>=SEM.last:viewSun>=lastSun;
   $('#prev').setAttribute('aria-label',mon?'חודש קודם':day?'יום קודם':'שבוע קודם');$('#next').setAttribute('aria-label',mon?'חודש הבא':day?'יום הבא':'שבוע הבא');
   $('#vWeek').setAttribute('aria-pressed',String(!mon));$('#vMonth').setAttribute('aria-pressed',String(mon));
-  $('.nav').hidden=upv;$('#anc').hidden=!!anchor||!edit||upv;
+  $('.nav').hidden=upv;
   $('#upCard').hidden=ph&&!upv;$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;$('#expCard').hidden=$('#shCard').hidden=day||upv;
   $('#gridCard').hidden=!wkv||ph&&!wkGrid;$('#agCard').hidden=!wkv||ph&&wkGrid;$('#wkBar').hidden=!(ph&&wkv);$('#gridTgl').setAttribute('aria-pressed',String(wkGrid));
   $('#addLbl').textContent=mon?'הוספה':day?'הוספה ליום זה':'הוספה לשבוע';$('#addBtn').hidden=upv;
@@ -952,7 +937,7 @@ function render(){
     const evs=evsForWeek(viewSun,items), an=analyze(evs,evsForWeek(addDays(viewSun,7),items).filter(e=>e.d===0));
     if(day)renderDay(evs,an);
     else{
-      $('#gridTitle').textContent='שבוע '+rng+(wk?' · '+WKN[wk]:'');
+      $('#gridTitle').textContent='שבוע '+rng;
       $('#agLead').textContent=`כל מה שמתוכנן בשבוע ${rng}, לפי סדר.`;
       renderSum(stats(evs),an); renderAtt(an); renderGrid(evs,an.clash); renderAgenda(evs,an.clash);
     }
@@ -1039,7 +1024,7 @@ function renderGrid(evs,clash){
       }else{
         const showTitle=ev.title!==KINDS[ev.kind].label;
         b.title=`${ev.title} · ${tr(ev.s,ev.e)}${ev.note?' · '+ev.note:''} · ${WKN[ev.week]} · לחיצה לעריכה`;
-        b.innerHTML=`<span class="kd">${KINDS[ev.kind].short}${ev.week==='both'?' <span class="wk">· כל שבוע</span>':''}</span>`+
+        b.innerHTML=`<span class="kd">${KINDS[ev.kind].short}${ev.week!=='date'?' <span class="wk">· כל שבוע</span>':''}</span>`+
           `<div class="nm"><span>${esc(showTitle?ev.title:KINDS[ev.kind].label)}</span></div><div class="tm">${tr(ev.s,ev.e)}</div>`+
           (ev.note?`<div class="rm">${esc(ev.note)}</div>`:'');
       }
@@ -1088,11 +1073,11 @@ function renderDay(evs,an){ // phone day view: the week strip, the day's notes, 
   }).join(''):'<li class="none">יום פנוי</li>';
 }
 function renderMonth(){
-  const anchor=anchorOf(items), today=todayIso(), title=MONTHS[Number(viewYm.slice(5))-1]+' '+viewYm.slice(0,4);
+  const today=todayIso(), title=MONTHS[Number(viewYm.slice(5))-1]+' '+viewYm.slice(0,4);
   $('#monthTitle').textContent=title;
-  $('#month').innerHTML='<div></div>'+DAYS.map((d,i)=>`<div class="mh${i>=4?' wk':''}">${d}</div>`).join('')+monthSuns(viewYm).map(sun=>{
-    const wk=rot(sun,anchor), evs=evsForWeek(sun,items);
-    return`<div class="mt">${wk?`<span title="${WKN[wk]}">${wk==='A'?"א'":"ב'"}</span>`:''}</div>`+DAYS.map((_,i)=>monthCell(addDays(sun,i),evs,today)).join('');
+  $('#month').innerHTML=DAYS.map((d,i)=>`<div class="mh${i>=4?' wk':''}">${d}</div>`).join('')+monthSuns(viewYm).map(sun=>{
+    const evs=evsForWeek(sun,items);
+    return DAYS.map((_,i)=>monthCell(addDays(sun,i),evs,today)).join('');
   }).join('');
 }
 function monthCell(date,evs,today){
@@ -1125,14 +1110,11 @@ $('#month').addEventListener('click',x=>{ // one listener: a line acts by kind, 
   dayClick(date);
 });
 function renderShifts(){
-  const S=shiftMonths(items),anchor=anchorOf(items),cm=S.rows.find(r=>r.ym===ymOf(todayIso()))||S.rows[0];
+  const S=shiftMonths(items),cm=S.rows.find(r=>r.ym===ymOf(todayIso()))||S.rows[0];
   $('#shSum').textContent=cm?MONTHS[Number(cm.ym.slice(5))-1]+': '+hrs(cm.min)+' שעות · '+(cm.n===1?'משמרת אחת':cm.n+' משמרות'):''; // this month's line while the card is closed
   $('#shTbl').innerHTML='<thead><tr><th>חודש</th><th>שעות</th><th>משמרות</th></tr></thead><tbody>'
     +S.rows.map(r=>`<tr><td>${MONTHS[Number(r.ym.slice(5))-1]} ${r.ym.slice(0,4)}</td>${r.n?`<td>${hrs(r.min)}</td><td>${r.n}</td>`:'<td class="z">—</td><td class="z">0</td>'}</tr>`).join('')
     +`</tbody><tfoot><tr><td>סה"כ בסמסטר</td><td>${hrs(S.min)}</td><td>${S.n}</td></tr></tfoot>`;
-  const hasAB=items.some(x=>KINDS[x.kind]&&KINDS[x.kind].shift&&(x.week==='A'||x.week==='B')); // A/B shifts show up only once the rotation anchor is set
-  $('#shNote').hidden=!(hasAB&&!anchor&&canEdit()); // the anchor banner exists only in editable modes
-  $('#shNote').textContent='משמרות של שבוע א\' או ב\' ייספרו אחרי שתבחר איזה שבוע ברוטציה זה, בבאנר שבראש העמוד.';
 }
 function renderUp(){
   const L=upcoming(todayIso(),items,PHQ.matches?30:6),edit=canEdit(),S=submitted(items);
@@ -1199,10 +1181,10 @@ const dlg=$('#dlg'),frm=$('#frm');
 $('#kindChips').innerHTML=Object.entries(KINDS).map(([k,v])=>`<label><input type="radio" name="fKind" value="${k}" id="fk_${k}"><i style="background:var(${v.color})"></i>${v.short}</label>`).join('');
 $('#fDay').innerHTML=DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
 const getKind=()=>(frm.querySelector('input[name=fKind]:checked')||{}).value||'open';
-const getWeek=()=>(frm.querySelector('input[name=fWeek]:checked')||{}).value||'both';
+const getWeek=()=>$('#fRec').checked?'both':'date'; // "חוזר כל שבוע": a weekly item, otherwise one date
 function lastOf(kind){return items.filter(it=>it.kind===kind&&okTime(it.start)&&okTime(it.end)).sort((a,b)=>(b.updated||0)-(a.updated||0))[0]}
 function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true}
-function setWeek(w){const r=frm.querySelector(`input[name=fWeek][value="${w}"]`);if(r)r.checked=true}
+function setWeek(w){$('#fRec').checked=w==='A'||w==='B'||w==='both'} // A/B docs of the retired rotation open as weekly
 const COURSE_OPTS=Object.entries(COURSE).map(([t,c])=>`<option value="${esc(c)}">${esc(t)}</option>`).join('');
 $('#fCourse').innerHTML='<option value="">ללא</option>'+COURSE_OPTS;
 $('#fStatus').innerHTML=Object.entries(STAT).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
@@ -1213,7 +1195,6 @@ function syncFields(){
   const due=getKind()==='due',dt=isDated(),fd=$('#fDate'),fy=$('#fDay'),rp=()=>isoOk(fd.value)&&dow(fd.value)===Number(fy.value)?fd.value:clampDay(addDays(editSun,Number(fy.value))); // rp: the date "only on this date" takes from a recurring form (the picked date while its weekday still matches)
   if(dt!==dated){dated=dt;if(dt)fd.value=rp();else if(isoOk(fd.value))fy.value=String(dow(fd.value))} // switching mode keeps the day and the date in step (a picked date survives a round trip)
   $('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due;$('#fCourseF').hidden=$('#fStatusF').hidden=!due;$('#fDayF').hidden=dt;$('#fDateF').hidden=!dt;
-  $('#fwDateTxt').textContent='רק ב-'+dm(dt&&isoOk(fd.value)?fd.value:rp());
 }
 function openAdd(pre={}){
   const sun=pre.sun||viewSun; // the week to add to (month view passes its own)
@@ -1225,7 +1206,7 @@ function openAdd(pre={}){
   else if(last){$('#fStart').value=last.start;$('#fEnd').value=last.end}
   else{$('#fStart').value='18:00';$('#fEnd').value='21:00'}
   addTimes={s:$('#fStart').value,e:$('#fEnd').value};
-  setWeek(rot(sun,anchorOf(items))||'both');
+  setWeek('date'); // a new item is one date unless "חוזר כל שבוע" is ticked
   dated=isDated();$('#fDate').value=clampDay(addDays(sun,Number($('#fDay').value)));$('#fCourse').value='';$('#fStatus').value='todo';
   $('#dlgTitle').textContent='הוספה';$('#fDel').hidden=true;$('#fSkip').hidden=true;resetDel();$('#fErr').hidden=true;
   syncFields();hint();dlg.showModal();
@@ -1261,12 +1242,13 @@ function hint(){
   if(d.kind==='due'){h.className='hint';h.textContent=`הגשה ב-${dm(d.date)} עד ${okTime(d.start)?d.start:'23:59'}`;return}
   if(!okTime(d.start)||!okTime(d.end)||d.start===d.end){h.className='hint';h.textContent='בחר שעת התחלה וסיום. סיום מוקדם מההתחלה נחשב עד אחרי חצות.';return}
   const[s,e]=span(d.start,d.end);
-  const anchor=anchorOf(items),hits=[],pv=editing&&items.find(x=>x.id===editing),det=pv&&isRec(pv)&&d.week==='date',its=det?items.map(x=>x===pv?{...x,skip:[...(x.skip||[]),$('#fSkip').dataset.date]}:x):items; // detaching one occurrence: compare with the items as they will be saved (the series stays, minus that date); otherwise the edited item itself is left out
-  const suns=d.week==='date'?[sunOf(d.date)]:[editSun,addDays(editSun,7)].filter(w=>d.week==='both'||rot(w,anchor)===d.week);
+  const hits=[],pv=editing&&items.find(x=>x.id===editing),det=pv&&isRec(pv)&&d.week==='date',its=det?items.map(x=>x===pv?{...x,skip:[...(x.skip||[]),$('#fSkip').dataset.date]}:x):items; // detaching one occurrence: compare with the items as they will be saved (the series stays, minus that date); otherwise the edited item itself is left out
+  const suns=d.week==='date'?[sunOf(d.date)]:[editSun,addDays(editSun,7)]; // a weekly item: this week and the next (an off day or a one-off can hide a clash in one of them)
   suns.forEach(w=>evsForWeek(w,its,det?null:editing).forEach(o=>{if(!o.cancelled&&o.d===d.day&&s<o.e&&o.s<e){const t=`${o.title} (${tr(o.s,o.e)})`;if(!hits.includes(t))hits.push(t)}}));
   const len=hrs(e-s)+' שעות'+(e>1440?' · נגמר אחרי חצות':'');
-  if(hits.length){h.className='hint bad';h.textContent=`${len} · חפיפה עם ${hits.join(', ')}`}
-  else{h.className='hint ok';h.textContent=`${len} · אין חפיפה`}
+  const pre=det?`רק ב-${dm(d.date)} · שאר הסדרה נשארת כל שבוע · `:''; // unticking "חוזר כל שבוע" on a series moves only this date
+  if(hits.length){h.className='hint bad';h.textContent=`${pre}${len} · חפיפה עם ${hits.join(', ')}`}
+  else{h.className='hint ok';h.textContent=`${pre}${len} · אין חפיפה`}
 }
 frm.addEventListener('input',x=>{
   if(x.target.id==='fStart'||x.target.id==='fEnd')timesTouched=true;
@@ -1348,9 +1330,8 @@ async function offer(filename,data){
   if(dl){try{await dl.save({filename,data});toast('הקובץ ירד')}catch(e){const c=e&&e.code;if(c!=='declined')toast(c==='rate_limited'?'כבר פתוח חלון הורדה':'ההורדה לא זמינה כאן')}return}
   try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data]));a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}catch(e){toast('ההורדה לא זמינה כאן')}
 }
-const expWarn=()=>{if(!anchorOf(items))toast("לא נבחר שבוע א'/ב' — ייצאו רק פריטים של שני השבועות")};
-$('#expCsv').addEventListener('click',()=>{expWarn();offer('weekplan-semA.csv',buildCsv(items))});
-$('#expIcs').addEventListener('click',()=>{expWarn();offer('weekplan-semA.zip',zip1('weekplan-semA.ics',buildIcs(items,new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z')))});
+$('#expCsv').addEventListener('click',()=>{offer('weekplan-semA.csv',buildCsv(items))});
+$('#expIcs').addEventListener('click',()=>{offer('weekplan-semA.zip',zip1('weekplan-semA.ics',buildIcs(items,new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z')))});
 
 /* ---------- print the shown week or month ---------- */
 const PRINT_H=700; // usable A4-landscape height in CSS px, minus slack for a wrapped legend
@@ -1395,7 +1376,14 @@ const ghRepo=()=>ghc.owner+'/'+ghc.repo;
 function ghCacheSave(){try{localStorage.setItem(GH_CACHE,JSON.stringify({repo:ghRepo(),items,sha:ghSha,at:Date.now()}))}catch(e){}}
 function ghCacheGet(){try{const c=JSON.parse(localStorage.getItem(GH_CACHE));return c&&c.repo===ghRepo()&&Array.isArray(c.items)?c:null}catch(e){return null}} // a cache from another repo is ignored
 const ghLim=r=>r.headers.get('x-ratelimit-remaining')==='0';
-async function ghGet(){ // {store,sha}; a missing file is an empty store. HTTP errors throw {status,why} (ghWhy), a dead network a TypeError, an unreadable file {bad:1}
+let ghPriv=''; // the owner/repo already seen to be private
+async function ghGet(){ // {store,sha}; a missing file is an empty store. HTTP errors throw {status,why} (ghWhy), a dead network a TypeError, an unreadable file {bad:1}, a public repo {why:'public'}
+  if(ghPriv!==ghRepo()){ // never read or write the data in a public repo (the code repo is public): check once per repo
+    const q=await fetch(ghRepoUrl(),{headers:ghHdr(),cache:'no-store'});
+    if(!q.ok)throw{status:q.status,why:ghWhy('repo',q.status,ghLim(q))};
+    if(!(await q.json()).private)throw{why:'public'};
+    ghPriv=ghRepo();
+  }
   const r=await fetch(ghUrl(),{headers:ghHdr(),cache:'no-store'});
   if(r.status===404){ // a private repo the token cannot see also answers 404: only a visible repo means the file is really missing
     const q=await fetch(ghRepoUrl(),{headers:ghHdr(),cache:'no-store'});
@@ -1510,13 +1498,6 @@ $('#dayCard').addEventListener('touchend',x=>{if(!swipe0)return;const t=x.change
 PHQ.addEventListener('change',()=>{if(!PHQ.matches&&(view==='day'||view==='up'))view='week';render()}); // e.g. an iPhone turned sideways is wider than 600px: desktop layout
 $('#vWeek').addEventListener('click',()=>setView('week'));$('#vMonth').addEventListener('click',()=>setView('month'));
 $('#mLegend').innerHTML=$('#gridCard .legend').innerHTML;
-$('#rotBtn').addEventListener('click',()=>setAnchor(rot(viewSun,anchorOf(items))==='A'?'B':'A'));
-$('#anc').addEventListener('click',x=>{const b=x.target.closest('[data-anchor]');if(b)setAnchor(b.dataset.anchor)});
-async function setAnchor(w){
-  if(!canEdit())return;
-  const cur=items.filter(x=>x.kind==='anchor').sort((p,q)=>(q.updated||0)-(p.updated||0))[0];
-  await saveItem(cur?cur.id:null,{kind:'anchor',date:w==='A'?viewSun:addDays(viewSun,-7),updated:Date.now()},`השבוע ${dm(viewSun)} הוא ${WKN[w]}`);
-}
 $('#addBtn').addEventListener('click',()=>{const t=todayIso(),d=clampDay(ymOf(t)===viewYm?t:viewYm+'-01');openAdd(view==='month'?{sun:sunOf(d),day:dow(d)}:view==='day'?{day:dow(viewDay)}:{})}); // month: today if it is in the shown month, else the 1st (its week and weekday). day: viewSun is the picked day's week
 
 try{if(location.protocol==='https:'&&navigator.serviceWorker)navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){} // offline shell; https only (not localhost, not file)

@@ -29,12 +29,9 @@ test('existing helpers survive the split',()=>{
   assert.equal(core.esc('<a>'),'&lt;a&gt;');
 });
 const A='2026-10-18';
-test('rot',()=>{
-  assert.equal(core.rot('2026-10-18',A),'A');assert.equal(core.rot('2026-10-25',A),'B');
-  assert.equal(core.rot('2026-10-11',A),'B');assert.equal(core.rot('2026-10-04',A),'A');
-  assert.equal(core.rot('2026-10-18',null),null);
-  assert.equal(core.anchorOf([{kind:'anchor',date:'2026-10-18',updated:1},{kind:'anchor',date:'2026-10-25',updated:2}]),'2026-10-25');
-  assert.equal(core.anchorOf([]),null);
+test('the week-A/B rotation is gone',()=>{
+  assert.equal(core.rot,undefined);assert.equal(core.anchorOf,undefined);
+  assert.equal(core.WKN.A,'כל שבוע');assert.equal(core.WKN.both,'כל שבוע');
 });
 test('clampSun',()=>{
   assert.equal(core.clampSun('2026-10-04'),'2026-10-18');
@@ -58,13 +55,13 @@ test('evsForWeek',()=>{
     {id:'o1',kind:'gm',date:'2026-10-24',start:'18:00',end:'20:00'},
     {id:'d1',kind:'due',date:'2026-10-22',start:'23:59'}];
   const w1=core.evsForWeek('2026-10-18',items);
-  assert.deepEqual(w1.filter(e=>e.src==='user').map(e=>e.id).sort(),['o1','r1']);
+  assert.deepEqual(w1.filter(e=>e.src==='user').map(e=>e.id).sort(),['o1','r1','r2']);   // A/B docs of the retired rotation are weekly; r3 skips 23.10
   assert.equal(w1.find(e=>e.id==='o1').date,'2026-10-24');
   assert.equal(w1.find(e=>e.id==='o1').week,'date');
   assert.equal(w1.find(e=>e.id==='o1').kind,'other'); // retired kind:'gm' falls back to other
   assert.equal(w1.filter(e=>e.src==='base').length,12);assert.ok(!w1.some(e=>e.key==='b10')); // BASE[10] OB lecture is self:1 (self-paced on Zoom), never drawn; indices stay put
   const w2=core.evsForWeek('2026-10-25',items);
-  assert.deepEqual(w2.filter(e=>e.src==='user').map(e=>e.id).sort(),['r2','r3']);
+  assert.deepEqual(w2.filter(e=>e.src==='user').map(e=>e.id).sort(),['r1','r2','r3']);
   assert.equal(w2.filter(e=>e.src==='base'&&e.d===2).length,0);
   const mk=core.evsForWeek('2027-01-17',items);
   assert.deepEqual(mk.filter(e=>e.src==='base').map(e=>e.d),[0,0,0]);
@@ -77,9 +74,11 @@ test('tolerates old and malformed docs',()=>{
     {id:'a',kind:'anchor',date:'garbage'}]);
   assert.deepEqual(w.filter(e=>e.src==='user').map(e=>[e.id,e.kind]),[['old','other']]);
 });
-test('no anchor: only both-weeks items',()=>{
-  const w=core.evsForWeek('2026-10-18',[{id:'a',kind:'open',day:4,start:'07:00',end:'15:00',week:'A'},{id:'b',kind:'study',day:5,start:'10:00',end:'12:00',week:'both'}]);
-  assert.deepEqual(w.filter(e=>e.src==='user').map(e=>e.id),['b']);
+test('A/B docs of the retired rotation show every week, with or without an anchor doc',()=>{
+  const L=[{id:'a',kind:'open',day:4,start:'07:00',end:'15:00',week:'A'},{id:'b',kind:'study',day:5,start:'10:00',end:'12:00',week:'both'},{id:'c',kind:'close',day:2,start:'18:00',end:'23:00',week:'B'}];
+  for(const sun of ['2026-10-18','2026-10-25'])for(const extra of [[],[{id:'x',kind:'anchor',date:'2026-10-18',updated:1}]])
+    assert.deepEqual(core.evsForWeek(sun,[...L,...extra]).filter(e=>e.src==='user').map(e=>e.id).sort(),['a','b','c']);
+  assert.equal(core.lineTxt(core.evsForWeek('2026-10-18',L).find(e=>e.id==='a')).meta,'כל שבוע');
 });
 test('upcoming',()=>{
   const items=[{id:'d1',kind:'due',date:'2027-01-20',start:'23:59',title:'מטלה 3'},{id:'d2',kind:'due',date:'2027-01-21',title:'x',done:true}];
@@ -305,7 +304,7 @@ test('dayLines: one day, ordered by time, deadlines included',()=>{
   // cancelled classes stay in the list, flagged; items of the other week type and other days stay out
   const cx=core.dayLines('2026-10-19',[...items,{id:'k',kind:'cancel',date:'2026-10-19',base:5}]);
   assert.deepEqual(cx.filter(l=>l.cancelled).map(l=>l.key),['b5']);
-  assert.equal(core.dayLines('2026-10-26',items).some(l=>l.id==='c'),false); // week B
+  assert.equal(core.dayLines('2026-10-26',items).some(l=>l.id==='c'),true);  // a week-A doc of the retired rotation is weekly now
   assert.deepEqual(core.dayLines('2026-10-27',[]),[]);                       // election day: no classes
   assert.equal(core.dayLines('2026-10-27',[{id:'off',kind:'off',date:'2026-10-27'}]).length,0);
   assert.deepEqual(core.dayLines('2027-01-17',[]).map(l=>l.key),['b7','b8','b9']); // make-up day: Sunday runs Tuesday's timetable
@@ -427,12 +426,12 @@ test('shiftMonths: monthly shift hours over the semester',()=>{
   assert.equal(mon.rows.find(r=>r.ym==='2026-10').n,2);   // 19.10, 26.10
   assert.equal(mon.rows.find(r=>r.ym==='2026-11').n,5);   // 2,9,16,23,30
   assert.equal(mon.n,mon.rows.reduce((a,r)=>a+r.n,0));assert.equal(mon.min,mon.n*480);
-  // week A only: needs the anchor; without it A/B shifts are not counted
-  assert.equal(core.shiftMonths([sh('x',{day:1,week:'A'})]).n,0);
+  // A/B docs of the retired rotation count every week, anchor or not
+  assert.equal(core.shiftMonths([sh('x',{day:1,week:'A'})]).n,mon.n);
   const ab=core.shiftMonths([A,sh('x',{day:1,week:'A'}),sh('y',{day:2,week:'B'})]);
-  let want=0;for(let sun='2026-10-18';sun<='2027-03-13';sun=core.addDays(sun,7))want+=1; // one shift per week, A on Monday or B on Tuesday
-  assert.equal(ab.n,want);
-  assert.ok(ab.rows.find(r=>r.ym==='2026-10').n===2);      // 19.10 (A) + 27.10 (B)
+  let want=0;for(let sun='2026-10-18';sun<='2027-03-13';sun=core.addDays(sun,7))want+=1;
+  assert.equal(ab.n,2*want);                               // Monday and Tuesday, every week
+  assert.ok(ab.rows.find(r=>r.ym==='2026-10').n===4);      // 19, 20, 26, 27.10
   // skipped, one-off, non-shift kinds, overnight
   const sk=core.shiftMonths([sh('m',{day:1,week:'both',skip:['2026-10-19']})]);
   assert.equal(sk.rows.find(r=>r.ym==='2026-10').n,1);
@@ -524,8 +523,9 @@ test('ghWhy + ghMsg: which part of the key to fix',()=>{
   assert.equal(w('write',403),'write');assert.equal(w('write',404),'write');        // Contents read-only
   assert.equal(w('read',403,true),'rate');assert.equal(w('write',429,true),'rate');
   assert.equal(w('read',500),'');assert.equal(w('write',409),'');
-  for(const k of core.GH_AUTH)assert.match(core.ghMsg(k,'o','r',403),/\(קוד 403\)$/);
+  for(const k of ['token','repo','perm','write'])assert.match(core.ghMsg(k,'o','r',403),/\(קוד 403\)$/);
   assert.match(core.ghMsg('repo','pavelkovrov-eng','weekplan-data'),/pavelkovrov-eng\/weekplan-data/);
   assert.match(core.ghMsg('perm','o','r'),/Read and write/);assert.match(core.ghMsg('write','o','r'),/Read-only/);
   assert.equal(core.ghMsg('',  'o','r'),'');
+  assert.match(core.ghMsg('public','pavelkovrov-eng','weekplan'),/ציבורי.*weekplan-data/);assert.ok(core.GH_AUTH.includes('public'));
 });
