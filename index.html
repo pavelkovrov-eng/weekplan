@@ -232,7 +232,7 @@ details.card[open] .upsum{display:none}
 #setDlg .setsec{margin-top:12px;box-shadow:none}
 .setrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .btn.del.armed{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad-tx)}
-#setDlg{width:min(620px,calc(100% - 32px))}
+html:not(.ph) #setDlg{width:min(620px,calc(100% - 32px))} /* on a phone it is the full-width bottom sheet like every dialog */
 .mhandle{display:flex;justify-content:center;padding:16px 0 10px;cursor:grab;touch-action:none}
 .mhandle i{width:44px;height:5px;border-radius:3px;background:var(--border-dark)}
 .mhandle[hidden],.mday[hidden]{display:none}
@@ -344,11 +344,13 @@ footer{font-size:12.5px;color:var(--text-muted);text-align:center;border-top:1px
 dialog{border:0;padding:0;border-radius:16px;background:var(--bg-card);color:var(--text-main);width:min(540px,calc(100% - 32px));
   box-shadow:0 24px 60px -12px var(--shadow)}
 dialog::backdrop{background:var(--scrim)}
+dialog[open]::backdrop{animation:bdIn .22s ease}
+@keyframes bdIn{from{opacity:0}to{opacity:1}}
 dialog{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y} /* vertical scroll only */
 dialog *{min-width:0;max-width:100%}
 dialog input[type=date],dialog input[type=time]{-webkit-appearance:none;appearance:none;width:100%;min-width:0;max-width:100%;box-sizing:border-box;min-height:44px} /* iOS gives these inputs a fixed intrinsic width */
 html:has(dialog[open]){overflow:hidden} /* the page behind a dialog does not scroll (on iOS it made the dialog seem to move) */
-.ph dialog{position:fixed;inset:auto 0 0 0;margin:0;width:100%;max-width:none;max-height:92vh;max-height:92dvh;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+.ph dialog,.ph #setDlg{position:fixed;inset:auto 0 0 0;margin:0;width:100%;max-width:none;max-height:92vh;max-height:92dvh;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
 .ph .row2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .ph .dlg{padding:18px 16px 22px}
 .dlg{padding:22px;display:grid;gap:16px}
@@ -1967,9 +1969,23 @@ $('#monthCard').addEventListener('mousedown',x=>{if(!dragZone(x.target))return;d
     e.style.transition='transform .18s ease';
     if(m>110||(m>40&&fast)){ // a first-run onboarding cannot be dismissed
       if(e.id==='obDlg'&&ob&&ob.first){e.style.transform='';return}
-      e.style.transform='translateY(100%)';setTimeout(()=>{e.close();e.style.transform='';e.style.transition=''},170)}
+      e.style.transform='translateY(100%)';setTimeout(()=>{e.dataset.noanim='1';e.close();delete e.dataset.noanim;e.style.transform='';e.style.transition=''},170)}
     else{e.style.transform='';setTimeout(()=>{e.style.transition=''},200)}
   },{passive:true});
+})();
+/* every dialog grows out of the button that opened it and shrinks back into it */
+let lastBtn=null;
+addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('button,[role=button]')},true);
+(()=>{
+  const sm=HTMLDialogElement.prototype.showModal,cl=HTMLDialogElement.prototype.close,still=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const origin=d=>{const r=d.getBoundingClientRect(),b=lastBtn&&lastBtn.isConnected?lastBtn.getBoundingClientRect():null;d.style.transformOrigin=(b?b.left+b.width/2-r.left:r.width/2)+'px '+(b?b.top+b.height/2-r.top:r.height/2)+'px'};
+  HTMLDialogElement.prototype.showModal=function(){sm.call(this);if(still())return;try{origin(this);this.animate([{opacity:0,transform:'scale(.2)'},{opacity:1,transform:'scale(1)'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(e){}};
+  HTMLDialogElement.prototype.close=function(v){
+    if(!this.open||this.dataset.closing||this.dataset.noanim||still())return cl.call(this,v);
+    this.dataset.closing='1';let a;
+    try{origin(this);a=this.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.2)'}],{duration:180,easing:'ease-in'})}catch(e){}
+    let fin=0;const done=()=>{if(fin++)return;delete this.dataset.closing;cl.call(this,v)};if(a){a.onfinish=done;setTimeout(done,260)}else done(); // the timer: a paused page (background tab) never finishes the animation
+  };
 })();
 let swipe0=null; // swipe on the day card: a finger moving right is the next day (RTL, see swipeDir)
 $('#dayCard').addEventListener('touchstart',x=>{swipe0=x.touches.length===1?[x.touches[0].clientX,x.touches[0].clientY]:null},{passive:true});
