@@ -227,10 +227,10 @@ details.card[open] .upsum{display:none}
 .ml.d.late{color:var(--bad-tx);font-weight:800}
 .ph .ml.d.late{background:var(--bad-bd);box-shadow:none}
 .pastebtn{margin-top:12px}
-.mhandle{display:flex;justify-content:center;padding:10px 0 6px;cursor:grab;touch-action:none}
+.mhandle{display:flex;justify-content:center;padding:16px 0 10px;cursor:grab;touch-action:none}
 .mhandle i{width:44px;height:5px;border-radius:3px;background:var(--border-dark)}
 .mhandle[hidden],.mday[hidden]{display:none}
-.mdh{margin:6px 4px 10px;font-size:15px;font-weight:700;color:var(--ink)}
+.mdh{touch-action:none;margin:6px 4px 10px;font-size:15px;font-weight:700;color:var(--ink)}
 .ph .mc.sel{background:var(--accent-soft);outline:2px solid var(--accent);outline-offset:-2px}
 .ph .mc{cursor:pointer}
 .ph .mexp .scroller,.ph .mexp #mLegend,.ph .mexp .mleg,.ph .mexp .ghead{display:none}
@@ -401,6 +401,12 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph .nav>button{min-width:44px;min-height:44px}
 .ph .card{padding:14px;margin-bottom:16px}
 .ph .btn,.ph .chips label,.ph .edit-link,.ph .upgo{min-height:44px}
+/* phone week grid: two days at a time, swipe sideways for the next day; the hour axis stays in place */
+.ph #gridCard .scroller{container-type:inline-size;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;margin-inline:0;padding-inline:0}
+.ph #gridCard .scroller::-webkit-scrollbar{display:none}
+.ph #gridCard .grid{min-width:0;width:max-content;grid-template-columns:48px repeat(7,calc((100cqw - 56px - 8px)/2));column-gap:8px}
+.ph #gridCard .grid>:nth-child(8n+1){position:sticky;inset-inline-start:0;z-index:3;background:var(--bg-card)}
+.ph #gridCard .grid>.dh,.ph #gridCard .grid>.col,.ph #gridCard .grid>.df{scroll-snap-align:start;scroll-margin-inline-start:56px}
 .ph .edit-link{min-width:44px}
 .ph .day .edit-link{min-height:32px;display:inline-flex;align-items:center}
 .ph .day .stb{min-height:36px}
@@ -1863,23 +1869,30 @@ $('#dayList').addEventListener('click',x=>{ // a class asks to cancel, an own it
 $('#mDay').addEventListener('click',x=>{const b=x.target.closest('[data-key]'),l=b&&mdL[b.dataset.key];if(!l||!canEdit()&&l.src!=='base'&&false)return;if(l.src==='base')openCancel(l);else openEdit(l.id)});
 const mexpSet=v=>{mexp=v;renderMonthDay()};
 $('#mHandle').addEventListener('keydown',x=>{if(x.key==='Enter'||x.key===' '){x.preventDefault();mexpSet(!mexp)}}); // keyboard only; touch and mouse drag
-let drag=null; // {y0,h}: the month shrinks while the finger pulls the list up and grows when it pulls down; it snaps open or closed on release
+let drag=null,dragRaf=0; // {y0,h,from,cur,startExp}: the month shrinks while the finger pulls the list up and grows when it pulls down; it snaps open or closed on release
+const dragSc=()=>$('#month').closest('.scroller');
+function dragApply(){dragRaf=0;if(drag&&drag.cur!=null)dragSc().style.maxHeight=drag.cur+'px'} // one layout write per frame
 function dragMove(y){
-  if(!drag)return;const sc=$('#month').closest('.scroller'),dy=y-drag.y0;
-  if(mexp&&dy>0){mexp=false;$('#monthCard').classList.remove('mexp');sc.style.display='';drag.h=sc.scrollHeight;sc.style.maxHeight='0px';drag.from=0;drag.y0=y-1}
-  const base=drag.from!=null?drag.from:drag.h,h=Math.max(0,Math.min(drag.h,base+dy));
-  sc.style.overflow='hidden';sc.style.maxHeight=h+'px';drag.cur=h;
+  if(!drag)return;const sc=dragSc(),dy=y-drag.y0;
+  if(mexp&&dy>0){mexp=false;$('#monthCard').classList.remove('mexp');sc.style.display='';drag.h=sc.scrollHeight;sc.style.maxHeight='0px';sc.style.overflow='hidden';drag.from=0}
+  else if(drag.from==null||!mexp){sc.style.overflow='hidden'}
+  const base=drag.from!=null?drag.from:drag.h;drag.cur=Math.max(0,Math.min(drag.h,base+dy));
+  if(!dragRaf)dragRaf=requestAnimationFrame(dragApply);
 }
 function dragEnd(){
-  if(!drag)return;const sc=$('#month').closest('.scroller'),open=drag.cur!=null&&drag.cur>drag.h*(drag.startExp?0.25:0.7); // a short pull is enough to open the month again; closing needs a longer pull up
-  sc.style.maxHeight='';sc.style.overflow='';const was=drag;drag=null;
-  if(was.cur==null)return;mexpSet(!open);
+  if(!drag)return;const sc=dragSc(),was=drag;drag=null;if(dragRaf){cancelAnimationFrame(dragRaf);dragRaf=0}
+  if(was.cur==null)return;
+  const open=was.cur>was.h*(was.startExp?0.25:0.7); // a short pull opens the month again; closing needs a longer pull up
+  sc.style.transition='max-height .18s ease';sc.style.maxHeight=(open?was.h:0)+'px';
+  setTimeout(()=>{sc.style.transition='';sc.style.maxHeight='';sc.style.overflow='';mexpSet(!open)},190);
 }
-const dragStart=y=>{const sc=$('#month').closest('.scroller');drag={y0:y,h:mexp?0:sc.scrollHeight,from:mexp?0:null,startExp:mexp}};
-$('#mHandle').addEventListener('touchstart',x=>{dragStart(x.touches[0].clientY);if(mexp){drag.h=0}},{passive:true});
-$('#mHandle').addEventListener('touchmove',x=>dragMove(x.touches[0].clientY),{passive:true});
-$('#mHandle').addEventListener('touchend',dragEnd,{passive:true});
-$('#mHandle').addEventListener('mousedown',x=>{dragStart(x.clientY);const mv=e=>dragMove(e.clientY),up=()=>{dragEnd();removeEventListener('mousemove',mv);removeEventListener('mouseup',up)};addEventListener('mousemove',mv);addEventListener('mouseup',up)});
+const dragStart=y=>{const sc=dragSc();drag={y0:y,h:mexp?0:sc.scrollHeight,from:mexp?0:null,startExp:mexp}};
+const dragZone=t=>t.closest&&t.closest('#mHandle,.mdh'); // the handle and the day heading both pull
+$('#monthCard').addEventListener('touchstart',x=>{if(PHQ.matches&&dragZone(x.target))dragStart(x.touches[0].clientY)},{passive:true});
+$('#monthCard').addEventListener('touchmove',x=>{if(drag)dragMove(x.touches[0].clientY)},{passive:true});
+$('#monthCard').addEventListener('touchend',()=>dragEnd(),{passive:true});
+$('#monthCard').addEventListener('touchcancel',()=>dragEnd(),{passive:true});
+$('#monthCard').addEventListener('mousedown',x=>{if(!dragZone(x.target))return;dragStart(x.clientY);const mv=e=>dragMove(e.clientY),up=()=>{dragEnd();removeEventListener('mousemove',mv);removeEventListener('mouseup',up)};addEventListener('mousemove',mv);addEventListener('mouseup',up)});
 /* phone: pull a dialog down (from its top) to close it; it follows the finger and snaps back after a short pull */
 (()=>{let d=null,y0=0,dy=0,t0=0;
   addEventListener('touchstart',x=>{const e=x.target.closest&&x.target.closest('dialog[open]');if(!PHQ.matches||!e||x.touches.length!==1){d=null;return}d=e;y0=x.touches[0].clientY;dy=0;t0=Date.now()},{passive:true});
