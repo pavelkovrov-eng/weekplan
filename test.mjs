@@ -529,3 +529,22 @@ test('ghWhy + ghMsg: which part of the key to fix',()=>{
   assert.equal(core.ghMsg('',  'o','r'),'');
   assert.match(core.ghMsg('public','pavelkovrov-eng','weekplan'),/ציבורי.*weekplan-data/);assert.ok(core.GH_AUTH.includes('public'));
 });
+
+test('Supabase helpers: OAuth hash, JWT expiry, rows <-> items, failure reasons',()=>{
+  assert.deepEqual(core.sbParseHash('#access_token=a.b.c&refresh_token=r1&expires_in=3600&token_type=bearer'),{access:'a.b.c',refresh:'r1'});
+  assert.equal(core.sbParseHash('#error=access_denied&error_description=x'),null);assert.equal(core.sbParseHash(''),null);assert.equal(core.sbParseHash(undefined),null);
+  assert.equal(core.sbParseHash('#access_token=a'),null);                                   // both tokens or nothing
+  const b64u=o=>Buffer.from(JSON.stringify(o)).toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const jwt=exp=>'h.'+b64u({exp,email:'d@ex.com'})+'.sig',now=1_800_000_000_000;
+  assert.equal(core.sbPayload(jwt(1))?.email,'d@ex.com');assert.equal(core.sbPayload('garbage'),null);assert.equal(core.sbPayload(undefined),null);
+  assert.equal(core.sbExpired(jwt(now/1000+3600),now),false);assert.equal(core.sbExpired(jwt(now/1000+30),now),true);   // inside the 60 s skew
+  assert.equal(core.sbExpired(jwt(now/1000-5),now),true);assert.equal(core.sbExpired('garbage',now),true);
+  const items=[{id:'a1',kind:'due',title:'x',date:'2026-11-20',done:false},{id:'b2',kind:'open',day:4}];
+  const rows=core.sbRows(items);
+  assert.deepEqual(rows,[{id:'a1',doc:{kind:'due',title:'x',date:'2026-11-20',done:false}},{id:'b2',doc:{kind:'open',day:4}}]);
+  assert.deepEqual(core.sbItems(rows),items);
+  assert.deepEqual(core.sbItems([{id:'z'},{id:3,doc:{}},{id:'q',doc:[1]},null,{id:'ok',doc:{kind:'due'}}]),[{kind:'due',id:'ok'}]);
+  assert.deepEqual(core.sbItems(null),[]);
+  assert.equal(core.sbWhy(401,''),'auth');assert.equal(core.sbWhy(404,'PGRST205'),'table');assert.equal(core.sbWhy(403,'42501'),'grant');assert.equal(core.sbWhy(500,''),'');
+  assert.match(core.sbMsg('table'),/SQL/);assert.equal(core.sbMsg(''),'');
+});

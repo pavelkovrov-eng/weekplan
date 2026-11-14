@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.github.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.github.com https://yemvjkopkeheshifunbu.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -511,7 +511,7 @@ button.dlb{cursor:pointer}
   </div>
 </section>
 
-<footer>בסיס נעול: מקבץ ב' + אנגלית מתקדמים א' · לוח שנה ומועדי בחינות: האקדמית ת"א-יפו תשפ"ז (מועדים עלולים להשתנות) · מבחן מוצג כ-3 שעות · <button type="button" class="edit-link" id="ghLink">חיבור ל-GitHub</button></footer>
+<footer>בסיס נעול: מקבץ ב' + אנגלית מתקדמים א' · לוח שנה ומועדי בחינות: האקדמית ת"א-יפו תשפ"ז (מועדים עלולים להשתנות) · מבחן מוצג כ-3 שעות · <button type="button" class="edit-link" id="ghLink">חיבור ל-GitHub</button> · <button type="button" class="edit-link" id="sbLink">חשבון Google</button></footer>
 </div>
 
 <nav class="tabs" id="tabs" aria-label="תצוגות">
@@ -583,6 +583,21 @@ button.dlb{cursor:pointer}
     <div class="actions">
       <button type="submit" class="btn pri" id="pAdd" disabled>הוספה</button>
       <button type="button" class="btn" id="pCancel">ביטול</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="sbDlg" aria-labelledby="sbTitle">
+  <form class="dlg" id="sbFrm" novalidate>
+    <h3 id="sbTitle">חשבון Google</h3>
+    <div class="hint" id="sbInfo"></div>
+    <div class="err" id="sbErr" hidden></div>
+    <div class="actions">
+      <button type="button" class="btn pri" id="sbIn">התחברות עם Google</button>
+      <button type="button" class="btn" id="sbMove" hidden>העברת הנתונים מ-GitHub</button>
+      <button type="button" class="btn" id="sbClose">סגירה</button>
+      <span class="sp"></span>
+      <button type="button" class="btn del" id="sbOut" hidden>התנתקות</button>
     </div>
   </form>
 </dialog>
@@ -894,12 +909,29 @@ function ghMsg(why,owner,repo,status){ // the Hebrew line in the connect dialog:
     :why==='public'?`המאגר ${owner}/${repo} ציבורי, וכל מי שנכנס ל-GitHub יכול לקרוא אותו. הנתונים נשמרים רק במאגר פרטי: כתוב כאן weekplan-data.`
     :why==='rate'?'GitHub חוסם זמנית בגלל יותר מדי בקשות. נסה שוב בעוד כמה דקות.'+c:'';
 }
+function sbParseHash(h){ // the OAuth redirect from Supabase: #access_token=…&refresh_token=…&expires_in=3600
+  const p=new URLSearchParams(String(h||'').replace(/^#/,'')),a=p.get('access_token'),r=p.get('refresh_token');
+  return a&&r?{access:a,refresh:r}:null;
+}
+const sbPayload=t=>{try{const s=String(t).split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(b64dec(s+'='.repeat((4-s.length%4)%4)))}catch(e){return null}}; // the claims of a JWT (not verified: the server does that)
+const sbExpired=(t,now,skew=60)=>{const p=sbPayload(t);return!p||typeof p.exp!=='number'||p.exp*1000-skew*1000<=now}; // true when unreadable or within `skew` seconds of expiry
+const sbRows=items=>items.map(({id,...doc})=>({id,doc})); // items -> Supabase rows {id,doc}
+const sbItems=rows=>(Array.isArray(rows)?rows:[]).filter(r=>r&&typeof r.id==='string'&&r.doc&&typeof r.doc==='object'&&!Array.isArray(r.doc)).map(r=>({...r.doc,id:r.id}));
+function sbWhy(status,code){ // why a Supabase call failed -> a key for sbMsg
+  if(status===401)return'auth';
+  if(code==='PGRST205'||status===404)return'table';
+  if(code==='42501'||status===403)return'grant';
+  return'';
+}
+const sbMsg=why=>why==='auth'?'ההתחברות פגה או לא תקפה. התחבר שוב עם Google.'
+  :why==='table'?'הטבלה items לא קיימת ב-Supabase. הרץ את ה-SQL מהמסמך ב-SQL Editor.'
+  :why==='grant'?'אין הרשאה לטבלה items. בדוק שהרצת את שורת ה-grant ושה-RLS מוגדר.':'';
 function opNoop(store,op){return JSON.stringify(applyOp(store,op))===JSON.stringify(store)} // store must be normalised ({v:1,items} as itemsToStore makes it)
 </script>
 <script>
 const PHQ=matchMedia('(max-width:600px)'); // phone width: day view + tab bar (class ph on <html>)
 let items=[], viewSun=clampSun(sunOf(todayIso())), viewDay=clampDay(todayIso()), viewYm=clampYm(ymOf(todayIso())), wkGrid=false, dayL=[], view=(()=>{try{const v=localStorage.getItem('wp.view');return v==='month'?v:PHQ.matches&&v!=='week'?'day':'week'}catch(e){return PHQ.matches?'day':'week'}})(), editSun=null, mode='loading', db=null, editing=null, timesTouched=false, delArmed=0, addTimes=null;
-const canEdit=()=>mode==='db'||mode==='local'||mode==='srv'||mode==='gh'; // srv = the local server (python3 server.py), gh = GitHub contents API
+const canEdit=()=>mode==='db'||mode==='local'||mode==='srv'||mode==='gh'||mode==='sb'; // srv = the local server (python3 server.py), gh = GitHub contents API
 function go(sun){viewSun=clampSun(sun);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goMonth(ym){viewYm=clampYm(ym);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goDay(d){viewDay=clampDay(d);viewSun=sunOf(viewDay);viewYm=clampYm(ymOf(viewDay));render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()} // the three stay in step, so week and month tabs open on the picked day
@@ -945,8 +977,8 @@ function render(){
   $('#addBtn').disabled=!edit;$('#pasteBtn').hidden=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
 }
 function renderStore(){
-  const m={loading:['','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
-  const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent=m[1];$('#ghLink').hidden=mode==='srv'||mode==='db';
+  const m={loading:['','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],sb:['db','נשמר בחשבון Google'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
+  const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent=m[1];$('#ghLink').hidden=mode==='srv'||mode==='db'||mode==='sb';$('#sbLink').hidden=mode==='srv'||mode==='db';
 }
 function renderSum(s,an){
   const cells=[
@@ -1461,7 +1493,111 @@ $('#ghFrm').addEventListener('submit',x=>{
   try{localStorage.setItem(GH_LS,JSON.stringify({owner:o,repo:r,token:t}))}catch(err){e.textContent='הדפדפן חוסם שמירה של המפתח.';e.hidden=false;return}
   ghDlg.close();ghNew=true;ghStart();
 });
+/* ---------- Supabase (signed in with Google): each user's items are rows {id,doc} guarded by Row Level Security ---------- */
+const SB_URL='https://yemvjkopkeheshifunbu.supabase.co', SB_KEY='sb_publishable_GaBUBHImwih_fS5pl8yM7Q_zDTUUsjg', SB_LS='wp.sb', SB_CACHE='wp.sb.cache'; // the publishable key is public by design; RLS protects the data
+let sbs=null, sbOn=false, sbNew=false; // sbs = {access,refresh}
+const sbHas=()=>{try{return!!JSON.parse(localStorage.getItem(SB_LS)).refresh}catch(e){return false}};
+const sbCachePut=v=>{try{v?localStorage.setItem(SB_CACHE,JSON.stringify(v)):localStorage.removeItem(SB_CACHE)}catch(e){}};
+const sbPut=v=>{sbs=v;try{v?localStorage.setItem(SB_LS,JSON.stringify(v)):localStorage.removeItem(SB_LS)}catch(e){}if(!v)sbCachePut(null)}; // ending the session also drops the cached items
+const sbSub=()=>{const p=sbs&&sbPayload(sbs.access);return p&&p.sub||''};
+const sbFlag=()=>{try{return sessionStorage.getItem('wp.sb.go')==='1'}catch(e){return false}};
+function sbTake(){ // the page was just opened by the OAuth redirect: keep the tokens, clean the address bar. Only right after our own sign-in click (a flag of this tab), so a crafted link with someone else's tokens is ignored
+  const t=sbParseHash(location.hash),own=sbFlag();
+  if(t||/error_description=/.test(location.hash)){try{sessionStorage.removeItem('wp.sb.go')}catch(e){}}
+  if(t&&own){sbPut(t);sbCachePut(null);sbNew=true;history.replaceState(null,'',location.pathname+location.search);return true}
+  if(t){history.replaceState(null,'',location.pathname+location.search);return false}
+  if(/error_description=/.test(location.hash)){history.replaceState(null,'',location.pathname+location.search);toast('הכניסה עם Google לא הצליחה.')}
+  return false;
+}
+let sbRef=null; // the refresh in flight: callers share it
+function sbRefresh(){
+  return sbRef||(sbRef=(async()=>{
+    try{
+      let cur=null;try{cur=JSON.parse(localStorage.getItem(SB_LS))}catch(e){}
+      if(cur&&cur.refresh&&cur.refresh!==sbs.refresh){sbs=cur;if(!sbExpired(cur.access,Date.now()))return} // another tab already refreshed: use its tokens
+      const r=await fetch(SB_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:sbs.refresh})});
+      if(r.status===400||r.status===401){sbPut(null);throw{status:401,why:'auth'}} // the session is really over
+      if(!r.ok)throw{status:r.status,why:''}; // 429/5xx: transient, keep the tokens
+      const j=await r.json();if(!j.access_token||!j.refresh_token)throw{status:502,why:''};
+      sbPut({access:j.access_token,refresh:j.refresh_token});
+    }finally{sbRef=null}
+  })());
+}
+async function sbFetch(path,o={}){ // a Supabase REST call; refreshes an expired access token once; throws {status,why}
+  if(!sbs)sbs=JSON.parse(localStorage.getItem(SB_LS));
+  if(sbExpired(sbs.access,Date.now()))await sbRefresh();
+  for(let n=0;n<2;n++){
+    const r=await fetch(SB_URL+path,{...o,headers:{apikey:SB_KEY,Authorization:'Bearer '+sbs.access,'Content-Type':'application/json',...o.headers},cache:'no-store'});
+    if(r.status===401&&!n){await sbRefresh();continue}
+    if(r.ok)return r;
+    if(r.status===401){sbPut(null);throw{status:401,why:'auth'}} // still refused after a refresh
+    let c='';try{c=(await r.json()).code||''}catch(e){}
+    throw{status:r.status,why:sbWhy(r.status,c)};
+  }
+}
+function sbCacheSave(){sbCachePut({items,sub:sbSub(),at:Date.now()})}
+function sbCacheGet(){try{const c=JSON.parse(localStorage.getItem(SB_CACHE));return c&&Array.isArray(c.items)&&c.sub&&c.sub===sbSub()?c:null}catch(e){return null}} // only the cache of the account that is signed in
+function sbFail(e,quiet){ // quiet: a background refresh that keeps what is on screen
+  const why=e&&e.why;
+  if(why==='auth'||why==='table'||why==='grant'){
+    if(quiet||document.querySelector('dialog[open]:not(#sbDlg)'))toast(sbMsg(why));else openSb(sbMsg(why));
+    if(mode==='loading'){const c=sbCacheGet();if(c){items=c.items;mode='ro';render()}}return}
+  if(quiet)return;
+  const c=sbCacheGet();if(c&&mode==='loading'){items=c.items;mode='ro';render();toast('אין חיבור — מוצג המצב האחרון (קריאה בלבד).')}else toast('לא הצלחתי לטעון את הנתונים. בדוק את החיבור.');
+}
+let sbSeq=0;
+async function sbLoad(){
+  const q=++sbSeq;
+  try{
+    const rows=[];for(let i=0;;i+=1000){const r=await sbFetch('/rest/v1/items?select=id,doc&order=id',{headers:{'Range-Unit':'items',Range:i+'-'+(i+999)}}),pg=await r.json();rows.push(...pg);if(pg.length<1000)break} // PostgREST returns at most 1000 rows per request
+    if(q!==sbSeq)return;
+    items=sbItems(rows);mode='sb';sbCacheSave();render();
+    if(sbNew){sbNew=false;toast('מחובר עם Google · '+(items.length===1?'פריט אחד':items.length+' פריטים'))}
+  }catch(e){if(q===sbSeq)sbFail(e,mode==='sb'||mode==='ro')}
+}
+async function sbSave(op){ // set or delete one doc
+  try{
+    if(op.doc==null)await sbFetch('/rest/v1/items?id=eq.'+encodeURIComponent(op.id),{method:'DELETE',headers:{Prefer:'return=minimal'}});
+    else await sbFetch('/rest/v1/items?on_conflict=user_id,id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:op.id,doc:op.doc,updated_at:new Date().toISOString()})});
+    sbSeq++;items=storeToItems(applyOp(itemsToStore(items),op));sbCacheSave();render();return true;
+  }catch(e){
+    if(e&&e.why&&sbMsg(e.why))openSb(sbMsg(e.why));else toast(e&&e.status?'השמירה לא הצליחה. נסה שוב בעוד רגע.':'אין חיבור לאינטרנט — השינוי לא נשמר.');
+    return false;
+  }
+}
+function sbStart(){
+  if(!sbOn){sbOn=true;addEventListener('online',sbLoad);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&mode==='sb')sbLoad()})}
+  return sbLoad();
+}
+const sbDlg=$('#sbDlg');
+function openSb(err){
+  const e=$('#sbErr');e.textContent=err||'';e.hidden=!err;
+  if(sbDlg.open)$('#sbMove').disabled=false;
+  const inn=sbHas(),p=inn&&sbPayload((JSON.parse(localStorage.getItem(SB_LS))||{}).access);
+  $('#sbInfo').textContent=inn?'מחובר'+(p&&p.email?' כ-'+p.email:'')+'. הנתונים נשמרים בחשבון שלך ב-Supabase, ורק אתה רואה אותם.':'התחבר עם חשבון Google כדי לשמור את הנתונים בחשבון שלך. כל משתמש רואה רק את הנתונים של עצמו.';
+  $('#sbIn').hidden=inn;$('#sbOut').hidden=!inn;$('#sbMove').hidden=!(inn&&ghCfg());
+  if(!sbDlg.open)sbDlg.showModal();
+}
+$('#sbLink').addEventListener('click',()=>openSb());
+$('#sbClose').addEventListener('click',()=>sbDlg.close());
+sbDlg.addEventListener('click',x=>{if(x.target===sbDlg)sbDlg.close()});
+$('#sbIn').addEventListener('click',()=>{try{sessionStorage.setItem('wp.sb.go','1')}catch(e){}location.href=SB_URL+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(location.origin+location.pathname)});
+$('#sbOut').addEventListener('click',async()=>{
+  try{if(sbs||sbHas()){if(!sbs)sbs=JSON.parse(localStorage.getItem(SB_LS));await fetch(SB_URL+'/auth/v1/logout',{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+sbs.access}})}}catch(e){} // best effort: also ends the session on the server
+  sbPut(null);location.reload();
+});
+$('#sbMove').addEventListener('click',async()=>{ // one-time: copy the items of the GitHub store into this account (ids that already exist are kept as they are)
+  const b=$('#sbMove');b.disabled=true;$('#sbErr').hidden=true;
+  try{
+    ghc=ghCfg();const g=await ghGet(),rows=sbRows(storeToItems(g.store));
+    let added=0;
+    for(let i=0;i<rows.length;i+=200){const r=await sbFetch('/rest/v1/items?on_conflict=user_id,id&select=id',{method:'POST',headers:{Prefer:'resolution=ignore-duplicates,return=representation'},body:JSON.stringify(rows.slice(i,i+200))});added+=(await r.json()).length}
+    toast(added===rows.length?'הועברו '+added+' פריטים מ-GitHub':'הועברו '+added+' מתוך '+rows.length+' (השאר כבר קיימים)');sbDlg.close();await sbLoad();
+  }catch(e){const m=e&&e.why&&(sbMsg(e.why)||ghMsg(e.why,(ghc||{}).owner,(ghc||{}).repo,e.status))||'ההעברה לא הצליחה. נסה שוב.';openSb(m)} // openSb recomputes the buttons (the session may be gone)
+  b.disabled=false;
+});
 async function saveItem(id,data,msg){
+  if(mode==='sb'){const ok=await sbSave({id:id||newId(),doc:data});if(ok)toast(msg||(id?'עודכן':'נוסף'));return ok}
   if(mode==='gh'){const ok=await ghSave({id:id||newId(),doc:data});if(ok)toast(msg||(id?'עודכן':'נוסף'));return ok}
   if(mode==='srv'){const ok=await srvCall(id?'PUT':'POST',id?'/'+id:'',data);if(ok)toast(msg||(id?'עודכן':'נוסף'));return ok}
   if(mode==='db'){
@@ -1476,6 +1612,7 @@ async function saveItem(id,data,msg){
   return false;
 }
 async function removeItem(id,msg){
+  if(mode==='sb'){const ok=await sbSave({id,doc:null});if(ok)toast(msg||'נמחק');return ok}
   if(mode==='gh'){const ok=await ghSave({id,doc:null});if(ok)toast(msg||'נמחק');return ok}
   if(mode==='srv'){const ok=await srvCall('DELETE','/'+id);if(ok)toast(msg||'נמחק');return ok}
   if(mode==='db'){const ok=await dbCall(()=>db.collection('items').doc(id).delete());if(ok)toast(msg||'נמחק');return ok}
@@ -1503,6 +1640,8 @@ $('#addBtn').addEventListener('click',()=>{const t=todayIso(),d=clampDay(ymOf(t)
 try{if(location.protocol==='https:'&&navigator.serviceWorker)navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){} // offline shell; https only (not localhost, not file)
 render();
 (async()=>{
+  sbTake();
+  if(sbHas()){sbStart();return}
   if(location.protocol==='http:'&&/^(127\.0\.0\.1|localhost)$/.test(location.hostname)){try{await srvLoad();mode='srv';render();return}catch(e){}}
   if(/\.github\.io$/.test(location.hostname)||ghHas()){ghStart();return}
   const c=window.claude;
