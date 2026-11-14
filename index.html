@@ -375,7 +375,9 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph .edit-link{min-width:44px}
 .ph .day .edit-link{min-height:32px;display:inline-flex;align-items:center}
 .ph .day .stb{min-height:36px}
-.ph .day li{align-items:center;gap:8px}
+.ph .day .dlist{margin-top:8px}
+.day .dlist .dli{display:flex;align-items:center;gap:4px;font-size:inherit}
+.day .dlist li.none{display:block}
 .ph input[type=text],.ph input[type=time],.ph input[type=date],.ph input[type=password],.ph select,.ph textarea{font-size:16px;min-height:44px} /* 16px: iOS Safari zooms into smaller fields */
 .ph input[type=date]{height:46px} /* as tall as the select it stands in for, so the one-off dialog still fits 393x852 */
 .ph input[type=checkbox]{width:20px;height:20px}
@@ -1020,7 +1022,7 @@ function setView(v,date){ // v: day|week|month|up (day and up only on a phone); 
 }
 
 /* ---------- render ---------- */
-let agAuto=0,legAuto=0;
+let agAuto=0,legAuto=0,agL={}; // agL: the phone agenda's lines by date|key, for taps
 function render(){
   const ph=PHQ.matches; if(ph&&!legAuto){legAuto=1;document.querySelector('.mleg').open=false} // the long legend starts folded on a phone
   if(ph&&view==='week'&&!agAuto){agAuto=1;$('#agCard').open=true} // on a phone the agenda is the week tab itself: open once, the user may close it
@@ -1153,8 +1155,16 @@ function renderGrid(evs,clash){
 function renderAgenda(evs,clash){
   const edit=canEdit(),wd=DAYS.map((_,i)=>addDays(viewSun,i)),nS=evs.filter(e=>e.src==='user'&&KINDS[e.kind].shift).length,nD=items.filter(x=>x.kind==='due'&&wd.includes(x.date)).length;
   $('#agSum').textContent=[ltr(dm(viewSun)+'–'+dm(wd[6])),...(worksOn()?[nS===1?'משמרת אחת':nS+' משמרות']:[]),nD===1?'הגשה אחת':nD+' הגשות'].join(' · '); // the line next to the title while the card is closed
+  agL={};
   $('#agenda').innerHTML=DAYS.map((d,i)=>{
     const date=addDays(viewSun,i),c=CAL[date],off=offDoc(date,items),dn=`${d} ${dm(date)}`;
+    if(PHQ.matches){ // phone: the same rows as the day view, grouped by day
+      const L=dayLines(date,items,evs),b0=L.filter(l=>l.src==='base'&&!l.cancelled),today=todayIso();
+      L.forEach(l=>agL[date+'|'+l.key]=l);
+      const sb=b0.length?`לימודים ${ltr(fm(b0[0].s)+'–'+fm(Math.max(...b0.map(e=>e.e))))}`+(c?' · '+c.label:''):off?'לימודים בוטלו':(c?c.label:L.length?'אין לימודים':'');
+      if(!L.length)return`<div class="day free"><div class="dn">${dn}${c?`<small>${esc(c.label)}</small>`:''}</div><div class="none">${off?'לימודים בוטלו':'יום פנוי לגמרי'}</div></div>`;
+      return`<div class="day"><div class="dn">${dn}<small>${esc(sb)}</small></div><ul class="dlist">${L.map(l=>dayLi(l,clash,edit,today)).join('')}</ul></div>`;
+    }
     const list=evs.filter(e=>e.d===i).sort((a,b)=>a.s-b.s),base=list.filter(e=>e.src==='base'&&!e.cancelled);
     const dues=items.filter(x=>x.kind==='due'&&x.date===date);
     const sub=base.length?`לימודים ${ltr(fm(base[0].s)+'–'+fm(Math.max(...base.map(e=>e.e))))}`+(c?' · '+c.label:''):off?'לימודים בוטלו':(c?c.label:list.length?'אין לימודים':'');
@@ -1171,14 +1181,17 @@ function renderDay(evs,an){ // phone day view: the week strip, the day's notes, 
   $('#dstrip').innerHTML=DAYI.map((l,k)=>{const d=addDays(viewSun,k);return`<button type="button" data-day="${d}" aria-pressed="${d===date}" aria-label="${DAYS[k]} ${dm(d)}"${d===today?' class="today"':''}><small>${l}</small><b>${Number(d.slice(8))}</b></button>`}).join('');
   $('#dayHead').innerHTML=`<h2>${DAYS[dow(date)]} ${dm(date)}</h2>`+(c?`<small>${esc(c.label)}</small>`:'')+(off?'<small>לימודים בוטלו</small>':'');
   dayL=dayLines(date,items,evs);
-  $('#dayList').innerHTML=dayL.length?dayL.map(l=>{
-    const t=lineTxt(l),due=l.src==='due',tap=l.src!=='exam'&&(l.src!=='base'||edit),hit=an.clash.has(l.key),meta=[l.cancelled?'בוטל':'',due&&l.st!=='done'&&l.date<today?'באיחור':'',l.e>1440?'עד '+fm(l.e)+' (למחרת)':'',t.meta].filter(Boolean).join(' · ');
+  $('#dayList').innerHTML=dayL.length?dayL.map(l=>dayLi(l,an.clash,edit,today)).join(''):'<li class="none">יום פנוי</li>';
+}
+function dayLi(l,clash,edit,today){ // one line of a day, as a tappable row: time column, course colour bar, title and room (the phone day view and the phone week agenda)
+  {
+    const t=lineTxt(l),due=l.src==='due',tap=l.src!=='exam'&&(l.src!=='base'||edit),hit=clash.has(l.key),meta=[l.cancelled?'בוטל':'',due&&l.st!=='done'&&l.date<today?'באיחור':'',l.e>1440?'עד '+fm(l.e)+' (למחרת)':'',t.meta].filter(Boolean).join(' · ');
     const when=due?'עד '+fm(l.s):tr(l.s,l.e),act=l.src==='base'?l.cancelled?'החזרה':'ביטול':'עריכה';
     return`<li class="dli${l.cancelled?' cancelled':''}${due&&l.done?' done':''}${due&&l.st!=='done'&&l.date<today?' late':''}">${due?stBtn(l,edit,dueName(l)):''}`
-      +`<${tap?`button type="button" data-key="${esc(l.key)}" aria-label="${esc(t.ttl+' · '+when+(meta?' · '+meta:'')+(edit?' · לחיצה ל'+act:''))}"`:'div'} class="dlb">`
+      +`<${tap?`button type="button" data-key="${esc(l.key)}" data-date="${l.date}" aria-label="${esc(t.ttl+' · '+when+(meta?' · '+meta:'')+(edit?' · לחיצה ל'+act:''))}"`:'div'} class="dlb">`
       +`<span class="tm">${due?`<span>עד</span><b>${fm(l.s)}</b>`:`<b>${fm(l.s)}</b><span>${fm(l.e)}</span>`}</span><i style="background:var(${t.col})"></i>`
       +`<span class="tx"><b>${esc(t.ttl)}</b>${meta||hit?`<span class="meta">${esc(meta)}${hit?'<span class="tag-clash">התנגשות</span>':''}</span>`:''}</span></${tap?'button':'div'}></li>`;
-  }).join(''):'<li class="none">יום פנוי</li>';
+  }
 }
 function renderMonth(){
   const today=todayIso(), title=MONTHS[Number(viewYm.slice(5))-1]+' '+viewYm.slice(0,4);
@@ -1262,6 +1275,8 @@ document.addEventListener('click',x=>{
 document.addEventListener('keydown',x=>{if(x.key==='Escape'&&stOpen){x.preventDefault();stClose(true)}else if((x.key==='ArrowDown'||x.key==='ArrowUp')&&x.target.closest('#stMenu')){x.preventDefault();const o=[...$('#stMenu').children],i=o.indexOf(document.activeElement);o[(i+(x.key==='ArrowDown'?1:-1)+o.length)%o.length].focus()}});
 addEventListener('scroll',()=>stClose(),{passive:true});addEventListener('resize',()=>stClose());
 $('#agenda').addEventListener('click',x=>{
+  const k=x.target.closest('[data-key]'),kl=k&&agL[k.dataset.date+'|'+k.dataset.key];
+  if(kl){if(kl.src==='base')openCancel(kl);else openEdit(kl.id);return} // a phone agenda row acts like a day-view row
   const b=x.target.closest('[data-edit]'),c=x.target.closest('[data-cancel]');
   if(b)openEdit(b.dataset.edit);
   if(c&&!c.disabled){c.disabled=true;const[date,i]=c.dataset.cancel.split('|');toggleCancel(date,Number(i))}
