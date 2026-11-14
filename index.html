@@ -405,8 +405,8 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph #gridCard .scroller{container-type:inline-size;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;margin-inline:0;padding-inline:0}
 .ph #gridCard .scroller::-webkit-scrollbar{display:none}
 .ph #gridCard .grid{min-width:0;width:max-content;grid-template-columns:48px repeat(7,calc((100cqw - 56px - 8px)/2));column-gap:8px}
-.ph #gridCard .grid>:nth-child(8n+1){position:sticky;inset-inline-start:0;z-index:3;background:var(--bg-card)}
-.ph #gridCard .grid>.dh,.ph #gridCard .grid>.col,.ph #gridCard .grid>.df{scroll-snap-align:start;scroll-margin-inline-start:56px}
+.ph #gridCard .grid>:nth-child(8n+1){position:-webkit-sticky;position:sticky;right:0;z-index:3;background:var(--bg-card)}
+.ph #gridCard .grid>.dh,.ph #gridCard .grid>.col,.ph #gridCard .grid>.df{scroll-snap-align:start;scroll-margin-right:56px;scroll-margin-inline-start:56px}
 .ph .edit-link{min-width:44px}
 .ph .day .edit-link{min-height:32px;display:inline-flex;align-items:center}
 .ph .day .stb{min-height:36px}
@@ -504,7 +504,7 @@ button.dlb{cursor:pointer}
 </div>
 
 
-<div class="wkbar" id="wkBar" hidden><button type="button" class="btn" id="gridTgl" aria-pressed="false">גריד</button></div>
+<div class="wkbar" id="wkBar" hidden></div>
 
 <section class="card" id="dayCard" hidden>
   <div class="dstrip" id="dstrip" role="group" aria-label="ימי השבוע"></div>
@@ -1062,7 +1062,6 @@ function setView(v,date){ // v: day|week|month|up (day and up only on a phone); 
 let agAuto=0,legAuto=0,agL={}; // agL: the phone agenda's lines by date|key, for taps
 function render(){
   const ph=PHQ.matches; if(ph&&!legAuto){legAuto=1;document.querySelector('.mleg').open=false} // the long legend starts folded on a phone
-  if(ph&&view==='week'&&!agAuto){agAuto=1;$('#agCard').open=true} // on a phone the agenda is the week tab itself: open once, the user may close it
   const day=ph&&view==='day', upv=ph&&view==='up', mon=view==='month', wkv=!mon&&!day&&!upv; // phone views: day, week, month, up (what's coming)
   document.documentElement.classList.toggle('ph',ph);
   const rng=dm(viewSun)+'–'+dm(addDays(viewSun,6)), edit=canEdit();
@@ -1073,7 +1072,7 @@ function render(){
   $('#vWeek').setAttribute('aria-pressed',String(!mon));$('#vMonth').setAttribute('aria-pressed',String(mon));
   $('.nav').hidden=upv;
   $('#upCard').hidden=ph&&!upv;$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;document.querySelectorAll('.lg-sh').forEach(l=>l.hidden=!worksOn());$('#expCard').hidden=day||upv;$('#shCard').hidden=day||upv||!worksOn();
-  $('#gridCard').hidden=!wkv||ph&&!wkGrid;$('#agCard').hidden=!wkv||ph&&wkGrid;$('#wkBar').hidden=!(ph&&wkv);$('#gridTgl').setAttribute('aria-pressed',String(wkGrid));
+  $('#gridCard').hidden=!wkv;$('#agCard').hidden=!wkv;$('#wkBar').hidden=true; // the phone week tab shows the two-day grid, the agenda is a closed card below it
   $('#addLbl').textContent=mon?'הוספה':day?'הוספה ליום זה':'הוספה לשבוע';$('#addBtn').hidden=upv;
   document.querySelectorAll('#tabs [data-v]').forEach(b=>b.setAttribute('aria-current',b.dataset.v===view?'page':'false'));
   {const pf=profileOf(items);$('.top h1').textContent=pf&&pf.name?'השבוע של '+pf.name:'השבוע שלי'}
@@ -1859,7 +1858,6 @@ async function removeItem(id,msg){
 $('#prev').addEventListener('click',()=>step(-1));$('#next').addEventListener('click',()=>step(1));
 $('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?goDay(todayIso()):go(sunOf(todayIso())));
 $('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(b){setView(b.dataset.v);scrollTo(0,0)}});
-$('#gridTgl').addEventListener('click',()=>{wkGrid=!wkGrid;render()});
 $('#grid').addEventListener('click',x=>{const b=x.target.closest('[data-more]');if(!b)return;x.stopPropagation();const d=b.dataset.more;dueMore.has(d)?dueMore.delete(d):dueMore.add(d);render()});
 $('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b){goDay(b.dataset.day);$('#dstrip [aria-pressed=true]').focus({preventScroll:true})}}); // the strip is redrawn: keep the focus on the picked day
 $('#dayList').addEventListener('click',x=>{ // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
