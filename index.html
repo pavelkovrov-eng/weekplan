@@ -401,12 +401,18 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph .nav>button{min-width:44px;min-height:44px}
 .ph .card{padding:14px;margin-bottom:16px}
 .ph .btn,.ph .chips label,.ph .edit-link,.ph .upgo{min-height:44px}
-/* phone week grid: two days at a time, swipe sideways for the next day; the hour axis stays in place */
-.ph #gridCard .scroller{container-type:inline-size;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;margin-inline:0;padding-inline:0}
+/* phone week grid: two days at a time, swipe sideways for the next day; the hour axis is NOT inside the scroller (a strip on the right), so it can never move or vanish */
+#gridAxis,#gridAxisFoot{display:none}
+.ph .gwrap{position:relative}
+.ph #gridCard .scroller{container-type:inline-size;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;margin:0 56px 0 0;padding-inline:0}
 .ph #gridCard .scroller::-webkit-scrollbar{display:none}
-.ph #gridCard .grid{min-width:0;width:max-content;grid-template-columns:48px repeat(7,calc((100cqw - 56px - 8px)/2));column-gap:8px}
-.ph #gridCard .grid>:nth-child(8n+1){position:-webkit-sticky;position:sticky;right:0;z-index:3;background:var(--bg-card)}
-.ph #gridCard .grid>.dh,.ph #gridCard .grid>.col,.ph #gridCard .grid>.df{scroll-snap-align:start;scroll-margin-right:56px;scroll-margin-inline-start:56px}
+.ph #gridCard .grid{min-width:0;width:max-content;grid-template-columns:repeat(7,calc((100cqw - 8px)/2));column-gap:8px}
+.ph #gridCard .grid>:nth-child(8n+1){display:none}
+.ph #gridCard .grid>.dh,.ph #gridCard .grid>.col,.ph #gridCard .grid>.df{scroll-snap-align:start}
+.ph #gridAxis{display:block;position:absolute;right:0;width:48px;pointer-events:none}
+.ph #gridAxis span{position:absolute;inset-inline-end:2px;font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);transform:translateY(-50%)}
+.ph #gridAxis .mid{color:var(--soft-tx)}
+.ph #gridAxisFoot{display:block;position:absolute;right:0;width:48px;text-align:center;font-size:11px;font-weight:700;color:var(--text-faint);pointer-events:none}
 .ph .edit-link{min-width:44px}
 .ph .day .edit-link{min-height:32px;display:inline-flex;align-items:center}
 .ph .day .stb{min-height:36px}
@@ -539,7 +545,7 @@ button.dlb{cursor:pointer}
     <span><i style="background:var(--other-bg);border-color:var(--other-bd);border-style:dashed"></i>אחר</span>
     <span><i style="background:var(--bad-bg);border-color:var(--bad-bd)"></i>הגשה</span>
   </div>
-  <div class="scroller"><div class="grid" id="grid"></div></div>
+  <div class="gwrap"><div class="scroller"><div class="grid" id="grid"></div></div><div id="gridAxis" aria-hidden="true"></div><div id="gridAxisFoot" aria-hidden="true">הגשות</div></div>
 </section>
 
 
@@ -1190,6 +1196,14 @@ function renderGrid(evs,clash){
     const l=document.createElement('div');l.className='dfl';l.textContent='הגשות';g.appendChild(l) // the label sits in the hour-axis column
     DAYS.forEach((_,i)=>{const f=document.createElement('div');f.className='df';f.innerHTML=dayDue(addDays(viewSun,i));g.appendChild(f)});
   }
+  gridAxisSync(g);
+}
+function gridAxisSync(g){ // phone: copy the hour labels into the strip beside the scroller and line it up with the day columns
+  const a=$('#gridAxis'),f=$('#gridAxisFoot');if(!PHQ.matches){a.innerHTML='';return}
+  const wrap=a.parentNode.getBoundingClientRect(),col=g.querySelector('.col'),df=g.querySelector('.df'),ax=g.querySelector('.axis');
+  if(!col||!ax){a.innerHTML='';return}
+  const c=col.getBoundingClientRect();a.innerHTML=ax.innerHTML;a.style.top=(c.top-wrap.top)+'px';a.style.height=c.height+'px';
+  if(df)f.style.top=(df.getBoundingClientRect().top-wrap.top+8)+'px';
 }
 function renderAgenda(evs,clash){
   const edit=canEdit(),wd=DAYS.map((_,i)=>addDays(viewSun,i)),nS=evs.filter(e=>e.src==='user'&&KINDS[e.kind].shift).length,nD=items.filter(x=>x.kind==='due'&&wd.includes(x.date)).length;
