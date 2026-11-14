@@ -891,6 +891,23 @@ function storeToItems(o){return Object.entries(o&&typeof o.items==='object'&&o.i
 function itemsToStore(items){const m={};items.forEach(({id,...d})=>{m[id]=d});return{v:1,items:m}}
 function applyOp(store,op){const m={...(store&&store.items)};if(op.doc==null)delete m[op.id];else{const{id,...d}=op.doc;m[op.id]=d}return{v:1,items:m}} // op = {id,doc}; doc null deletes
 function storeValid(o){return!!o&&typeof o==='object'&&o.v===1&&!!o.items&&typeof o.items==='object'&&!Array.isArray(o.items)} // the only file format we write; anything else is never overwritten
+function ghWhy(stage,status,limited){ // why a GitHub call failed: stage = 'read' (items.json), 'repo' (the repo itself, after a 404 on the file) or 'write' (the PUT)
+  if(limited&&(status===403||status===429))return'rate';
+  if(status===401)return'token';
+  if(stage==='repo'&&(status===403||status===404))return'repo';
+  if(stage==='read'&&status===403)return'perm';
+  if(stage==='write'&&(status===403||status===404))return'write';
+  return'';
+}
+const GH_AUTH=['token','repo','perm','write']; // the reasons that mean "fix the key"
+function ghMsg(why,owner,repo,status){ // the Hebrew line in the connect dialog: what to change when creating the key
+  const c=status?` (קוד ${status})`:'';
+  return why==='token'?'GitHub לא מכיר את המפתח: הוא שגוי, נמחק או שפג תוקפו. צור מפתח חדש והדבק אותו.'+c
+    :why==='repo'?`למפתח אין גישה למאגר ${owner}/${repo}. ביצירת המפתח, תחת Repository access, בחר Only select repositories ואת ${repo}. בדוק גם ששם המשתמש והמאגר כאן נכונים.`+c
+    :why==='perm'?'למפתח יש גישה למאגר אבל לא לקבצים. תחת Permissions ← Repository permissions ← Contents בחר Read and write.'+c
+    :why==='write'?'המפתח יכול לקרוא אבל לא לשמור. תחת Permissions ← Repository permissions ← Contents בחר Read and write, לא Read-only.'+c
+    :why==='rate'?'GitHub חוסם זמנית בגלל יותר מדי בקשות. נסה שוב בעוד כמה דקות.'+c:'';
+}
 function opNoop(store,op){return JSON.stringify(applyOp(store,op))===JSON.stringify(store)} // store must be normalised ({v:1,items} as itemsToStore makes it)
 </script>
 <script>
@@ -1367,7 +1384,7 @@ async function srvLoad(){const r=await fetch('/api/items',{cache:'no-store'}),j=
 async function srvCall(m,p,b){try{const r=await fetch('/api/items'+p,{method:m,headers:{'Content-Type':'application/json'},body:b&&JSON.stringify(b)});if(!r.ok)throw 0;await srvLoad();render();return true}catch(e){toast('השמירה לא הצליחה. ודא שחלון הטרמינל של המתכנן פתוח.');return false}}
 /* ---------- GitHub (mode gh): wp.gh = {owner,repo,token}; the data file is items.json in that repo ---------- */
 const GH_LS='wp.gh', GH_CACHE='wp.gh.cache', GH_DEF={owner:'pavelkovrov-eng',repo:'weekplan-data'};
-let ghc=null, ghSha=null, ghSeq=0, ghOn=false; // ghc = config in use, ghSha = sha of items.json we last saw, ghSeq drops a load that a newer load or a save overtook
+let ghc=null, ghSha=null, ghSeq=0, ghOn=false, ghNew=false; // ghc = config in use, ghSha = sha of items.json we last saw, ghSeq drops a load that a newer load or a save overtook
 const ghHas=()=>{try{return localStorage.getItem(GH_LS)!==null}catch(e){return false}};
 function ghCfg(){try{const c=JSON.parse(localStorage.getItem(GH_LS));return c&&c.token?{...GH_DEF,...c}:null}catch(e){return null}}
 const ghRepoUrl=()=>`https://api.github.com/repos/${encodeURIComponent(ghc.owner)}/${encodeURIComponent(ghc.repo)}`;
@@ -1377,32 +1394,34 @@ const newId=()=>[...crypto.getRandomValues(new Uint8Array(10))].map(b=>pad(b.toS
 const ghRepo=()=>ghc.owner+'/'+ghc.repo;
 function ghCacheSave(){try{localStorage.setItem(GH_CACHE,JSON.stringify({repo:ghRepo(),items,sha:ghSha,at:Date.now()}))}catch(e){}}
 function ghCacheGet(){try{const c=JSON.parse(localStorage.getItem(GH_CACHE));return c&&c.repo===ghRepo()&&Array.isArray(c.items)?c:null}catch(e){return null}} // a cache from another repo is ignored
-async function ghGet(){ // {store,sha}; a missing file is an empty store. HTTP errors throw {status}, a dead network a TypeError, an unreadable file {bad:1}
+const ghLim=r=>r.headers.get('x-ratelimit-remaining')==='0';
+async function ghGet(){ // {store,sha}; a missing file is an empty store. HTTP errors throw {status,why} (ghWhy), a dead network a TypeError, an unreadable file {bad:1}
   const r=await fetch(ghUrl(),{headers:ghHdr(),cache:'no-store'});
   if(r.status===404){ // a private repo the token cannot see also answers 404: only a visible repo means the file is really missing
     const q=await fetch(ghRepoUrl(),{headers:ghHdr(),cache:'no-store'});
-    if(q.status===404)throw{status:403};
-    if(!q.ok)throw{status:q.status};
+    if(!q.ok)throw{status:q.status,why:ghWhy('repo',q.status,ghLim(q))};
     return{store:{v:1,items:{}},sha:null};
   }
-  if(!r.ok)throw{status:r.status};
+  if(!r.ok)throw{status:r.status,why:ghWhy('read',r.status,ghLim(r))};
   const j=await r.json();let st;try{st=JSON.parse(b64dec(j.content))}catch(e){}
   if(!storeValid(st))throw{bad:1};
   return{store:st,sha:j.sha};
 }
 function ghBad(){if(mode!=='ro')toast('קובץ הנתונים ב-GitHub לא בפורמט הצפוי — מוצג לקריאה בלבד.');if(mode!=='gh'){const c=ghCacheGet();items=c?c.items:[]}mode='ro';render()} // read-only, so nothing ever overwrites the file
-const ghAuth=()=>{toast('המפתח לא תקף או שאין לו הרשאה. הדבק מפתח חדש.');openGh()};
+const ghAuth=e=>{toast('החיבור ל-GitHub נכשל. הפרטים בחלון החיבור.');openGh(ghMsg(e.why,ghc.owner,ghc.repo,e.status))}; // the dialog says what to change in the key
 async function ghLoad(){ // also the refresh on focus / reconnect; falls back to the cached copy, read-only
   const q=++ghSeq;
   try{
     const g=await ghGet();if(q!==ghSeq)return;
     if(mode==='gh'&&g.sha===ghSha)return;
     ghSha=g.sha;items=storeToItems(g.store);mode='gh';ghCacheSave();render();
+    if(ghNew){ghNew=false;toast('מחובר ל-GitHub · '+(items.length===1?'פריט אחד':items.length+' פריטים'))} // first load after a key was saved
   }catch(e){
     if(q!==ghSeq)return;
     if(e&&e.bad){ghBad();return}
-    const auth=e&&(e.status===401||e.status===403);
-    if(auth)ghAuth();else if(mode==='gh'||mode==='ro')return; // a failed refresh keeps what is on screen
+    const auth=e&&GH_AUTH.includes(e.why);
+    if(e&&e.why==='rate'){toast(ghMsg('rate'));if(mode==='gh'||mode==='ro')return;const c=ghCacheGet();if(c){items=c.items;ghSha=c.sha;mode='ro';render()}return} // GitHub's rate limit: not the key's fault
+    if(auth)ghAuth(e);else if(mode==='gh'||mode==='ro')return; // a failed refresh keeps what is on screen
     const c=ghCacheGet();
     if(c){items=c.items;ghSha=c.sha;mode='ro';render();if(!auth)toast('אין חיבור — מוצג המצב האחרון (קריאה בלבד).')}
     else if(!auth)toast('לא הצלחתי לטעון את הנתונים. בדוק את החיבור.');
@@ -1419,21 +1438,22 @@ async function ghSave(op){ // set or delete one doc; on a sha conflict re-read, 
         body:JSON.stringify({message:msg,content:b64enc(JSON.stringify(store,null,2)+'\n'),...(ghSha&&{sha:ghSha}),branch:'main'})});
       if(r.ok){const j=await r.json();ghSeq++;ghSha=j.content.sha;items=storeToItems(store);ghCacheSave();render();return true}
       if(r.status===409||r.status===422&&/sha/i.test((await r.json().catch(()=>0)).message||''))continue;
-      throw{status:r.status};
+      throw{status:r.status,why:ghWhy('write',r.status,ghLim(r))};
     }
     throw{status:409};
   }catch(e){
     const s=e&&e.status;
     if(e&&e.bad)ghBad();
-    else if(s===401||s===403)ghAuth();else toast(s?'השמירה לא הצליחה. נסה שוב בעוד רגע.':'אין חיבור לאינטרנט — השינוי לא נשמר.');
+    else if(e&&GH_AUTH.includes(e.why))ghAuth(e);else if(e&&e.why==='rate')toast(ghMsg('rate'));else toast(s?'השמירה לא הצליחה. נסה שוב בעוד רגע.':'אין חיבור לאינטרנט — השינוי לא נשמר.');
     return false;
   }
 }
 const ghDlg=$('#ghDlg');
-function openGh(){
+function openGh(err){ // err: why the last connection failed, shown in the dialog
+  const e=$('#ghErr');e.textContent=err||'';e.hidden=!err;
   if(ghDlg.open)return; // already showing: keep what is typed
   const c=ghCfg(),d=c||GH_DEF;$('#ghOwner').value=d.owner;$('#ghRepo').value=d.repo;$('#ghTok').value='';
-  $('#ghTok').placeholder=c?'נשמר כבר. השאר ריק כדי לא לשנות':'github_pat_…';$('#ghOut').hidden=!c;$('#ghErr').hidden=true;
+  $('#ghTok').placeholder=c?'נשמר כבר. השאר ריק כדי לא לשנות':'github_pat_…';$('#ghOut').hidden=!c;
   ghDlg.showModal();
 }
 function ghStart(){
@@ -1442,16 +1462,16 @@ function ghStart(){
   if(!ghOn){ghOn=true;addEventListener('online',ghLoad);document.addEventListener('visibilitychange',()=>{if(!document.hidden)ghLoad()})}
   return ghLoad();
 }
-$('#ghLink').addEventListener('click',openGh);
+$('#ghLink').addEventListener('click',()=>openGh());
 $('#ghCancel').addEventListener('click',()=>ghDlg.close());
 ghDlg.addEventListener('click',x=>{if(x.target===ghDlg)ghDlg.close()});
 $('#ghOut').addEventListener('click',()=>{try{localStorage.removeItem(GH_LS);localStorage.removeItem(GH_CACHE)}catch(e){}location.reload()}); // reload re-runs the mode detection
 $('#ghFrm').addEventListener('submit',x=>{
-  x.preventDefault();const o=$('#ghOwner').value.trim(),r=$('#ghRepo').value.trim(),t=$('#ghTok').value.trim()||(ghCfg()||{}).token||'',e=$('#ghErr');
-  const bad=!/^[\w.-]+$/.test(o)||!/^[\w.-]+$/.test(r)?'שם המשתמש והמאגר צריכים להיות באותיות לועזיות, ספרות, נקודה, מקף או קו תחתון.':!t?'צריך להדביק מפתח.':'';
+  x.preventDefault();const o=$('#ghOwner').value.trim(),r=$('#ghRepo').value.trim(),t=$('#ghTok').value.replace(/\s+/g,'')||(ghCfg()||{}).token||'',e=$('#ghErr'); // a paste on a phone can bring spaces or a line break
+  const bad=!/^[\w.-]+$/.test(o)||!/^[\w.-]+$/.test(r)?'שם המשתמש והמאגר צריכים להיות באותיות לועזיות, ספרות, נקודה, מקף או קו תחתון.':!t?'צריך להדביק מפתח.':!/^[A-Za-z0-9_]{20,}$/.test(t)?'זה לא נראה כמו מפתח של GitHub. מפתח הוא רצף ארוך של אותיות לועזיות וספרות שמתחיל ב-github_pat_.':'';
   if(bad){e.textContent=bad;e.hidden=false;return}
   try{localStorage.setItem(GH_LS,JSON.stringify({owner:o,repo:r,token:t}))}catch(err){e.textContent='הדפדפן חוסם שמירה של המפתח.';e.hidden=false;return}
-  ghDlg.close();ghStart();
+  ghDlg.close();ghNew=true;ghStart();
 });
 async function saveItem(id,data,msg){
   if(mode==='gh'){const ok=await ghSave({id:id||newId(),doc:data});if(ok)toast(msg||(id?'עודכן':'נוסף'));return ok}

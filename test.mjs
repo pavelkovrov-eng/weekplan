@@ -516,3 +516,16 @@ test('parseMoodle: a date inside a title or a link URL does not move the day blo
   assert.deepEqual(core.parseMoodle(t),[{date:'2026-11-15',title:'דוח עד 1/12/2026'},{date:'2026-11-16',title:'ב'}]);
   assert.equal(core.parseMoodle("1/12/2026\n"+Array.from({length:3000},(_,i)=>"יש להגיש את 'a"+i+"'").join('\n')).length,3000); // many rows: no quadratic dedupe
 });
+test('ghWhy + ghMsg: which part of the key to fix',()=>{
+  const w=core.ghWhy;
+  assert.equal(w('read',401),'token');assert.equal(w('repo',401),'token');assert.equal(w('write',401),'token');
+  assert.equal(w('repo',404),'repo');assert.equal(w('repo',403),'repo');            // the private repo is not visible to the key
+  assert.equal(w('read',403),'perm');                                              // the repo is visible but Contents is not granted
+  assert.equal(w('write',403),'write');assert.equal(w('write',404),'write');        // Contents read-only
+  assert.equal(w('read',403,true),'rate');assert.equal(w('write',429,true),'rate');
+  assert.equal(w('read',500),'');assert.equal(w('write',409),'');
+  for(const k of core.GH_AUTH)assert.match(core.ghMsg(k,'o','r',403),/\(קוד 403\)$/);
+  assert.match(core.ghMsg('repo','pavelkovrov-eng','weekplan-data'),/pavelkovrov-eng\/weekplan-data/);
+  assert.match(core.ghMsg('perm','o','r'),/Read and write/);assert.match(core.ghMsg('write','o','r'),/Read-only/);
+  assert.equal(core.ghMsg('',  'o','r'),'');
+});
