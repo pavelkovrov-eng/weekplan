@@ -220,6 +220,9 @@ details.card[open] .upsum{display:none}
 .df .due.late,.ml.d.late{color:var(--bad-tx);font-weight:800}
 .ph .ml.d.late{background:var(--bad-bd);box-shadow:none}
 .pastebtn{margin-top:12px}
+.who{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn.out{padding:5px 14px;font-size:13px}
+.btn.out.armed{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad-tx)}
 .welcome{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:var(--bg-app)}
 .welcome[hidden]{display:none}
 .wcard{max-width:420px;text-align:center;display:grid;gap:14px}
@@ -438,7 +441,7 @@ button.dlb{cursor:pointer}
     <h1>השבוע שלי</h1>
     <p class="sub">מערכת הלימודים קבועה ונעולה. משמרות, אימונים ושעות למידה מוסיפים מעליה, כל שבוע או לתאריך אחד.</p>
   </div>
-  <span class="store" id="store"><i></i><span>מתחבר…</span></span>
+  <div class="who"><span class="store" id="store"><i></i><span>מתחבר…</span></span><button type="button" class="btn out" id="outBtn" hidden>התנתקות</button></div>
 </header>
 
 <div class="bar">
@@ -1041,7 +1044,7 @@ function render(){
 }
 function renderStore(){
   const m={loading:['','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],sb:['db','נשמר בחשבון Google'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
-  const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent=m[1];$('#obLink').hidden=mode!=='sb';$('#ghLink').hidden=mode==='srv'||mode==='db'||mode==='sb';$('#sbLink').hidden=mode==='srv'||mode==='db';
+  const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent=m[1];$('#obLink').hidden=$('#outBtn').hidden=mode!=='sb';$('#ghLink').hidden=mode==='srv'||mode==='db'||mode==='sb';$('#sbLink').hidden=mode==='srv'||mode==='db';
 }
 function renderSum(s,an){
   const cells=[
@@ -1651,9 +1654,17 @@ function showWelcome(){
 function sbSignIn(){try{sessionStorage.setItem('wp.sb.go','1')}catch(e){}location.href=SB_URL+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(location.origin+location.pathname)}
 $('#sbIn').addEventListener('click',sbSignIn);
 $('#wIn').addEventListener('click',sbSignIn);
-$('#sbOut').addEventListener('click',async()=>{
+async function sbSignOut(){
   try{if(sbs||sbHas()){if(!sbs)sbs=JSON.parse(localStorage.getItem(SB_LS));await fetch(SB_URL+'/auth/v1/logout',{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+sbs.access}})}}catch(e){} // best effort: also ends the session on the server
   sbPut(null);location.reload();
+}
+$('#sbOut').addEventListener('click',sbSignOut);
+let outArm=0;
+$('#outBtn').addEventListener('click',()=>{ // two clicks: the first only arms the button (signing out clears this device's cached data)
+  const b=$('#outBtn');
+  if(outArm){outArm=0;sbSignOut();return}
+  outArm=Date.now();b.classList.add('armed');b.textContent='לחץ שוב להתנתקות';
+  setTimeout(()=>{outArm=0;b.classList.remove('armed');b.textContent='התנתקות'},4000);
 });
 $('#sbMove').addEventListener('click',async()=>{ // one-time: copy the items of the GitHub store into this account (ids that already exist are kept as they are)
   const b=$('#sbMove');b.disabled=true;$('#sbErr').hidden=true;
