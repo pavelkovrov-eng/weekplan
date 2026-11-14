@@ -527,6 +527,7 @@ button.dlb{cursor:pointer}
 <section class="card" id="gridCard">
   <div class="ghead"><h2 id="gridTitle">השבוע</h2><div class="printbar"><button type="button" class="btn" id="printBtn">הדפסה</button><button type="button" class="edit-link" id="printFile">קובץ להדפסה</button></div></div>
   <p class="lead">לחיצה על שטח פנוי ביום פותחת הוספה בשעה הזו. לחיצה על פריט שהוספת פותחת עריכה. הלימודים לא ניתנים לשינוי.</p>
+  <details class="mleg" open><summary>מקרא</summary>
   <div class="legend">
     <span class="c-stat"><i style="background:var(--cc);border-color:var(--cc)"></i>הסתברות</span>
     <span class="c-math"><i style="background:var(--cc);border-color:var(--cc)"></i>מתמטיקה</span>
@@ -545,6 +546,7 @@ button.dlb{cursor:pointer}
     <span><i style="background:var(--other-bg);border-color:var(--other-bd);border-style:dashed"></i>אחר</span>
     <span><i style="background:var(--bad-bg);border-color:var(--bad-bd)"></i>הגשה</span>
   </div>
+  </details>
   <div class="gwrap"><div class="scroller"><div class="grid" id="grid"></div></div><div id="gridAxis" aria-hidden="true"></div><div id="gridAxisFoot" aria-hidden="true">הגשות</div></div>
 </section>
 
@@ -1067,7 +1069,7 @@ function setView(v,date){ // v: day|week|month|up (day and up only on a phone); 
 /* ---------- render ---------- */
 let agAuto=0,legAuto=0,agL={}; // agL: the phone agenda's lines by date|key, for taps
 function render(){
-  const ph=PHQ.matches; if(ph&&!legAuto){legAuto=1;document.querySelector('.mleg').open=false} // the long legend starts folded on a phone
+  const ph=PHQ.matches; if(ph&&!legAuto){legAuto=1;document.querySelectorAll('.mleg').forEach(m=>m.open=false)} // the long legend starts folded on a phone
   const day=ph&&view==='day', upv=ph&&view==='up', mon=view==='month', wkv=!mon&&!day&&!upv; // phone views: day, week, month, up (what's coming)
   document.documentElement.classList.toggle('ph',ph);
   const rng=dm(viewSun)+'–'+dm(addDays(viewSun,6)), edit=canEdit();
