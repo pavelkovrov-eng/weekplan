@@ -1187,10 +1187,10 @@ function dayLi(l,clash,edit,today){ // one line of a day, as a tappable row: tim
   {
     const t=lineTxt(l),due=l.src==='due',tap=l.src!=='exam'&&(l.src!=='base'||edit),hit=clash.has(l.key),meta=[l.cancelled?'בוטל':'',due&&l.st!=='done'&&l.date<today?'באיחור':'',l.e>1440?'עד '+fm(l.e)+' (למחרת)':'',t.meta].filter(Boolean).join(' · ');
     const when=due?'עד '+fm(l.s):tr(l.s,l.e),act=l.src==='base'?l.cancelled?'החזרה':'ביטול':'עריכה';
-    return`<li class="dli${l.cancelled?' cancelled':''}${due&&l.done?' done':''}${due&&l.st!=='done'&&l.date<today?' late':''}">${due?stBtn(l,edit,dueName(l)):''}`
+    return`<li class="dli${l.cancelled?' cancelled':''}${due&&l.done?' done':''}${due&&l.st!=='done'&&l.date<today?' late':''}">`
       +`<${tap?`button type="button" data-key="${esc(l.key)}" data-date="${l.date}" aria-label="${esc(t.ttl+' · '+when+(meta?' · '+meta:'')+(edit?' · לחיצה ל'+act:''))}"`:'div'} class="dlb">`
       +`<span class="tm">${due?`<span>עד</span><b>${fm(l.s)}</b>`:`<b>${fm(l.s)}</b><span>${fm(l.e)}</span>`}</span><i style="background:var(${t.col})"></i>`
-      +`<span class="tx"><b>${esc(t.ttl)}</b>${meta||hit?`<span class="meta">${esc(meta)}${hit?'<span class="tag-clash">התנגשות</span>':''}</span>`:''}</span></${tap?'button':'div'}></li>`;
+      +`<span class="tx"><b>${esc(t.ttl)}</b>${meta||hit?`<span class="meta">${esc(meta)}${hit?'<span class="tag-clash">התנגשות</span>':''}</span>`:''}</span></${tap?'button':'div'}>${due?stBtn(l,edit,dueName(l)):''}</li>`; // the status pill after the row: on the left in RTL
   }
 }
 function renderMonth(){
