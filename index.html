@@ -227,6 +227,12 @@ details.card[open] .upsum{display:none}
 .ml.d.late{color:var(--bad-tx);font-weight:800}
 .ph .ml.d.late{background:var(--bad-bd);box-shadow:none}
 .pastebtn{margin-top:12px}
+.sethead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sethead h3{margin:0}
+#setDlg .setsec{margin-top:12px;box-shadow:none}
+.setrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.btn.del.armed{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad-tx)}
+#setDlg{width:min(620px,calc(100% - 32px))}
 .mhandle{display:flex;justify-content:center;padding:16px 0 10px;cursor:grab;touch-action:none}
 .mhandle i{width:44px;height:5px;border-radius:3px;background:var(--border-dark)}
 .mhandle[hidden],.mday[hidden]{display:none}
@@ -492,7 +498,7 @@ button.dlb{cursor:pointer}
     <h1>השבוע שלי</h1>
     <p class="sub">מערכת הלימודים קבועה ונעולה. משמרות, אימונים ושעות למידה מוסיפים מעליה, כל שבוע או לתאריך אחד.</p>
   </div>
-  <div class="who"><span class="store" id="store" role="img"><i></i><span>⏳</span></span><button type="button" class="btn ib" id="themeBtn">🌙</button><button type="button" class="btn ib out" id="outBtn" title="התנתקות" aria-label="התנתקות" hidden>🚪</button></div>
+  <div class="who"><button type="button" class="btn ib" id="setBtn" title="הגדרות" aria-label="הגדרות">⚙️</button><button type="button" class="btn ib" id="themeBtn">🌙</button><span class="store" id="store" role="img"><i></i><span>⏳</span></span><button type="button" class="btn ib out" id="outBtn" title="התנתקות" aria-label="התנתקות" hidden>🚪</button></div>
 </header>
 
 <div class="bar">
@@ -568,22 +574,11 @@ button.dlb{cursor:pointer}
   <div class="agenda" id="agenda"></div>
 </details>
 
-<details class="card" id="shCard">
-  <summary><h2>סיכום משמרות</h2><span class="upsum" id="shSum"></span></summary>
-  <p class="lead">שעות המשמרות שלך בכל חודש, לפי המשמרות הקבועות והחד-פעמיות. מ-1.10.26 עד 13.03.27 (משמרות חד-פעמיות מתחילת אוקטובר, משמרות קבועות מ-18.10); משמרת שמסתיימת אחרי חצות נספרת בחודש שבו היא מתחילה.</p>
-  <table class="shm" id="shTbl"></table>
-  </details>
 
-<details class="card" id="expCard">
-  <summary><h2>ייצוא ליומן</h2><span class="upsum">Google Calendar · Apple</span></summary>
-  <p class="lead">כל הסמסטר עד סוף המבחנים: שיעורים, משמרות קבועות, פריטים חד-פעמיים, מבחנים והגשות. ייבוא חוזר יוצר כפילויות, אז כדאי לייבא ליומן נפרד ולמחוק אותו לפני ייבוא מחדש.</p>
-  <div class="exp">
-    <div><button type="button" class="btn pri" id="expCsv">Google Calendar · CSV</button><p>ב-Google Calendar: הגדרות ← ייבוא וייצוא ← ייבוא. בוחרים את הקובץ ואת היומן.</p></div>
-    <div><button type="button" class="btn pri" id="expIcs">Apple ויומנים אחרים · ics בתוך zip</button><p>פותחים את ה-zip ולוחצים פעמיים על weekplan-semA.ics.</p></div>
-  </div>
-</details>
 
-<footer>בסיס נעול: מקבץ ב' + אנגלית מתקדמים א' · לוח שנה ומועדי בחינות: האקדמית ת"א-יפו תשפ"ז (מועדים עלולים להשתנות) · מבחן מוצג כ-3 שעות · <button type="button" class="edit-link" id="ghLink">חיבור ל-GitHub</button> · <button type="button" class="edit-link" id="sbLink">חשבון Google</button> · <button type="button" class="edit-link" id="obLink" hidden>ההגדרות שלי</button></footer>
+
+
+<footer>בסיס נעול: מקבץ ב' + אנגלית מתקדמים א' · לוח שנה ומועדי בחינות: האקדמית ת"א-יפו תשפ"ז (מועדים עלולים להשתנות) · מבחן מוצג כ-3 שעות </footer>
 </div>
 
 <nav class="tabs" id="tabs" aria-label="תצוגות">
@@ -682,6 +677,39 @@ button.dlb{cursor:pointer}
       <button type="button" class="btn" id="obSkip">דלג</button>
     </div>
   </form>
+</dialog>
+
+<dialog id="setDlg" aria-labelledby="setTitle">
+  <div class="dlg">
+    <div class="sethead"><h3 id="setTitle">הגדרות</h3><button type="button" class="btn ib" id="setClose" title="סגירה" aria-label="סגירה">✕</button></div>
+    <details class="card setsec" id="setProf"><summary><h2>הפרופיל שלי</h2><span class="upsum" id="setProfSum"></span></summary>
+      <p class="lead">המקבץ, השם והאם אתה עובד במשמרות.</p>
+      <button type="button" class="btn" id="obLink" hidden>עריכה</button>
+    </details>
+    <details class="card" id="shCard">
+  <summary><h2>סיכום משמרות</h2><span class="upsum" id="shSum"></span></summary>
+  <p class="lead">שעות המשמרות שלך בכל חודש, לפי המשמרות הקבועות והחד-פעמיות. מ-1.10.26 עד 13.03.27 (משמרות חד-פעמיות מתחילת אוקטובר, משמרות קבועות מ-18.10); משמרת שמסתיימת אחרי חצות נספרת בחודש שבו היא מתחילה.</p>
+  <table class="shm" id="shTbl"></table>
+  </details>
+    <details class="card" id="expCard">
+  <summary><h2>ייצוא ליומן</h2><span class="upsum">Google Calendar · Apple</span></summary>
+  <p class="lead">כל הסמסטר עד סוף המבחנים: שיעורים, משמרות קבועות, פריטים חד-פעמיים, מבחנים והגשות. ייבוא חוזר יוצר כפילויות, אז כדאי לייבא ליומן נפרד ולמחוק אותו לפני ייבוא מחדש.</p>
+  <div class="exp">
+    <div><button type="button" class="btn pri" id="expCsv">Google Calendar · CSV</button><p>ב-Google Calendar: הגדרות ← ייבוא וייצוא ← ייבוא. בוחרים את הקובץ ואת היומן.</p></div>
+    <div><button type="button" class="btn pri" id="expIcs">Apple ויומנים אחרים · ics בתוך zip</button><p>פותחים את ה-zip ולוחצים פעמיים על weekplan-semA.ics.</p></div>
+  </div>
+</details>
+    <details class="card setsec" id="setData"><summary><h2>הנתונים שלי</h2><span class="upsum">גיבוי ומחיקה</span></summary>
+      <p class="lead">קובץ עם כל המשמרות, ההגשות והפריטים שלך, או מחיקה שלהם.</p>
+      <div class="setrow"><button type="button" class="btn" id="setBackup">ייצוא כל הנתונים (JSON)</button><button type="button" class="btn del" id="setWipe">מחיקת כל הנתונים שלי</button></div>
+      <p class="lead" id="setWipeNote">מחיקה מסירה את כל הפריטים שלך ומנתקת אותך. כדי למחוק גם את רשומת ההתחברות, פנה דרך עמוד הפרטיות.</p>
+    </details>
+    <details class="card setsec" id="setAcct"><summary><h2>החשבון והפרטיות</h2><span class="upsum" id="setAcctSum"></span></summary>
+      <p class="lead" id="setAcctTxt"></p>
+      <div class="setrow"><button type="button" class="btn" id="ghLink">חיבור ל-GitHub</button><button type="button" class="btn" id="sbLink">חשבון Google</button></div>
+      <p class="lead"><a href="privacy.html">מדיניות פרטיות</a></p>
+    </details>
+  </div>
 </dialog>
 
 <dialog id="sbDlg" aria-labelledby="sbTitle">
@@ -1079,7 +1107,7 @@ function render(){
   $('#prev').setAttribute('aria-label',mon?'חודש קודם':day?'יום קודם':'שבוע קודם');$('#next').setAttribute('aria-label',mon?'חודש הבא':day?'יום הבא':'שבוע הבא');
   $('#vWeek').setAttribute('aria-pressed',String(!mon));$('#vMonth').setAttribute('aria-pressed',String(mon));
   $('.nav').hidden=upv;
-  $('#upCard').hidden=ph&&!upv;$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;document.querySelectorAll('.lg-sh').forEach(l=>l.hidden=!worksOn());$('#expCard').hidden=day||upv;$('#shCard').hidden=day||upv||!worksOn();
+  $('#upCard').hidden=ph&&!upv;$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;document.querySelectorAll('.lg-sh').forEach(l=>l.hidden=!worksOn());$('#shCard').hidden=!worksOn();
   $('#gridCard').hidden=!wkv;$('#agCard').hidden=!wkv;$('#wkBar').hidden=true; // the phone week tab shows the two-day grid, the agenda is a closed card below it
   $('#addLbl').textContent=mon?'הוספה':day?'הוספה ליום זה':'הוספה לשבוע';$('#addBtn').hidden=upv;
   document.querySelectorAll('#tabs [data-v]').forEach(b=>b.setAttribute('aria-current',b.dataset.v===view?'page':'false'));
@@ -1754,6 +1782,31 @@ async function sbSignOut(){
   sbPut(null);location.reload();
 }
 $('#sbOut').addEventListener('click',sbSignOut);
+/* ---------- settings dialog: profile, shifts summary, calendar export, my data, account ---------- */
+const setDlg=$('#setDlg');
+function setFill(){
+  const pf=profileOf(items),email=(()=>{try{const t=JSON.parse(localStorage.getItem(SB_LS));const p=t&&sbPayload(t.access);return p&&p.email||''}catch(e){return''}})();
+  $('#setProfSum').textContent=pf?[TRACKS[trackOf(items)].label,pf.name||'',pf.works===false?'בלי משמרות':'עם משמרות'].filter(Boolean).join(' · '):'מקבץ ב\'';
+  $('#setAcctTxt').textContent=email?'מחובר כ-'+email:mode==='sb'?'מחובר':'לא מחובר לחשבון Google';
+  $('#setAcctSum').textContent=email||({sb:'Google',gh:'GitHub',srv:'מחשב',local:'דפדפן'}[mode]||'');
+}
+$('#setBtn').addEventListener('click',()=>{setFill();render();setDlg.showModal()}); // render() refreshes the shifts table inside
+$('#setClose').addEventListener('click',()=>setDlg.close());
+setDlg.addEventListener('click',x=>{if(x.target===setDlg)setDlg.close()});
+$('#obLink').addEventListener('click',()=>{setDlg.close();openOb(false)});
+for(const id of ['#sbLink','#ghLink'])$(id).addEventListener('click',()=>setDlg.close()); // their own dialogs open on top
+$('#setBackup').addEventListener('click',()=>offer('weekplan-backup-'+todayIso()+'.json',JSON.stringify(itemsToStore(items),null,2)+'\n'));
+let wipeArm=0;
+$('#setWipe').addEventListener('click',async()=>{ // two clicks: the first arms it for 4 s
+  const b=$('#setWipe');
+  if(!wipeArm){wipeArm=Date.now();b.classList.add('armed');b.textContent='לחץ שוב: זה מוחק הכול';setTimeout(()=>{wipeArm=0;b.classList.remove('armed');b.textContent='מחיקת כל הנתונים שלי'},4000);return}
+  wipeArm=0;b.disabled=true;
+  try{
+    if(mode==='sb'){await sbFetch('/rest/v1/items?id=not.is.null',{method:'DELETE',headers:{Prefer:'return=minimal'}});await sbSignOut();return}
+    for(const it of [...items])if(!await removeItem(it.id,' '))break;
+    toast('הנתונים נמחקו');setDlg.close();
+  }catch(e){toast('המחיקה לא הצליחה. נסה שוב.');b.disabled=false;b.classList.remove('armed');b.textContent='מחיקת כל הנתונים שלי'}
+});
 const THEME_LS='wp.theme';
 function themeNow(){return document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}
 function themeShow(){const d=themeNow()==='dark',b=$('#themeBtn');b.textContent=d?'☀️':'🌙';b.title=b.dataset.t=d?'מעבר למצב בהיר':'מעבר למצב כהה';b.setAttribute('aria-label',b.title)}
@@ -1842,7 +1895,6 @@ $('#obFrm').addEventListener('submit',async x=>{
 $('#obBack').addEventListener('click',()=>{if(obBusy)return;obRead();ob.i--;obRender()});
 $('#obSkip').addEventListener('click',()=>{if(obBusy)return;const st=ob.steps[ob.i];if(st==='name')ob.a.name='';else ob.a.eng=null;if(ob.i<ob.steps.length-1){ob.i++;obRender()}else obFinish()});
 obDlg.addEventListener('cancel',x=>{if(ob&&ob.first)x.preventDefault()}); // the first run cannot be dismissed with Esc
-$('#obLink').addEventListener('click',()=>openOb(false));
 function maybeOnboard(){ // a new account with no data: ask the opening questions once
   if(obAsked||mode!=='sb'||profileOf(items)||items.length||obDlg.open)return;
   obAsked=true;openOb(true);
