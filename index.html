@@ -180,7 +180,7 @@ button.blk:hover{transform:translateY(-1px);z-index:4}
 .shm .z{color:var(--text-faint);font-weight:400}
 .dh .due{display:block;font-size:10.5px;font-weight:700;color:var(--bad-tx)}
 .dfl{align-self:start;padding-top:8px;border-top:1px solid var(--border-light);font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--text-faint);text-align:center}
-.df{display:flex;flex-direction:column;align-items:stretch;gap:4px;padding-top:8px;border-top:1px solid var(--border-light);min-width:0}
+.df{display:flex;flex-direction:column;align-items:stretch;gap:4px;padding-top:8px;min-height:34px;border-top:1px solid var(--border-light);min-width:0}
 .dchip{display:flex;align-items:center;gap:6px;min-width:0;padding:2px 9px;border:1px solid var(--border-light);border-radius:999px;background:var(--bg-sunk);font-size:11.5px;font-weight:600;color:var(--text-main)}
 .dchip>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dchip>i{flex:none;width:7px;height:7px;border-radius:50%;background:var(--cc,var(--bad-bd))}
@@ -1157,8 +1157,8 @@ function renderGrid(evs,clash){
     });
     g.appendChild(col);
   });
-  if(items.some(x=>x.kind==='due'&&DAYS.some((_,i)=>x.date===addDays(viewSun,i)))){ // the week's deadlines sit under the day columns, not above them
-    {const l=document.createElement('div');l.className='dfl';l.textContent='הגשות';g.appendChild(l)} // the row's label sits in the hour-axis column
+  { // the week's deadlines sit under the day columns; the row and its label "הגשות" stay even in a week with none
+    const l=document.createElement('div');l.className='dfl';l.textContent='הגשות';g.appendChild(l) // the label sits in the hour-axis column
     DAYS.forEach((_,i)=>{const f=document.createElement('div');f.className='df';f.innerHTML=dayDue(addDays(viewSun,i));g.appendChild(f)});
   }
 }
