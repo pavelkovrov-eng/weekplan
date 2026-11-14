@@ -227,13 +227,28 @@ details.card[open] .upsum{display:none}
 .ml.d.late{color:var(--bad-tx);font-weight:800}
 .ph .ml.d.late{background:var(--bad-bd);box-shadow:none}
 .pastebtn{margin-top:12px}
+.mhandle{display:flex;justify-content:center;padding:10px 0 6px;cursor:grab;touch-action:none}
+.mhandle i{width:44px;height:5px;border-radius:3px;background:var(--border-dark)}
+.mhandle[hidden],.mday[hidden]{display:none}
+.mdh{margin:6px 4px 10px;font-size:15px;font-weight:700;color:var(--ink)}
+.ph .mc.sel{background:var(--accent-soft);outline:2px solid var(--accent);outline-offset:-2px}
+.ph .mc{cursor:pointer}
+.ph .mexp .scroller,.ph .mexp #mLegend,.ph .mexp .mleg,.ph .mexp .ghead{display:none}
+.ph .mexp .mday{min-height:60vh}
+.mday .dli{margin-bottom:12px}
+.mday .dlb{padding:14px;border:0;border-radius:14px;background:var(--bg-card);box-shadow:0 2px 8px var(--shadow);min-height:72px}
+.mday .dlb .tx>b{font-size:15px}
+.mday .dlb .tx .meta{display:block;margin-top:4px;font-size:13px;color:var(--text-muted)}
+.mday .dlb .tm b{font-size:15px}
 .ph .printbar{display:none!important}
 .mleg>summary{display:none}
 .ph .mleg>summary{display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;font-size:13px;color:var(--text-muted);min-height:36px}
 .ph .mleg>summary::after{content:"▾"}
 .ph .mleg[open]>summary::after{content:"▴"}
-.who{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.btn.out{padding:5px 14px;font-size:13px}
+.who{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;flex:none}
+.store{padding:0;width:42px;height:42px;justify-content:center;border-radius:50%;font-size:18px;line-height:1}
+.store i{display:none}
+.btn.ib,.ph .btn.ib{width:42px;height:42px;min-height:42px;padding:0;border-radius:50%;font-size:18px;line-height:1;display:inline-grid;place-items:center}
 .btn.out.armed{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad-tx)}
 .welcome{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:var(--bg-app)}
 .welcome[hidden]{display:none}
@@ -458,7 +473,7 @@ button.dlb{cursor:pointer}
     <h1>השבוע שלי</h1>
     <p class="sub">מערכת הלימודים קבועה ונעולה. משמרות, אימונים ושעות למידה מוסיפים מעליה, כל שבוע או לתאריך אחד.</p>
   </div>
-  <div class="who"><span class="store" id="store"><i></i><span>מתחבר…</span></span><button type="button" class="btn out" id="outBtn" hidden>התנתקות</button></div>
+  <div class="who"><span class="store" id="store" role="img"><i></i><span>⏳</span></span><button type="button" class="btn ib" id="themeBtn">🌙</button><button type="button" class="btn ib out" id="outBtn" title="התנתקות" aria-label="התנתקות" hidden>🚪</button></div>
 </header>
 
 <div class="bar">
@@ -487,6 +502,8 @@ button.dlb{cursor:pointer}
   <div class="ghead"><h2 id="monthTitle"></h2></div>
   <details class="mleg" open><summary>מקרא</summary><div class="legend" id="mLegend"></div></details>
   <div class="scroller"><div class="month" id="month"></div></div>
+  <div class="mhandle" id="mHandle" role="button" tabindex="0" aria-expanded="false" aria-label="הרחבת רשימת היום" hidden><i></i></div>
+  <div class="mday" id="mDay" hidden></div>
 </section>
 <section class="card" id="gridCard">
   <div class="ghead"><h2 id="gridTitle">השבוע</h2><div class="printbar"><button type="button" class="btn" id="printBtn">הדפסה</button><button type="button" class="edit-link" id="printFile">קובץ להדפסה</button></div></div>
@@ -1063,7 +1080,7 @@ function render(){
 }
 function renderStore(){
   const m={loading:['','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],sb:['db','נשמר בחשבון Google'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
-  const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent=m[1];$('#obLink').hidden=$('#outBtn').hidden=mode!=='sb';$('#ghLink').hidden=mode==='srv'||mode==='db'||mode==='sb';$('#sbLink').hidden=mode==='srv'||mode==='db';
+  const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent={loading:'⏳',db:'☁️',srv:'🖥️',gh:'☁️',sb:'☁️',local:'💾',ro:'👁️'}[mode]||'⏳';el.title=m[1];el.setAttribute('aria-label',m[1]);$('#obLink').hidden=$('#outBtn').hidden=mode!=='sb';$('#ghLink').hidden=mode==='srv'||mode==='db'||mode==='sb';$('#sbLink').hidden=mode==='srv'||mode==='db';
 }
 function renderSum(s,an){
   const cells=[
@@ -1203,13 +1220,27 @@ function dayLi(l,clash,edit,today){ // one line of a day, as a tappable row: tim
       +`<span class="tx"><b>${esc(t.ttl)}</b>${meta||hit?`<span class="meta">${esc(meta)}${hit?'<span class="tag-clash">התנגשות</span>':''}</span>`:''}</span></${tap?'button':'div'}>${due?stBtn(l,edit,dueName(l)):''}</li>`; // the status pill after the row: on the left in RTL
   }
 }
+let monthSel=''; // phone month view: the selected day (its list sits under the month)
+function renderMonthDay(){
+  const on=PHQ.matches&&view==='month';
+  $('#mDay').hidden=$('#mHandle').hidden=!on;$('#monthCard').classList.toggle('mexp',on&&mexp);if(!on)return;
+  const d=monthSel,evs=evsForWeek(sunOf(d),items),an=analyze(evs,evsForWeek(addDays(sunOf(d),7),items).filter(e=>e.d===0)),L=dayLines(d,items,evs),edit=canEdit(),today=todayIso();
+  mdL={};L.forEach(l=>mdL[l.key]=l);
+  const c=CAL[d],off=offDoc(d,items);
+  $('#mDay').innerHTML=`<h3 class="mdh">${DAYS[dow(d)]} ${dm(d)}${c?` · ${esc(c.label)}`:off?' · לימודים בוטלו':''}</h3><ul class="dlist">`+(L.length?L.map(l=>dayLi(l,an.clash,edit,today)).join(''):'<li class="none">יום פנוי</li>')+'</ul>';
+  $('#mHandle').setAttribute('aria-expanded',String(mexp));
+}
+let mexp=false,mdL={}; // mexp: the list is pulled up, the month is hidden
+function monthPick(date){monthSel=date;renderMonth()}
 function renderMonth(){
+  if(!monthSel||ymOf(monthSel)!==viewYm){const t=todayIso();monthSel=ymOf(t)===viewYm?t:viewYm+'-01'}
   const today=todayIso(), title=MONTHS[Number(viewYm.slice(5))-1]+' '+viewYm.slice(0,4);
   $('#monthTitle').textContent=title;
   $('#month').innerHTML=DAYS.map((d,i)=>`<div class="mh${i>=4?' wk':''}">${d}</div>`).join('')+monthSuns(viewYm).map(sun=>{
     const evs=evsForWeek(sun,items);
     return DAYS.map((_,i)=>monthCell(addDays(sun,i),evs,today)).join('');
   }).join('');
+  renderMonthDay();
 }
 function monthCell(date,evs,today){
   const c=CAL[date], off=offDoc(date,items), lab=[c&&c.label,off&&'לימודים בוטלו'].filter(Boolean).join(' · '), edit=canEdit(), dn=DAYS[dow(date)]+' '+dm(date);
@@ -1223,7 +1254,7 @@ function monthCell(date,evs,today){
   }).concat(items.filter(x=>x.kind==='due'&&x.date===date).map(x=>({s:toMin(okTime(x.start)?x.start:'23:59'),
     h:`<button type="button" class="ml d${x.done?' done':''}${dueLate(x,today)?' late':''} ${dueCls(x)}" data-kind="due" data-date="${date}" data-id="${esc(x.id)}" ${ta(dueLbl(x)+' · עד '+(okTime(x.start)?x.start:'23:59')+(dueLate(x,today)?' · באיחור':''),edit&&'לחיצה לעריכה')}><span>${esc(dueLbl(x))}</span></button>`})))
     .sort((a,b)=>a.s-b.s);
-  return`<div class="mc${ymOf(date)!==viewYm?' out':''}${date===today?' today':''}" data-date="${date}"><div class="mtop"><button type="button" class="mn" aria-label="${esc(dn+' · מעבר ל'+(PHQ.matches?'יום':'שבוע'))}">${Number(date.slice(8))}</button>${lab?`<small>${esc(lab)}</small>`:''}</div>`
+  return`<div class="mc${ymOf(date)!==viewYm?' out':''}${date===today?' today':''}${PHQ.matches&&date===monthSel?' sel':''}" data-date="${date}"><div class="mtop"><button type="button" class="mn" aria-label="${esc(dn+' · מעבר ל'+(PHQ.matches?'יום':'שבוע'))}">${Number(date.slice(8))}</button>${lab?`<small>${esc(lab)}</small>`:''}</div>`
     +L.slice(0,5).map(x=>x.h).join('')+(L.length>5?`<button type="button" class="ml more" data-kind="more" data-date="${date}" aria-label="${esc(dn+' · '+(L.length===6?'עוד פריט אחד':'עוד '+(L.length-5)+' פריטים')+' · מעבר לשבוע')}"><bdi dir="ltr">+${L.length-5}</bdi> עוד</button>`:'')+'</div>';
 }
 function dayClick(date){ // desktop: to the week of that day, at the top of the grid. Phone: to the day view
@@ -1233,6 +1264,7 @@ function dayClick(date){ // desktop: to the week of that day, at the top of the 
 }
 $('#month').addEventListener('click',x=>{ // one listener: a line acts by kind, anything else in a cell is a day click
   const c=x.target.closest('.mc');if(!c)return;
+  if(PHQ.matches){monthPick(c.dataset.date);return} // phone: select the day, its list is under the month
   const date=c.dataset.date,b=x.target.closest('[data-kind]'),k=b&&b.dataset.kind;
   if(canEdit()){
     if(k==='user'||k==='due'){openEdit(b.dataset.id,sunOf(date));return}
@@ -1694,12 +1726,19 @@ async function sbSignOut(){
   sbPut(null);location.reload();
 }
 $('#sbOut').addEventListener('click',sbSignOut);
+const THEME_LS='wp.theme';
+function themeNow(){return document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}
+function themeShow(){const d=themeNow()==='dark',b=$('#themeBtn');b.textContent=d?'☀️':'🌙';b.title=b.dataset.t=d?'מעבר למצב בהיר':'מעבר למצב כהה';b.setAttribute('aria-label',b.title)}
+try{const t=localStorage.getItem(THEME_LS);if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}
+$('#themeBtn').addEventListener('click',()=>{const n=themeNow()==='dark'?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem(THEME_LS,n)}catch(e){}themeShow()});
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',themeShow);
+themeShow();
 let outArm=0;
 $('#outBtn').addEventListener('click',()=>{ // two clicks: the first only arms the button (signing out clears this device's cached data)
   const b=$('#outBtn');
   if(outArm){outArm=0;sbSignOut();return}
-  outArm=Date.now();b.classList.add('armed');b.textContent='לחץ שוב להתנתקות';
-  setTimeout(()=>{outArm=0;b.classList.remove('armed');b.textContent='התנתקות'},4000);
+  outArm=Date.now();b.classList.add('armed');b.textContent='⚠️';b.title='לחץ שוב להתנתקות';
+  setTimeout(()=>{outArm=0;b.classList.remove('armed');b.textContent='🚪';b.title='התנתקות'},4000);
 });
 $('#sbMove').addEventListener('click',async()=>{ // one-time: copy the items of the GitHub store into this account (ids that already exist are kept as they are)
   const b=$('#sbMove');b.disabled=true;$('#sbErr').hidden=true;
@@ -1814,6 +1853,26 @@ $('#dayList').addEventListener('click',x=>{ // a class asks to cancel, an own it
   const b=x.target.closest('[data-key]'),l=b&&dayL.find(e=>e.key===b.dataset.key);if(!l)return;
   if(l.src==='base')openCancel(l);else openEdit(l.id);
 });
+$('#mDay').addEventListener('click',x=>{const b=x.target.closest('[data-key]'),l=b&&mdL[b.dataset.key];if(!l||!canEdit()&&l.src!=='base'&&false)return;if(l.src==='base')openCancel(l);else openEdit(l.id)});
+const mexpSet=v=>{mexp=v;renderMonthDay()};
+$('#mHandle').addEventListener('keydown',x=>{if(x.key==='Enter'||x.key===' '){x.preventDefault();mexpSet(!mexp)}}); // keyboard only; touch and mouse drag
+let drag=null; // {y0,h}: the month shrinks while the finger pulls the list up and grows when it pulls down; it snaps open or closed on release
+function dragMove(y){
+  if(!drag)return;const sc=$('#month').closest('.scroller'),dy=y-drag.y0;
+  if(mexp&&dy>0){mexp=false;$('#monthCard').classList.remove('mexp');sc.style.display='';drag.h=sc.scrollHeight;sc.style.maxHeight='0px';drag.from=0;drag.y0=y-1}
+  const base=drag.from!=null?drag.from:drag.h,h=Math.max(0,Math.min(drag.h,base+dy));
+  sc.style.overflow='hidden';sc.style.maxHeight=h+'px';drag.cur=h;
+}
+function dragEnd(){
+  if(!drag)return;const sc=$('#month').closest('.scroller'),open=drag.cur!=null&&drag.cur>drag.h*(drag.startExp?0.25:0.7); // a short pull is enough to open the month again; closing needs a longer pull up
+  sc.style.maxHeight='';sc.style.overflow='';const was=drag;drag=null;
+  if(was.cur==null)return;mexpSet(!open);
+}
+const dragStart=y=>{const sc=$('#month').closest('.scroller');drag={y0:y,h:mexp?0:sc.scrollHeight,from:mexp?0:null,startExp:mexp}};
+$('#mHandle').addEventListener('touchstart',x=>{dragStart(x.touches[0].clientY);if(mexp){drag.h=0}},{passive:true});
+$('#mHandle').addEventListener('touchmove',x=>dragMove(x.touches[0].clientY),{passive:true});
+$('#mHandle').addEventListener('touchend',dragEnd,{passive:true});
+$('#mHandle').addEventListener('mousedown',x=>{dragStart(x.clientY);const mv=e=>dragMove(e.clientY),up=()=>{dragEnd();removeEventListener('mousemove',mv);removeEventListener('mouseup',up)};addEventListener('mousemove',mv);addEventListener('mouseup',up)});
 let swipe0=null; // swipe on the day card: a finger moving right is the next day (RTL, see swipeDir)
 $('#dayCard').addEventListener('touchstart',x=>{swipe0=x.touches.length===1?[x.touches[0].clientX,x.touches[0].clientY]:null},{passive:true});
 $('#dayCard').addEventListener('touchend',x=>{if(!swipe0)return;const t=x.changedTouches[0],d=swipeDir(t.clientX-swipe0[0],t.clientY-swipe0[1]);swipe0=null;if(d)step(d)},{passive:true});
