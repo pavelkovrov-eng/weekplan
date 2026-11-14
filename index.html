@@ -220,6 +220,11 @@ details.card[open] .upsum{display:none}
 .df .due.late,.ml.d.late{color:var(--bad-tx);font-weight:800}
 .ph .ml.d.late{background:var(--bad-bd);box-shadow:none}
 .pastebtn{margin-top:12px}
+.ph .printbar{display:none!important}
+.mleg>summary{display:none}
+.ph .mleg>summary{display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;font-size:13px;color:var(--text-muted);min-height:36px}
+.ph .mleg>summary::after{content:"▾"}
+.ph .mleg[open]>summary::after{content:"▴"}
 .who{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .btn.out{padding:5px 14px;font-size:13px}
 .btn.out.armed{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad-tx)}
@@ -409,12 +414,12 @@ button.dlb{cursor:pointer}
 .ph .month{min-width:0;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
 .ph .mh{font-size:12px}
 
-.ph .mc{min-height:60px;flex-direction:row;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:3px;padding:4px 2px}
+.ph .mc{min-height:68px;flex-direction:row;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:4px;padding:4px 2px}
 .ph .mtop{flex:0 0 100%;justify-content:center;margin:0}
 .ph .mtop small,.ph .ml>span,.ph .ml.more{display:none}
-.ph .mn{font-size:14px}
-.ph .ml,.ph .ml.k-tut,.ph .ml.x,.ph .ml.x.m2,.ph .ml.d{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:none;overflow:hidden;pointer-events:none}
-.ph .ml>i{width:7px;height:7px}
+.ph .mn{font-size:15px}
+.ph .ml,.ph .ml.k-tut,.ph .ml.x,.ph .ml.x.m2,.ph .ml.d{width:10px;height:10px;padding:0;border:0;border-radius:50%;background:none;overflow:hidden;pointer-events:none}
+.ph .ml>i{width:10px;height:10px}
 .ph .ml.x,.ph .ml.x.m2,.ph .ml.d{background:var(--cc,var(--bad-bd))}
 .ph .ml.d.cd{background:none;box-shadow:inset 0 0 0 2px var(--cc)}
 .ph .ml.d.cd.late{background:var(--bad-bd);box-shadow:none} /* a late deadline is a red dot even with a course */
@@ -468,7 +473,7 @@ button.dlb{cursor:pointer}
 </section>
 <section class="card" id="monthCard" hidden>
   <div class="ghead"><h2 id="monthTitle"></h2></div>
-  <div class="legend" id="mLegend"></div>
+  <details class="mleg" open><summary>מקרא</summary><div class="legend" id="mLegend"></div></details>
   <div class="scroller"><div class="month" id="month"></div></div>
 </section>
 <section class="card" id="gridCard">
@@ -1011,9 +1016,10 @@ function setView(v,date){ // v: day|week|month|up (day and up only on a phone); 
 }
 
 /* ---------- render ---------- */
-let agAuto=0;
+let agAuto=0,legAuto=0;
 function render(){
-  const ph=PHQ.matches; if(ph&&view==='week'&&!agAuto){agAuto=1;$('#agCard').open=true} // on a phone the agenda is the week tab itself: open once, the user may close it
+  const ph=PHQ.matches; if(ph&&!legAuto){legAuto=1;document.querySelector('.mleg').open=false} // the long legend starts folded on a phone
+  if(ph&&view==='week'&&!agAuto){agAuto=1;$('#agCard').open=true} // on a phone the agenda is the week tab itself: open once, the user may close it
   const day=ph&&view==='day', upv=ph&&view==='up', mon=view==='month', wkv=!mon&&!day&&!upv; // phone views: day, week, month, up (what's coming)
   document.documentElement.classList.toggle('ph',ph);
   const rng=dm(viewSun)+'–'+dm(addDays(viewSun,6)), edit=canEdit();
