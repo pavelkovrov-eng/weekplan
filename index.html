@@ -374,7 +374,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .fbody{display:contents}
 /* phone add/edit window: the fields scroll inside .fbody, Save/Cancel are a fixed footer (a sticky bar inside the scaling dialog jumped while it opened) */
 .ph #dlg{overflow:hidden}.ph #dlg[open]{display:flex;flex-direction:column}
-.ph #frm{display:flex;flex-direction:column;flex:1;min-height:0;padding:0}
+.ph #frm{display:flex;flex-direction:column;flex:0 1 auto;min-height:0;padding:0} /* flex:1 means basis 0% and collapses the form in WebKit when the dialog's height is auto */
 .ph #frm .fbody{display:grid;gap:16px;overflow-y:auto;overflow-x:hidden;min-height:0;padding:18px 16px 16px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 .ph #frm .actions{flex:none;background:var(--bg-card);border-top:1px solid var(--border-light);padding:10px 16px;margin:0;max-width:none;box-sizing:border-box}
 .actions .sp{flex:1}
