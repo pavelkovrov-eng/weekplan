@@ -450,6 +450,9 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .btn[aria-pressed=true]{background:var(--ink);color:var(--bg-card);border-color:var(--ink)}
 .wkbar{margin-bottom:12px}
 .ph .wrap{padding-inline:12px;padding-bottom:calc(var(--tabh) + 24px + env(safe-area-inset-bottom,0px))}
+.ph #miniTop{position:fixed;inset-inline:0;top:0;z-index:19;display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:calc(env(safe-area-inset-top,0px) + 8px) 18px 9px;background:color-mix(in srgb,var(--bg-card) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--border-light);opacity:0;transform:translateY(-100%);pointer-events:none;transition:transform .35s var(--ez-out),opacity .25s}
+.ph #miniTop.on{opacity:1;transform:none;pointer-events:auto}#miniTop b{font-size:16px;font-weight:800;color:var(--ink)}#miniTop span{font:600 13px var(--font-mono);color:var(--text-muted);direction:ltr}
+#miniTop{display:none}.ph #miniTop{display:flex} /* the big header scrolls away; this frosted strip takes its place (a fixed copy: the page itself never changes height, so there is no jitter at the threshold) */
 .ph .top{flex-wrap:nowrap;align-items:center;gap:10px;padding-block:14px 10px}
 .ph h1{font-size:24px;margin:0}
 .ph .sub,.ph .eyebrow,.ph .seg{display:none}
@@ -652,6 +655,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <footer>בסיס נעול: מקבץ ב' + אנגלית מתקדמים א' · לוח שנה ומועדי בחינות: האקדמית ת"א-יפו תשפ"ז (מועדים עלולים להשתנות) · מבחן מוצג כ-3 שעות </footer>
 </div>
 
+<div id="miniTop" aria-hidden="true"><b></b><span></span></div>
 <nav class="tabs" id="tabs" aria-label="תצוגות">
   <button type="button" data-v="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect class="bd" x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/><rect x="9" y="13" width="6" height="4" rx="1" fill="currentColor"/></svg><span>יום</span></button>
   <button type="button" data-v="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect class="bd" x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4M8 13.5h8M8 17h8"/></svg><span>שבוע</span></button>
@@ -1197,7 +1201,7 @@ function go(sun){viewSun=clampSun(sun);render();if(document.activeElement?.match
 function goMonth(ym){viewYm=clampYm(ym);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goDay(d){viewDay=clampDay(d);viewSun=sunOf(viewDay);viewYm=clampYm(ymOf(viewDay));render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()} // the three stay in step, so week and month tabs open on the picked day
 const emptyDay=(date,edit)=>{const off=!!(offDoc(date,items)||CAL[date]&&CAL[date].off);return`<li class="none"><span class="em" aria-hidden="true">${off?'🎉':dow(date)===6?'😴':'🌤️'}</span><b>${off?'לימודים בוטלו':'יום פנוי'}</b>${edit?'<button type="button" class="btn" data-add>הוספה ליום הזה</button>':''}</li>`}; // an empty day, with the add button in it
-const slide=d=>{if(still()||!d||!PHQ.matches||view!=='day')return;for(const e of [$('#dayHead'),$('#dayList')])e.animate([{opacity:0,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:220,easing:EZ.snap})}; // the new day enters from the side the finger came from
+const slide=d=>{if(still()||!d||!PHQ.matches)return;for(const e of view==='day'?[$('#dayHead'),$('#dayList')]:view==='month'?[$('#month')]:view==='week'?[$('#grid')]:[])e.animate([{opacity:0,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:220,easing:EZ.snap})}; // the new day enters from the side the finger came from
 const step=n=>view==='month'?goMonth(addMonths(viewYm,n)):view==='day'?goDay(addDays(viewDay,n)):go(addDays(viewSun,7*n));
 function setView(v,date){ // v: day|week|month|up (day and up only on a phone); date: open the day view on that date
   if(v===view&&date==null)return;
@@ -2216,6 +2220,18 @@ gGrid.addEventListener('mousedown',x=>{if(x.button||!canEdit())return;const b=gB
     up=()=>{removeEventListener('mousemove',mv);removeEventListener('mouseup',up);if(on)gEnd()};addEventListener('mousemove',mv);addEventListener('mouseup',up)});
 addEventListener('keydown',x=>{if(x.key==='Escape'&&gDrag)gEnd(1)});
 addEventListener('pointerdown',x=>{if(gSel&&!(x.target.closest&&x.target.closest('#grid .blk.sel,#mvDlg,#toast'))){gSel='';document.querySelectorAll('#grid .blk.sel').forEach(b=>b.classList.remove('sel'))}},true); // a tap elsewhere drops the pick
+const miniTop=$('#miniTop');let miniRaf=0;
+function miniSync(){miniRaf=0;const on=PHQ.matches&&scrollY>90&&!document.querySelector('dialog[open]');if(on){miniTop.firstChild.textContent=$('h1').textContent;miniTop.lastChild.textContent=$('#wkLabel').textContent}miniTop.classList.toggle('on',on)}
+addEventListener('scroll',()=>{if(!miniRaf)miniRaf=requestAnimationFrame(miniSync)},{passive:true});miniTop.addEventListener('click',()=>scrollTo({top:0,behavior:still()?'auto':'smooth'})); // a tap on the strip goes back to the top, like the iOS status bar
+document.addEventListener('close',miniSync,true);
+/* swipe between weeks and months (a phone): the month swipes anywhere on the calendar; the week grid swipes only when it cannot scroll any further that way (it scrolls by days first), so the day columns keep working */
+let sw1=null;
+const scL=sc=>Math.max(-(sc.scrollWidth-sc.clientWidth),Math.min(0,sc.scrollLeft)); // the scroll position without iOS's rubber-band overshoot (RTL: 0 at the start, negative toward later days)
+const swArea=t=>t.closest&&(t.closest('#month')?'m':t.closest('#gridCard .scroller')?'w':'');
+addEventListener('touchstart',x=>{const a=PHQ.matches&&x.touches.length===1&&!drag&&!gDrag?swArea(x.target):'';const sc=a==='w'?x.target.closest('.scroller'):null;sw1=a&&(a==='m'||!x.target.closest('.blk.sel'))?{a,x:x.touches[0].clientX,y:x.touches[0].clientY,sc,l:sc?scL(sc):0}:null},{passive:true});
+addEventListener('touchend',x=>{const w=sw1;sw1=null;if(!w||(w.a==='m'&&view!=='month')||(w.a==='w'&&view!=='week'))return;const t=x.changedTouches[0],d=swipeDir(t.clientX-w.x,t.clientY-w.y);
+  if(!d||(w.sc&&Math.abs(scL(w.sc)-w.l)>3)||document.querySelector('dialog[open]'))return; // the grid moved: that was a scroll
+  step(d);slide(d)},{passive:true});
 let swipe0=null; // swipe on the day card: a finger moving right is the next day (RTL, see swipeDir)
 $('#dayCard').addEventListener('touchstart',x=>{swipe0=x.touches.length===1?[x.touches[0].clientX,x.touches[0].clientY]:null},{passive:true});
 $('#dayCard').addEventListener('touchend',x=>{if(!swipe0)return;const t=x.changedTouches[0],d=swipeDir(t.clientX-swipe0[0],t.clientY-swipe0[1]);swipe0=null;if(d){step(d);slide(d)}},{passive:true});
