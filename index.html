@@ -10,7 +10,7 @@
 <title>תכנון השבוע בסמסטר א'</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 /* Layout: header, a dated week bar (prev · range · next · today · add), an upcoming exams/deadlines card, one summary strip, an attention list, the 7-day grid (Sun→Sat, right to left, past midnight when needed), a day-by-day agenda, then the calendar-export card. The course base is locked; personal blocks layer on top, weekly or on one date. */
 :root{
@@ -382,7 +382,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .exp{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
 .exp p{margin:6px 0 0;font-size:13px;color:var(--text-muted)}
 
-.toast{position:fixed;inset-inline:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:50}
+.toast{margin:0;padding:0;border:0;background:none;width:auto;height:auto;overflow:visible;inset-block-start:auto;position:fixed;inset-inline:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:50}
 .toast span{background:var(--ink);color:var(--bg-card);padding:9px 16px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 8px 20px -6px var(--shadow)}
 
 @media (max-width:820px){.sum{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -392,7 +392,8 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 @media (max-width:640px){.wrap{padding-inline:16px}.card{padding:16px}
   .day{grid-template-columns:1fr;gap:6px}.day li{grid-template-columns:84px minmax(0,1fr)}
   .row2{grid-template-columns:1fr 1fr}.row2 .fld:is(#fDayF,#fDateF){grid-column:1/-1}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@keyframes ldp{50%{opacity:.35}}.store.ld>:last-child{animation:ldp 1.2s ease-in-out infinite}
 
 /* phone width (max-width:600px): class ph on <html> (set from JS). A day view, a bottom tab bar, a round add button */
 :root{--tabh:56px}
@@ -753,7 +754,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 </dialog>
 
 <div id="stMenu" role="menu" aria-label="סטטוס הגשה" hidden></div>
-<div class="toast" id="toast" aria-live="polite" hidden><span></span></div>
+<div class="toast" id="toast" popover="manual" aria-live="polite" hidden><span></span></div>
 
 <script id="core">
 const DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
@@ -1135,7 +1136,7 @@ function render(){
   $('#addBtn').disabled=!edit;$('#pasteBtn').hidden=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
 }
 function renderStore(){
-  const m={loading:['','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],sb:['db','נשמר בחשבון Google'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
+  const m={loading:['ld','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],sb:['db','נשמר בחשבון Google'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
   const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent={loading:'⏳',db:'☁️',srv:'🖥️',gh:'☁️',sb:'☁️',local:'💾',ro:'👁️'}[mode]||'⏳';el.title=m[1];el.setAttribute('aria-label',m[1]);$('#obLink').hidden=$('#outBtn').hidden=mode!=='sb';$('#ghLink').hidden=mode==='srv'||mode==='db'||mode==='sb';$('#sbLink').hidden=mode==='srv'||mode==='db';
 }
 function renderSum(s,an){
@@ -1505,7 +1506,7 @@ frm.addEventListener('submit',async x=>{
     const m=editing?'עודכן':doc.date?'נוסף ל-'+dm(doc.date):'נוסף ל'+WKN[doc.week];
     ok=await saveItem(editing,doc,doc.date?dMsg(doc.date,m):m);
   }
-  $('#fSave').disabled=false;if(ok)dlg.close();
+  $('#fSave').disabled=false;if(ok)dlg.close();else{$('#fErr').textContent='השמירה לא הצליחה. בדוק את החיבור ונסה שוב.';$('#fErr').hidden=false}
 });
 $('#fSkip').addEventListener('click',async()=>{
   const it=items.find(x=>x.id===editing),date=$('#fSkip').dataset.date;if(!it||!date)return;
@@ -1553,7 +1554,8 @@ $('#pFrm').addEventListener('submit',async x=>{
 
 /* ---------- storage ---------- */
 let toastT=0;
-function toast(t){const el=$('#toast');el.firstElementChild.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,2600)}
+function toast(t){const el=$('#toast');el.firstElementChild.textContent=t;el.hidden=false;try{el.hidePopover();el.showPopover()}catch(e){} // re-shown in the top layer, so it sits above an open dialog
+  clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true;try{el.hidePopover()}catch(e){}},2600)}
 let dl=null;
 async function offer(filename,data){
   if(dl){try{await dl.save({filename,data});toast('הקובץ ירד')}catch(e){const c=e&&e.code;if(c!=='declined')toast(c==='rate_limited'?'כבר פתוח חלון הורדה':'ההורדה לא זמינה כאן')}return}
@@ -1762,8 +1764,12 @@ async function sbSave(op){ // set or delete one doc
     return false;
   }
 }
+let shownToday=todayIso();
+document.addEventListener('visibilitychange',()=>{ // opened the next morning: land on the new today if the old one was on screen
+  if(document.hidden)return;const t=todayIso(),o=shownToday;if(t===o||document.querySelector('dialog[open]'))return;shownToday=t;if(viewDay===o||viewSun===sunOf(o))goDay(t)});
 function sbStart(){
-  if(!sbOn){sbOn=true;addEventListener('online',sbLoad);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&mode==='sb')sbLoad()})}
+  if(!sbOn){sbOn=true;addEventListener('online',sbLoad);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&sbHas())sbLoad()})}
+  if(mode==='loading'){const c=sbCacheGet();if(c){items=c.items;render()}} // show the last known data at once; the mode stays loading (read-only) until the real load answers
   return sbLoad();
 }
 const sbDlg=$('#sbDlg');
