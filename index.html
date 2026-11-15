@@ -405,7 +405,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 #frm .ftime.due .arw{display:none}#frm .ftime.due::before{content:'עד';font-size:18px;font-weight:700;color:var(--text-muted)}
 #frm #fHint{background:none;padding:0;text-align:center;margin-top:-10px;height:20px;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* always one line: a clash never changes the window's height */
 #frm #fHint.bad{color:var(--bad-tx);font-weight:700;cursor:pointer}#frm #fHint.full{height:auto;white-space:normal}
-#frm .pre{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;min-height:48px;align-items:center} /* three equal buttons that always fit: nothing scrolls or is cut */#frm .pre button{min-width:0;padding:6px 4px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:48px;line-height:1.15}#frm .pre button b{font-weight:700;font-size:13px}#frm .pre button small{font:500 11px var(--font-body);color:var(--text-muted)}#frm .pre button.on{border-color:var(--kd,var(--ink));background:var(--kb,var(--bg-sunk));color:var(--kt,var(--ink))}#frm .pre button.on small{color:inherit;opacity:.75}
+#frm .pre{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;min-height:44px;align-items:center} /* three equal buttons that always fit: nothing scrolls or is cut */#frm .pre button{min-width:0;padding:7px 4px;white-space:nowrap;min-height:44px}#frm .pre button.on{border-color:var(--kd,var(--ink));background:var(--kb,var(--bg-sunk));color:var(--kt,var(--ink))}
 #frm .fwhen{display:grid;gap:6px}
 #frm .fdays{display:flex;align-items:center;gap:6px}#frm #fDays{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 #frm #fDays button{min-height:42px;border:0;border-radius:50%;aspect-ratio:1;max-height:46px;justify-self:center;width:100%;max-width:46px;background:var(--bg-sunk);color:var(--text-main);font:inherit;font-weight:700;cursor:pointer;transition:transform .4s var(--ez-spring),background-color .15s}
@@ -1550,13 +1550,12 @@ $('#fDate').min=SEM.start;$('#fDate').max=SEM.last;
 let dated=false; // true while the date field (not the weekday select) is the one in use: a deadline, or "only on this date"
 const isDated=()=>getKind()==='due'||getWeek()==='date';
 let preKey='',endTouched=false,prevS='',prevE=''; // endTouched: the end was typed by hand, so changing the start no longer drags it along
-const PRE0={open:[['08:00','16:00'],['10:00','18:00'],['07:00','15:00']],close:[['16:00','22:00'],['14:00','22:00'],['17:00','23:00']],study:[['10:00','12:00'],['14:00','16:00'],['18:00','20:00']],other:[['10:00','12:00'],['14:00','16:00'],['18:00','20:00']]},PRED={'23:59':'סוף היום','12:00':'צהריים','08:00':'בוקר'};
-const preDur=x=>{const[a,b]=span(x.s,x.e),h=(b-a)/60;return h===1?'שעה':h===2?'שעתיים':hrs(b-a)+' שעות'};
+const PRE0={open:[['08:00','16:00'],['10:00','18:00'],['07:00','15:00']],close:[['16:00','22:00'],['14:00','22:00'],['17:00','23:00']],study:[['10:00','12:00'],['14:00','16:00'],['18:00','20:00']],other:[['10:00','12:00'],['14:00','16:00'],['18:00','20:00']]};
 function renderPre(){ // always three two-line buttons (range, then what it is), so the row never changes shape: the kind's own most used times first, then that kind's defaults; a deadline gets three hours
-  const k=getKind(),L=k==='due'?[{s:'23:59'},{s:'12:00'},{s:'08:00'}]:recentTimes(items,k);
+  const k=getKind(),L=k==='due'?[{s:'23:59'},{s:'12:00'},{s:'08:00'}]:recentTimes(items,k,9).filter(x=>[x.s,x.e].every(t=>!t||/:(00|30)$/.test(t))).slice(0,3);
   if(k!=='due')for(const[s,e]of PRE0[k]||PRE0.other){if(L.length>=3)break;if(!L.some(y=>y.s===s&&y.e===e))L.push({s,e})}
   const key=k+'|'+L.map(x=>x.s+(x.e||'')).join();if(key===preKey){preMark();return}preKey=key;
-  const b=$('#fPre');b.hidden=false;b.innerHTML=L.map(x=>`<button type="button" data-s="${x.s}"${x.e?` data-e="${x.e}"`:''}><b>${ltr(x.e?x.s+'–'+x.e:x.s)}</b><small>${x.e?preDur(x):PRED[x.s]||''}</small></button>`).join('');preMark()}
+  const b=$('#fPre');b.hidden=false;b.innerHTML=L.map(x=>`<button type="button" data-s="${x.s}"${x.e?` data-e="${x.e}"`:''}><b>${ltr(x.e?x.s+'–'+x.e:x.s)}</b></button>`).join('');preMark()}
 function preMark(){const s=$('#fStart').value,e=$('#fEnd').value,due=getKind()==='due';for(const b of $('#fPre').children)b.classList.toggle('on',b.dataset.s===s&&(due||b.dataset.e===e))} // the quick time that equals the fields is ringed
 function syncFields(){
   const due=getKind()==='due',dt=isDated(),fd=$('#fDate'),fy=$('#fDay'),rp=()=>isoOk(fd.value)&&dow(fd.value)===Number(fy.value)?fd.value:clampDay(addDays(editSun,Number(fy.value))); // rp: the date "only on this date" takes from a recurring form (the picked date while its weekday still matches)
