@@ -1785,6 +1785,10 @@ async function sbSave(op){ // set or delete one doc
     return false;
   }
 }
+// a Home Screen app that is only suspended resumes its old in-memory page and never loads a new deploy: on return, compare the page's ETag with the one seen at launch and reload when it changed
+if(location.protocol==='https:'){let tag=null;const tagOf=()=>fetch(location.pathname,{cache:'no-cache'}).then(r=>r.headers.get('etag')||r.headers.get('last-modified')).catch(()=>null);
+  tagOf().then(t=>tag=t);
+  document.addEventListener('visibilitychange',async()=>{if(document.hidden||!tag||document.querySelector('dialog[open]'))return;const t=await tagOf();if(t&&t!==tag)location.reload()})}
 let shownToday=todayIso();
 document.addEventListener('visibilitychange',()=>{ // opened the next morning: land on the new today if the old one was on screen
   if(document.hidden)return;const t=todayIso(),o=shownToday;if(t===o||document.querySelector('dialog[open]'))return;shownToday=t;if(viewDay===o||viewSun===sunOf(o))goDay(t)});
