@@ -1087,16 +1087,18 @@ const sbMsg=why=>why==='auth'?'ההתחברות פגה או לא תקפה. הת�
 function opNoop(store,op){return JSON.stringify(applyOp(store,op))===JSON.stringify(store)} // store must be normalised ({v:1,items} as itemsToStore makes it)
 </script>
 <script>
+const still=()=>matchMedia('(prefers-reduced-motion:reduce)').matches; // WAAPI animations ignore the CSS reduced-motion rule, so they ask this
 const PHQ=matchMedia('(max-width:600px)'); // phone width: day view + tab bar (class ph on <html>)
 let items=[], viewSun=clampSun(sunOf(todayIso())), viewDay=clampDay(todayIso()), viewYm=clampYm(ymOf(todayIso())), wkGrid=false, dayL=[], view=(()=>{try{const v=localStorage.getItem('wp.view');return v==='month'?v:PHQ.matches&&v!=='week'?'day':'week'}catch(e){return PHQ.matches?'day':'week'}})(), editSun=null, mode='loading', db=null, editing=null, timesTouched=false, delArmed=0, addTimes=null;
 const canEdit=()=>mode==='db'||mode==='local'||mode==='srv'||mode==='gh'||mode==='sb'; // srv = the local server (python3 server.py), gh = GitHub contents API
 function go(sun){viewSun=clampSun(sun);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goMonth(ym){viewYm=clampYm(ym);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goDay(d){viewDay=clampDay(d);viewSun=sunOf(viewDay);viewYm=clampYm(ymOf(viewDay));render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()} // the three stay in step, so week and month tabs open on the picked day
+const slide=d=>{if(still()||!d||!PHQ.matches||view!=='day')return;for(const e of [$('#dayHead'),$('#dayList')])e.animate([{opacity:0,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.8,.2,1)'})}; // the new day enters from the side the finger came from
 const step=n=>view==='month'?goMonth(addMonths(viewYm,n)):view==='day'?goDay(addDays(viewDay,n)):go(addDays(viewSun,7*n));
 function setView(v,date){ // v: day|week|month|up (day and up only on a phone); date: open the day view on that date
   if(v===view&&date==null)return;
-  if(v==='month')viewYm=clampYm(ymOf(view==='day'?viewDay:viewSun));
+  if(v==='month'){viewYm=clampYm(ymOf(view==='day'?viewDay:viewSun));monthSel=''} // monthSel='' : the month opens on the day that was picked
   if(v==='day'){const m=view==='month';viewDay=date!=null?clampDay(date):pickDay(viewDay,m?viewYm+'-01':viewSun,m?addDays(addMonths(viewYm,1)+'-01',-1):addDays(viewSun,6),todayIso());viewSun=sunOf(viewDay);viewYm=clampYm(ymOf(viewDay))}
   view=v;if(v==='up')$('#upCard').open=true; // the phone tab is the list itself
   else try{localStorage.setItem('wp.view',v)}catch(e){}
@@ -1104,11 +1106,12 @@ function setView(v,date){ // v: day|week|month|up (day and up only on a phone); 
 }
 
 /* ---------- render ---------- */
-let agAuto=0,legAuto=0,agL={}; // agL: the phone agenda's lines by date|key, for taps
+let agAuto=0,legAuto=0,agL={},wkSeen=''; // wkSeen: the week whose grid was last scrolled to the picked day
+let agAuto0; // agL: the phone agenda's lines by date|key, for taps
 function render(){
   const ph=PHQ.matches; if(ph&&!legAuto){legAuto=1;document.querySelectorAll('.mleg').forEach(m=>m.open=false)} // the long legend starts folded on a phone
   const day=ph&&view==='day', upv=ph&&view==='up', mon=view==='month', wkv=!mon&&!day&&!upv; // phone views: day, week, month, up (what's coming)
-  document.documentElement.classList.toggle('ph',ph);
+  document.documentElement.classList.toggle('ph',ph);if(!wkv)wkSeen='';
   const rng=dm(viewSun)+'–'+dm(addDays(viewSun,6)), edit=canEdit();
   const lbl=mon?MONTHS[Number(viewYm.slice(5))-1]+' '+viewYm.slice(0,4):day?DAYS[dow(viewDay)]+' · '+dm(viewDay):rng;
   if($('#wkLabel').textContent!==lbl)$('#wkLabel').textContent=lbl;
@@ -1131,6 +1134,7 @@ function render(){
       $('#gridTitle').textContent='שבוע '+ltr(rng);
       $('#agLead').textContent=`כל מה שמתוכנן בשבוע ${ltr(rng)}, לפי סדר.`;
       renderSum(stats(evs),an); renderAtt(an); renderGrid(evs,an.clash); renderAgenda(evs,an.clash);
+      if(ph&&wkSeen!==viewSun){wkSeen=viewSun;gridTo(viewDay>=viewSun&&viewDay<=addDays(viewSun,6)?viewDay:todayIso()>=viewSun&&todayIso()<=addDays(viewSun,6)?todayIso():viewSun)} // only on entering the tab or a new week, never on a data refresh
     }
   }
   $('#addBtn').disabled=!edit;$('#pasteBtn').hidden=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
@@ -1237,6 +1241,8 @@ function renderGrid(evs,clash){
   }
   gridAxisSync(g);
 }
+function gridTo(d){ // phone week grid: scroll so the column of day d is the first one (works in RTL: scrollLeft is the view position)
+  const sc=$('#gridCard .scroller'),c=sc&&sc.querySelector('.col[data-day="'+dow(d)+'"]');if(c)sc.scrollLeft+=c.getBoundingClientRect().right-sc.getBoundingClientRect().right}
 function gridAxisSync(g){ // phone: copy the hour labels into the strip beside the scroller and line it up with the day columns
   const a=$('#gridAxis'),f=$('#gridAxisFoot');if(!PHQ.matches){a.innerHTML='';return}
   const wrap=a.parentNode.getBoundingClientRect(),col=g.querySelector('.col'),df=g.querySelector('.df'),ax=g.querySelector('.axis');
@@ -1296,9 +1302,11 @@ function renderMonthDay(){
   $('#mHandle').setAttribute('aria-expanded',String(mexp));
 }
 let mexp=false,mdL={}; // mexp: the list is pulled up, the month is hidden
-function monthPick(date){monthSel=date;renderMonth()}
+function monthPick(date){ // the picked day is also the day of the other tabs; only the selection ring and the list change, the month is not redrawn
+  monthSel=date;viewDay=clampDay(date);viewSun=sunOf(viewDay);
+  $('#month .mc.sel')?.classList.remove('sel');$('#month .mc[data-date="'+date+'"]')?.classList.add('sel');renderMonthDay()}
 function renderMonth(){
-  if(!monthSel||ymOf(monthSel)!==viewYm){const t=todayIso();monthSel=ymOf(t)===viewYm?t:viewYm+'-01'}
+  if(!monthSel||ymOf(monthSel)!==viewYm){const t=todayIso();monthSel=ymOf(viewDay)===viewYm?viewDay:ymOf(t)===viewYm?t:viewYm+'-01'}
   const today=todayIso(), title=MONTHS[Number(viewYm.slice(5))-1]+' '+viewYm.slice(0,4);
   $('#monthTitle').textContent=title;
   $('#month').innerHTML=DAYS.map((d,i)=>`<div class="mh${i>=4?' wk':''}">${d}</div>`).join('')+monthSuns(viewYm).map(sun=>{
@@ -1937,11 +1945,11 @@ async function removeItem(id,msg){
   return false;
 }
 
-$('#prev').addEventListener('click',()=>step(-1));$('#next').addEventListener('click',()=>step(1));
+$('#prev').addEventListener('click',()=>{step(-1);slide(-1)});$('#next').addEventListener('click',()=>{step(1);slide(1)});
 $('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?goDay(todayIso()):go(sunOf(todayIso())));
 $('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(b){setView(b.dataset.v);scrollTo(0,0)}});
 $('#grid').addEventListener('click',x=>{const b=x.target.closest('[data-more]');if(!b)return;x.stopPropagation();const d=b.dataset.more;dueMore.has(d)?dueMore.delete(d):dueMore.add(d);render()});
-$('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b){goDay(b.dataset.day);$('#dstrip [aria-pressed=true]').focus({preventScroll:true})}}); // the strip is redrawn: keep the focus on the picked day
+$('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b){const o=viewDay;goDay(b.dataset.day);slide(b.dataset.day>o?1:b.dataset.day<o?-1:0);$('#dstrip [aria-pressed=true]').focus({preventScroll:true})}}); // the strip is redrawn: keep the focus on the picked day
 $('#dayList').addEventListener('click',x=>{ // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
   const b=x.target.closest('[data-key]'),l=b&&dayL.find(e=>e.key===b.dataset.key);if(!l)return;
   if(l.src==='base')openCancel(l);else openEdit(l.id);
@@ -1989,7 +1997,7 @@ $('#monthCard').addEventListener('mousedown',x=>{if(!dragZone(x.target))return;d
 let lastBtn=null;
 addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('button,[role=button]')},true);
 (()=>{
-  const sm=HTMLDialogElement.prototype.showModal,cl=HTMLDialogElement.prototype.close,still=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const sm=HTMLDialogElement.prototype.showModal,cl=HTMLDialogElement.prototype.close;
   const origin=d=>{const r=d.getBoundingClientRect(),b=lastBtn&&lastBtn.isConnected?lastBtn.getBoundingClientRect():null;d.style.transformOrigin=(b?b.left+b.width/2-r.left:r.width/2)+'px '+(b?b.top+b.height/2-r.top:r.height/2)+'px'};
   HTMLDialogElement.prototype.showModal=function(){sm.call(this);if(still())return;try{origin(this);this.animate([{opacity:0,transform:'scale(.2)'},{opacity:1,transform:'scale(1)'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(e){}};
   HTMLDialogElement.prototype.close=function(v){
@@ -2001,7 +2009,7 @@ addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('b
 })();
 let swipe0=null; // swipe on the day card: a finger moving right is the next day (RTL, see swipeDir)
 $('#dayCard').addEventListener('touchstart',x=>{swipe0=x.touches.length===1?[x.touches[0].clientX,x.touches[0].clientY]:null},{passive:true});
-$('#dayCard').addEventListener('touchend',x=>{if(!swipe0)return;const t=x.changedTouches[0],d=swipeDir(t.clientX-swipe0[0],t.clientY-swipe0[1]);swipe0=null;if(d)step(d)},{passive:true});
+$('#dayCard').addEventListener('touchend',x=>{if(!swipe0)return;const t=x.changedTouches[0],d=swipeDir(t.clientX-swipe0[0],t.clientY-swipe0[1]);swipe0=null;if(d){step(d);slide(d)}},{passive:true});
 PHQ.addEventListener('change',()=>{if(!PHQ.matches&&(view==='day'||view==='up'))view='week';render()}); // e.g. an iPhone turned sideways is wider than 600px: desktop layout
 $('#vWeek').addEventListener('click',()=>setView('week'));$('#vMonth').addEventListener('click',()=>setView('month'));
 $('#mLegend').innerHTML=$('#gridCard .legend').innerHTML;
