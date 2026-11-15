@@ -211,11 +211,6 @@ details.card[open] .upsum{display:none}
 .stb.s-done{background:color-mix(in srgb,var(--ok-tx) 14%,var(--bg-card));border-color:var(--ok-tx);color:var(--ok-tx)}
 .stb[aria-haspopup]::after{content:" ▾";font-size:10px}
 .ph .stb{min-height:44px}
-#stMenu[hidden]{display:none}
-#stMenu{position:fixed;z-index:50;display:grid;min-width:128px;padding:4px;background:var(--bg-card);border:1px solid var(--border-dark);border-radius:12px;box-shadow:0 6px 20px var(--shadow)}
-#stMenu button{border:0;background:none;padding:9px 12px;border-radius:8px;font:600 14px var(--font-body);text-align:start;cursor:pointer;color:var(--text-main);min-height:40px}
-#stMenu button:hover,#stMenu button:focus-visible{background:var(--bg-sunk);outline:2px solid var(--accent);outline-offset:-2px}
-#stMenu button[aria-checked="true"]::before{content:"✓ ";color:var(--ok-tx)}
 .upsub{margin-top:14px;border-top:1px solid var(--border-light);padding-top:10px}
 .upsub summary{cursor:pointer;font-weight:700;color:var(--text-muted);font-size:14px;min-height:32px;display:flex;align-items:center}
 .upsub ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
@@ -374,6 +369,8 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .hint.ok{color:var(--ok-tx)}
 .err{font-size:13px;color:var(--bad-tx);font-weight:600}
 .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pre button{border:1.5px solid var(--border-dark);background:var(--bg-card);color:var(--text-main);border-radius:999px;padding:7px 12px;font:600 13.5px var(--font-mono);cursor:pointer;min-height:36px}
+.ph .dlg .actions{position:sticky;bottom:0;z-index:2;background:var(--bg-card);border-top:1px solid var(--border-light);margin:0 -16px -22px;padding:10px 16px} /* Save and Cancel stay in view inside the floating window */
 .actions .sp{flex:1}
 .btn{border:1px solid var(--border-dark);background:var(--bg-card);padding:9px 16px;border-radius:10px;font-weight:600;cursor:pointer}
 .btn.pri{background:var(--ink);color:var(--bg-card);border-color:var(--ink)}
@@ -494,8 +491,8 @@ button.dlb{cursor:pointer}
 
 /* touch feel: no grey tap flash or double-tap zoom, buttons dip under the finger (not .blk/.mc/.mhandle/.col: their taps are measured) */
 html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,#stMenu button,.upgo,button.dlb):not(:disabled){transition:transform .1s ease}
-:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,#stMenu button):active:not(:disabled){transform:scale(.96)}
+:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,.upgo,button.dlb):not(:disabled){transition:transform .1s ease}
+:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label):active:not(:disabled){transform:scale(.96)}
 :is(.upgo,button.dlb):active:not(:disabled){transform:scale(.98)}
 </style>
 
@@ -626,6 +623,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
       <div class="fld"><label for="fStart">התחלה</label><input type="time" id="fStart" step="900" required></div>
       <div class="fld"><label for="fEnd">סיום</label><input type="time" id="fEnd" step="900" required></div>
     </div>
+    <div class="chips pre" id="fPre" hidden></div>
     <div class="fld" id="fCourseF" hidden><label for="fCourse">מקצוע</label><select id="fCourse"></select></div>
     <div class="fld" id="fStatusF" hidden><label for="fStatus">סטטוס</label><select id="fStatus"></select></div>
     <div class="fld" id="fWeekF">
@@ -754,7 +752,6 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   </form>
 </dialog>
 
-<div id="stMenu" role="menu" aria-label="סטטוס הגשה" hidden></div>
 <div class="toast" id="toast" popover="manual" aria-live="polite" hidden><span></span></div>
 
 <script id="core">
@@ -918,6 +915,10 @@ function evsForWeek(sun,items,skipId){
   return out;
 }
 const submitted=items=>items.filter(x=>x.kind==='due'&&isoOk(x.date)&&x.done).map(x=>({id:x.id,date:x.date,time:okTime(x.start)?x.start:'23:59',title:dueName(x)||'הגשה',st:'done',...(courseOk(x.course)&&{course:x.course})})).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0); // the submitted deadlines, newest first: the record under "what's coming"
+function recentTimes(items,kind,n=3){ // the most used start-end pairs of one kind (ties: the more recently saved), for the quick time buttons of the add dialog
+  const m=new Map();for(const it of items)if(it.kind===kind&&okTime(it.start)&&okTime(it.end)){const k=it.start+'-'+it.end,o=m.get(k)||{s:it.start,e:it.end,n:0,u:0};o.n++;o.u=Math.max(o.u,it.updated||0);m.set(k,o)}
+  return[...m.values()].sort((a,b)=>b.n-a.n||b.u-a.u).slice(0,n)
+}
 function upcoming(today,items,n=6){ // the late deadlines (past their date, not submitted: daysLeft < 0, all of them, oldest first), then the next n exams and deadlines
   const byTime=(a,b)=>a.date<b.date?-1:a.date>b.date?1:a.time<b.time?-1:a.time>b.time?1:0;
   const dues=items.filter(x=>x.kind==='due'&&isoOk(x.date)&&dueSt(x)!=='done').map(x=>({key:'u'+x.id,id:x.id,date:x.date,time:okTime(x.start)?x.start:'23:59',title:dueName(x)||'הגשה',tag:'הגשה',st:dueSt(x),...(courseOk(x.course)&&{course:x.course})}));
@@ -1179,9 +1180,9 @@ function dayDue(date){ // a day's deadlines as quiet chips for the foot of its g
   return shown.map(x=>`<span class="dchip${x.done?' done':''}${dueLate(x,t)?' late':''} ${dueCls(x)}" title="${esc(dueLbl(x))}${x.done?' · הוגש':''}"><i></i><span>${x.done?'✓ ':''}${esc(dueName(x)||'הגשה')}</span></span>`).join('')
     +(L.length>2?`<button type="button" class="dmore" data-more="${date}">${open?'פחות':'+'+(L.length-2)+' עוד'}</button>`:'');
 }
-function stBtn(x,edit,name){ // the status pill of a deadline: its state in words; a tap opens a small menu (לא התחלתי / הוגש)
+function stBtn(x,edit,name){ // the status pill of a deadline: its state in words; one tap flips it (לא התחלתי / הוגש)
   const s=x.st||dueSt(x);
-  return`<button type="button" class="stb s-${s}" data-st="${esc(x.id)}" data-s="${s}"${edit?' aria-haspopup="menu" aria-expanded="false"':' disabled'} aria-label="${esc((name||'הגשה')+' · '+STAT[s]+(edit?' · לחיצה לבחירת סטטוס':''))}">${STAT[s]}</button>`;
+  return`<button type="button" class="stb s-${s}" data-st="${esc(x.id)}" data-s="${s}"${edit?` aria-pressed="${s==='done'}"`:' disabled'} aria-label="${esc((name||'הגשה')+' · '+STAT[s]+(edit?' · לחיצה להחלפה':''))}">${STAT[s]}</button>`;
 }
 function renderGrid(evs,clash){
   let lo=480,hi=1200;
@@ -1372,25 +1373,8 @@ async function setSt(id,s){
   }finally{stBusy.delete(id)}
   const b=document.querySelector(`[data-st="${id}"]`);if(b)b.focus(); // the lists are redrawn: keep the keyboard on the same button
 }
-let stOpen=null; // the status pill whose menu is open
-function stClose(focus){const m=$('#stMenu');if(!m.hidden){m.hidden=true;if(stOpen){stOpen.setAttribute('aria-expanded','false');if(focus)stOpen.focus()}}stOpen=null}
-function stShow(btn){ // a small menu under the pill: לא התחלתי / הוגש
-  const m=$('#stMenu'),cur=btn.dataset.s;
-  stClose();stOpen=btn;btn.setAttribute('aria-expanded','true');m.dataset.id=btn.dataset.st;
-  m.innerHTML=Object.entries(STAT).map(([k,v])=>`<button type="button" role="menuitemradio" aria-checked="${k===cur}" data-pick="${k}">${v}</button>`).join('');
-  m.hidden=false;const r=btn.getBoundingClientRect(),mh=m.offsetHeight,mw=m.offsetWidth;
-  m.style.top=(r.bottom+4+mh>innerHeight&&r.top-4-mh>0?r.top-4-mh:r.bottom+4)+'px';m.style.left=Math.max(8,Math.min(innerWidth-mw-8,r.right-mw))+'px'; // RTL: the menu's right edge lines up with the pill's
-  (m.querySelector(`[data-pick="${cur}"]`)||m.firstElementChild).focus({preventScroll:true});
-}
 $('#up').addEventListener('click',x=>{const b=x.target.closest('[data-go]');if(!b)return;if(PHQ.matches){setView('day',b.dataset.go);scrollTo(0,0);return}if(view==='month')viewYm=clampYm(ymOf(b.dataset.go));go(sunOf(b.dataset.go))});
-document.addEventListener('click',x=>{
-  const p=x.target.closest('#stMenu [data-pick]'),b=x.target.closest('[data-st]');
-  if(p){const id=$('#stMenu').dataset.id;stClose();setSt(id,p.dataset.pick);return}
-  if(b&&!b.disabled){if(stOpen===b)stClose(true);else stShow(b);return}
-  stClose();
-});
-document.addEventListener('keydown',x=>{if(x.key==='Escape'&&stOpen){x.preventDefault();stClose(true)}else if((x.key==='ArrowDown'||x.key==='ArrowUp')&&x.target.closest('#stMenu')){x.preventDefault();const o=[...$('#stMenu').children],i=o.indexOf(document.activeElement);o[(i+(x.key==='ArrowDown'?1:-1)+o.length)%o.length].focus()}});
-addEventListener('scroll',()=>stClose(),{passive:true});addEventListener('resize',()=>stClose());
+document.addEventListener('click',x=>{const b=x.target.closest('[data-st]');if(b&&!b.disabled)setSt(b.dataset.st,b.dataset.s==='done'?'todo':'done')}); // one tap flips the status (there are only two)
 $('#agenda').addEventListener('click',x=>{
   const k=x.target.closest('[data-key]'),kl=k&&agL[k.dataset.date+'|'+k.dataset.key];
   if(kl){if(kl.src==='base')openCancel(kl);else openEdit(kl.id);return} // a phone agenda row acts like a day-view row
@@ -1431,10 +1415,14 @@ $('#fStatus').innerHTML=Object.entries(STAT).map(([k,v])=>`<option value="${k}">
 $('#fDate').min=SEM.start;$('#fDate').max=SEM.last;
 let dated=false; // true while the date field (not the weekday select) is the one in use: a deadline, or "only on this date"
 const isDated=()=>getKind()==='due'||getWeek()==='date';
+let preKey='',endTouched=false,prevS='',prevE=''; // endTouched: the end was typed by hand, so changing the start no longer drags it along
+function renderPre(){
+  const k=getKind(),L=k==='due'?[]:recentTimes(items,k),key=k+'|'+L.map(x=>x.s+x.e).join();if(key===preKey)return;preKey=key;
+  const b=$('#fPre');b.hidden=!L.length;b.innerHTML=L.map(x=>`<button type="button" data-s="${x.s}" data-e="${x.e}">${ltr(x.s+'–'+x.e)}</button>`).join('')}
 function syncFields(){
   const due=getKind()==='due',dt=isDated(),fd=$('#fDate'),fy=$('#fDay'),rp=()=>isoOk(fd.value)&&dow(fd.value)===Number(fy.value)?fd.value:clampDay(addDays(editSun,Number(fy.value))); // rp: the date "only on this date" takes from a recurring form (the picked date while its weekday still matches)
   if(dt!==dated){dated=dt;if(dt)fd.value=rp();else if(isoOk(fd.value))fy.value=String(dow(fd.value))} // switching mode keeps the day and the date in step (a picked date survives a round trip)
-  $('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due;$('#fCourseF').hidden=$('#fStatusF').hidden=!due;$('#fDayF').hidden=dt;$('#fDateF').hidden=!dt;
+  renderPre();$('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due;$('#fCourseF').hidden=$('#fStatusF').hidden=!due;$('#fDayF').hidden=dt;$('#fDateF').hidden=!dt;
 }
 function openAdd(pre={}){
   const sun=pre.sun||viewSun; // the week to add to (month view passes its own)
@@ -1445,7 +1433,7 @@ function openAdd(pre={}){
   if(pre.start!=null){const dur=last?span(last.start,last.end).reduce((a,b)=>b-a):180;$('#fStart').value=fm(pre.start);$('#fEnd').value=fm(pre.start+dur)}
   else if(last){$('#fStart').value=last.start;$('#fEnd').value=last.end}
   else{$('#fStart').value='18:00';$('#fEnd').value='21:00'}
-  addTimes={s:$('#fStart').value,e:$('#fEnd').value};
+  addTimes={s:$('#fStart').value,e:$('#fEnd').value};endTouched=false;prevS=$('#fStart').value;prevE=$('#fEnd').value;preKey='';
   setWeek('date'); // a new item is one date unless "חוזר כל שבוע" is ticked
   dated=isDated();$('#fDate').value=clampDay(addDays(sun,Number($('#fDay').value)));$('#fCourse').value='';$('#fStatus').value='todo';
   $('#dlgTitle').textContent='הוספה';$('#fDel').hidden=true;$('#fSkip').hidden=true;resetDel();$('#fErr').hidden=true;
@@ -1460,6 +1448,7 @@ function openEdit(id,sun=viewSun){ // sun: the week of the clicked occurrence
   const rec=isRec(it),date=rec?addDays(sun,Number(it.day)):'';
   setWeek(rec?it.week:'date');
   dated=isDated();$('#fDate').value=it.date||date;$('#fCourse').value=courseOk(it.course)?it.course:'';$('#fStatus').value=dueSt(it);
+  endTouched=false;prevS=$('#fStart').value;prevE=$('#fEnd').value;preKey='';
   $('#fSkip').hidden=!rec;$('#fSkip').dataset.date=date;$('#fSkip').textContent=rec?'דילוג ב-'+dm(date):'';
   $('#dlgTitle').textContent='עריכה';$('#fDel').hidden=false;resetDel();$('#fErr').hidden=true;
   syncFields();hint();dlg.showModal();
@@ -1492,9 +1481,12 @@ function hint(){
 }
 frm.addEventListener('input',x=>{
   if(x.target.id==='fStart'||x.target.id==='fEnd')timesTouched=true;
+  if(x.target.id==='fEnd')endTouched=true;
+  if(x.target.id==='fStart'&&!endTouched&&getKind()!=='due'&&okTime(prevS)&&okTime(prevE)&&okTime($('#fStart').value)){const[a,b]=span(prevS,prevE);$('#fEnd').value=fm((toMin($('#fStart').value)+b-a)%1440)}
   if(x.target.name==='fKind'&&!editing){const l=lastOf(getKind());if(getKind()==='due')$('#fStart').value='23:59';else if(l&&!timesTouched){$('#fStart').value=l.start;$('#fEnd').value=l.end}else if(addTimes&&$('#fStart').value==='23:59'){$('#fStart').value=addTimes.s;$('#fEnd').value=addTimes.e}}
-  syncFields();hint();
+  prevS=$('#fStart').value;prevE=$('#fEnd').value;syncFields();hint();
 });
+$('#fPre').addEventListener('click',x=>{const b=x.target.closest('button');if(!b)return;$('#fStart').value=b.dataset.s;$('#fEnd').value=b.dataset.e;timesTouched=endTouched=true;prevS=b.dataset.s;prevE=b.dataset.e;hint()});
 $('#fCancel').addEventListener('click',()=>dlg.close());
 function resetDel(){delArmed=0;const b=$('#fDel');b.classList.remove('armed');b.textContent='מחיקה'}
 $('#fDel').addEventListener('click',async()=>{

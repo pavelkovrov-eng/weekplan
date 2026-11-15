@@ -589,3 +589,11 @@ test('cancel docs belong to a track: changing the track does not re-point them',
   assert.equal(core.evsForWeek('2026-11-01',[ca,{id:'p',kind:'profile',track:'a',updated:1}]).find(e=>e.src==='base'&&e.i===0).cancelled,true);
   assert.ok(!core.evsForWeek('2026-11-01',[ca]).find(e=>e.src==='base'&&e.i===0).cancelled); // and track ב' ignores a track-א' cancel
 });
+
+test('recentTimes: the most used start-end pairs of a kind',()=>{
+  const it=(id,kind,start,end,updated)=>({id,kind,start,end,updated});
+  const L=[it('1','open','08:00','14:00',1),it('2','open','16:00','22:00',2),it('3','open','16:00','22:00',3),it('4','open','12:00','18:00',9),it('5','close','16:00','23:00',5),{id:'6',kind:'open',start:'x',end:'y'},{id:'7',kind:'due',date:'2026-11-20',start:'23:59'}];
+  assert.deepEqual(core.recentTimes(L,'open').map(x=>x.s+'-'+x.e),['16:00-22:00','12:00-18:00','08:00-14:00']); // count first, then the newer
+  assert.equal(core.recentTimes(L,'open',1).length,1);
+  assert.deepEqual(core.recentTimes(L,'study'),[]);
+});
