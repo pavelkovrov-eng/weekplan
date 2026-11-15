@@ -397,7 +397,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 /* add/edit window: "when" is the hero. One row of kinds, big times, the week's days, a switch, optional fields folded */
 #frm .kseg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;background:var(--border-light);border-radius:12px;padding:3px}
 #frm .kseg label{justify-content:center;gap:5px;padding:8px 2px;border:0;background:none;color:var(--text-muted);border-radius:9px;font-size:13.5px;min-height:40px;white-space:nowrap}#frm .kseg label[hidden]{display:none}
-#frm .kseg label{position:relative;z-index:1}#frm .kseg label:has(input:checked){color:var(--ink);font-weight:800}#kindPill{position:absolute;z-index:0;border-radius:9px;background:var(--bg-card);box-shadow:0 1px 5px var(--shadow);pointer-events:none} /* the white pill under the picked kind: travels like #tabPill */
+#frm .kseg label{position:relative;z-index:1}#frm .kseg label{transition:color .3s}#frm .kseg label:has(input:checked){color:var(--kt,var(--ink));font-weight:800}#kindPill{position:absolute;z-index:0;border-radius:9px;background:var(--kb,var(--bg-card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--kd,transparent) 55%,transparent);transition:background-color .35s,box-shadow .35s;pointer-events:none} /* the pill under the picked kind, tinted with that kind's colour (--kb/--kd/--kt set in kindPill); travels like #tabPill */
 #frm .ftime{display:flex;align-items:center;justify-content:center;gap:10px;direction:rtl;margin-top:4px}
 #frm .ftime input{width:auto;min-width:0;flex:0 1 auto;border:0;background:none;padding:2px 6px;border-radius:10px;font:700 38px/1.1 var(--font-mono);color:var(--ink);text-align:center;font-variant-numeric:tabular-nums;min-height:52px}
 #frm .ftime input:focus-visible{outline:2px solid var(--accent)}@media (hover:hover){#frm .ftime input:hover{background:var(--bg-sunk)}}
@@ -1523,7 +1523,7 @@ $('#grid').addEventListener('click',async x=>{
 
 /* ---------- dialog ---------- */
 const dlg=$('#dlg'),frm=$('#frm');
-$('#kindChips').innerHTML=Object.entries(KINDS).map(([k,v])=>`<label data-shift="${v.shift?1:0}"><input type="radio" name="fKind" value="${k}" id="fk_${k}"><i style="background:var(${v.color})"></i>${v.short}</label>`).join('');
+$('#kindChips').innerHTML=Object.entries(KINDS).map(([k,v])=>`<label data-shift="${v.shift?1:0}"><input type="radio" name="fKind" value="${k}" id="fk_${k}">${v.short}</label>`).join('');
 $('#fDay').innerHTML=DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
 $('#fDays').innerHTML=DAYI.map((l,i)=>`<button type="button" data-d="${i}" aria-label="${DAYS[i]}" aria-pressed="false">${l}</button>`).join(''); // the week's days: a tap picks the day (dated: in the week of the picked date)
 $('#fDays').addEventListener('click',x=>{const b=x.target.closest('[data-d]');if(!b)return;const fd=$('#fDate');$('#fDay').value=b.dataset.d;if(isDated())fd.value=clampDay(addDays(isoOk(fd.value)?sunOf(fd.value):editSun,Number(b.dataset.d)));syncFields();hint()});
@@ -1535,7 +1535,7 @@ const getWeek=()=>$('#fRec').checked?'both':'date'; // "חוזר כל שבוע":
 function lastOf(kind){return items.filter(it=>it.kind===kind&&okTime(it.start)&&okTime(it.end)).sort((a,b)=>(b.updated||0)-(a.updated||0))[0]}
 const kindPill=(()=>{let el=null,cur=null;return anim=>{ // same motion as tabPill, for the kind row of the add/edit window (offset* so the dialog's own scale never matters)
   const box=$('#kindChips');if(!el){el=document.createElement('i');el.id='kindPill';el.setAttribute('aria-hidden','true');box.prepend(el)}
-  const b=box.querySelector('label:has(input:checked)');if(!b||!b.offsetWidth||b.hidden){el.hidden=true;cur=null;return}el.hidden=false;
+  const b=box.querySelector('label:has(input:checked)'),kc={open:'open',close:'close',study:'study',due:'bad',other:'other'}[getKind()];if(kc)for(const[v,x]of[['b','bg'],['d','bd'],['t','tx']])box.style.setProperty('--k'+v,`var(--${kc}-${x})`);if(!b||!b.offsetWidth||b.hidden){el.hidden=true;cur=null;return}el.hidden=false;
   const to={l:b.offsetLeft,t:b.offsetTop,w:b.offsetWidth,h:b.offsetHeight},from=cur,px=o=>({left:o.l+'px',top:o.t+'px',width:o.w+'px',height:o.h+'px'});cur=to;Object.assign(el.style,px(to));
   if(!anim||!from||still()||Math.abs(from.l-to.l)<1)return;
   const L=Math.min(from.l,to.l),R=Math.max(from.l+from.w,to.l+to.w);
