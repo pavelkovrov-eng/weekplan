@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="השבוע">
 <meta name="theme-color" content="#f4f7f9" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0b111c" media="(prefers-color-scheme: dark)">
-<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#f4f7f9;color:#141413}@media (prefers-color-scheme:dark){html:not([data-theme=light]) body{background:#0b111c}}html[data-theme=dark] body{background:#0b111c}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>try{var t=localStorage.getItem("wp.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script></head><body>
 <title>תכנון השבוע בסמסטר א'</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -151,7 +151,7 @@ h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;line-height:1.12;margin:0 0 
 .blk.k-tut{background:color-mix(in srgb,var(--cc) 6%,var(--bg-card));border-style:dashed;border-color:color-mix(in srgb,var(--cc) 55%,var(--bg-card));border-left-style:solid}
 button.blk{font:inherit;cursor:pointer;border-width:1.5px;border-left-width:4px;transition:transform .12s}
 button.blk.base{cursor:pointer;line-height:1.3;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;border-width:1px 1px 1px 4px} /* button{font:inherit} resets line-height, and a button centers its content vertically: keep the div look */
-button.blk:hover{transform:translateY(-1px);z-index:4}
+@media (hover:hover){button.blk:hover{transform:translateY(-1px);z-index:4}}
 .blk .kd{display:block;font-size:10px;font-weight:700;letter-spacing:.03em;opacity:.8}
 .blk.u-open{background:var(--open-bg);border-color:var(--open-bd);color:var(--open-tx)}
 .blk.u-close{background:var(--close-bg);border-color:var(--close-bd);color:var(--close-tx)}
@@ -168,7 +168,7 @@ button.blk:hover{transform:translateY(-1px);z-index:4}
 .uplist li{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .uplist .none{color:var(--text-faint);font-size:14px}
 .upgo{flex:1 1 280px;display:grid;grid-template-columns:96px 104px minmax(0,1fr) auto;gap:10px;align-items:baseline;text-align:right;border:1px solid var(--border-light);background:var(--bg-sunk);border-radius:10px;padding:9px 12px;cursor:pointer;font:inherit;color:inherit}
-.upgo:hover{border-color:var(--border-dark)}
+@media (hover:hover){.upgo:hover{border-color:var(--border-dark)}}
 .upgo .dl{font-weight:800;color:var(--ink)}
 .upgo .dt{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted)}
 .upgo .tg{font-size:11.5px;font-weight:700;padding:1px 9px;border-radius:999px;border:1px solid var(--border-dark);color:var(--text-muted);white-space:nowrap}
@@ -284,7 +284,7 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 @media (max-width:640px){.upgo{grid-template-columns:auto auto}.upgo b{grid-column:1/-1}}
 .nav{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;background:var(--bg-card);border:1px solid var(--border-dark);border-radius:12px;padding:4px}
 .nav>button{border:0;background:transparent;padding:7px 12px;border-radius:9px;font-weight:700;cursor:pointer;color:var(--text-muted)}
-.nav>button:hover{background:var(--bg-sunk);color:var(--ink)}
+@media (hover:hover){.nav>button:hover{background:var(--bg-sunk);color:var(--ink)}}
 .nav>button:disabled{opacity:.35;cursor:not-allowed;background:transparent}
 .nav .wkl{font-family:var(--font-mono);font-weight:600;font-size:14px;color:var(--ink);padding-inline:6px;font-variant-numeric:tabular-nums}
 .blk.clash{outline:2px solid var(--bad-bd);outline-offset:-1px;z-index:3}
@@ -292,7 +292,7 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 .seg{display:inline-flex;border:1px solid var(--border-dark);border-radius:9px;overflow:hidden;margin-inline-start:4px}
 .nav .seg button{border:0;background:transparent;padding:6px 12px;font-weight:700;cursor:pointer;color:var(--text-muted)}
 .nav .seg button:focus-visible{outline-offset:-2px} /* .seg clips (overflow:hidden) a ring drawn outside */
-.nav .seg button:hover{background:var(--bg-sunk);color:var(--ink)}
+@media (hover:hover){.nav .seg button:hover{background:var(--bg-sunk);color:var(--ink)}}
 .nav .seg button[aria-pressed=true],.nav .seg button[aria-pressed=true]:hover{background:var(--ink);color:var(--bg-card)}
 .blk .wk{font-family:var(--font-mono);font-size:9.5px;opacity:.7}
 
@@ -301,16 +301,16 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 .mh{text-align:center;padding-bottom:4px;font-weight:700;font-size:13px;color:var(--ink)}
 .mh.wk{color:var(--text-muted)}
 .mc{min-height:110px;min-width:0;display:flex;flex-direction:column;gap:2px;padding:5px 6px;background:var(--bg-sunk);border:1px solid var(--border-light);border-radius:8px;cursor:pointer}
-.mc:hover{border-color:var(--border-dark)}
+@media (hover:hover){.mc:hover{border-color:var(--border-dark)}}
 .mc.out{opacity:.45}
 .mc.today{outline:2px solid var(--accent);outline-offset:-1px}
 .mtop{display:flex;align-items:baseline;gap:6px;margin-bottom:2px}
 .mn{border:0;background:none;padding:0;cursor:pointer;font-weight:700;font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
-.mn:hover{text-decoration:underline}
+@media (hover:hover){.mn:hover{text-decoration:underline}}
 .mc.today .mn{color:var(--accent-text)}
 .mtop small{min-width:0;font-size:10.5px;font-weight:600;line-height:1.25;color:var(--soft-tx)}
 .ml{display:flex;align-items:center;gap:4px;width:100%;padding:0;background:none;border:0;border-inline-start:3px solid transparent;text-align:start;cursor:pointer;font-size:12px;line-height:1.4;color:var(--text-main)} /* a button: reset the chrome, keep the div look */
-.ml:hover{background:var(--border-light)}
+@media (hover:hover){.ml:hover{background:var(--border-light)}}
 .ml>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ml>i{flex:none;width:7px;height:7px;border-radius:50%;background:var(--cc)}
 .ml b{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--text-muted)}
@@ -490,6 +490,12 @@ button.dlb{cursor:pointer}
   .scroller{overflow:visible;margin:0;padding:0}
   .grid,.month{min-width:0}
 }
+
+/* touch feel: no grey tap flash or double-tap zoom, buttons dip under the finger (not .blk/.mc/.mhandle/.col: their taps are measured) */
+html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,#stMenu button,.upgo,button.dlb):not(:disabled){transition:transform .1s ease}
+:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,#stMenu button):active:not(:disabled){transform:scale(.96)}
+:is(.upgo,button.dlb):active:not(:disabled){transform:scale(.98)}
 </style>
 
 <div class="wrap" dir="rtl" lang="he">
@@ -1811,7 +1817,7 @@ $('#setWipe').addEventListener('click',async()=>{ // two clicks: the first arms 
 });
 const THEME_LS='wp.theme';
 function themeNow(){return document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}
-function themeShow(){const d=themeNow()==='dark',b=$('#themeBtn');b.textContent=d?'☀️':'🌙';b.title=b.dataset.t=d?'מעבר למצב בהיר':'מעבר למצב כהה';b.setAttribute('aria-label',b.title)}
+function themeShow(){const d=themeNow()==='dark',b=$('#themeBtn');for(const m of document.querySelectorAll('meta[name=theme-color]'))m.content=d?'#0b111c':'#f4f7f9';b.textContent=d?'☀️':'🌙';b.title=b.dataset.t=d?'מעבר למצב בהיר':'מעבר למצב כהה';b.setAttribute('aria-label',b.title)}
 try{const t=localStorage.getItem(THEME_LS);if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}
 $('#themeBtn').addEventListener('click',()=>{const n=themeNow()==='dark'?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem(THEME_LS,n)}catch(e){}themeShow()});
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',themeShow);
