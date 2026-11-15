@@ -371,7 +371,12 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 #frm .actions{justify-content:center}#frm .actions .sp{display:none} /* the add/edit buttons sit in the middle */
 .pre button{border:1.5px solid var(--border-dark);background:var(--bg-card);color:var(--text-main);border-radius:999px;padding:7px 12px;font:600 13.5px var(--font-mono);cursor:pointer;min-height:36px}
-.ph .dlg .actions{position:sticky;bottom:0;z-index:2;background:var(--bg-card);border-top:1px solid var(--border-light);margin:0 -16px -22px;padding:10px 16px;max-width:none;width:auto;box-sizing:border-box} /* Save and Cancel stay in view inside the floating window */
+.fbody{display:contents}
+/* phone add/edit window: the fields scroll inside .fbody, Save/Cancel are a fixed footer (a sticky bar inside the scaling dialog jumped while it opened) */
+.ph #dlg{overflow:hidden}.ph #dlg[open]{display:flex;flex-direction:column}
+.ph #frm{display:flex;flex-direction:column;flex:1;min-height:0;padding:0}
+.ph #frm .fbody{display:grid;gap:16px;overflow-y:auto;overflow-x:hidden;min-height:0;padding:18px 16px 16px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.ph #frm .actions{flex:none;background:var(--bg-card);border-top:1px solid var(--border-light);padding:10px 16px;margin:0;max-width:none;box-sizing:border-box}
 .actions .sp{flex:1}
 .btn{border:1px solid var(--border-dark);background:var(--bg-card);padding:9px 16px;border-radius:10px;font-weight:600;cursor:pointer}
 .btn.pri{background:var(--ink);color:var(--bg-card);border-color:var(--ink)}
@@ -618,6 +623,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <dialog id="dlg" aria-labelledby="dlgTitle">
   <form class="dlg" id="frm" novalidate>
+    <div class="fbody">
     <h3 id="dlgTitle">הוספה לשבוע</h3>
     <div class="fld">
       <span class="lbl" id="kindLbl">סוג</span>
@@ -648,6 +654,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     </div>
     <div class="hint" id="fHint"></div>
     <div class="err" id="fErr" hidden></div>
+    </div>
     <div class="actions">
       <button type="submit" class="btn pri" id="fSave">שמירה</button>
       <button type="button" class="btn" id="fCancel">ביטול</button>
@@ -2012,7 +2019,7 @@ $('#monthCard').addEventListener('mousedown',x=>{if(!dragZone(x.target))return;d
 /* phone: pull a dialog down (from its top) to close it; it follows the finger and snaps back after a short pull */
 (()=>{let d=null,y0=0,dy=0,t0=0;
   addEventListener('touchstart',x=>{const e=x.target.closest&&x.target.closest('dialog[open]');if(!PHQ.matches||!e||x.touches.length!==1){d=null;return}d=e;y0=x.touches[0].clientY;dy=0;t0=Date.now()},{passive:true});
-  addEventListener('touchmove',x=>{if(!d)return;const m=x.touches[0].clientY-y0;if(m<=0||d.scrollTop>0){if(dy>0){dy=0;d.style.transform=''}return}dy=m;d.style.transition='none';d.style.transform=`translateY(${dy}px)`},{passive:true});
+  addEventListener('touchmove',x=>{if(!d)return;const m=x.touches[0].clientY-y0;if(m<=0||((d.querySelector('.fbody')||d).scrollTop)>0){if(dy>0){dy=0;d.style.transform=''}return}dy=m;d.style.transition='none';d.style.transform=`translateY(${dy}px)`},{passive:true});
   addEventListener('touchend',()=>{if(!d)return;const e=d,m=dy,fast=m/(Date.now()-t0||1)>0.6;d=null;dy=0;
     e.style.transition='transform .18s ease';
     if(m>110||(m>40&&fast)){ // a first-run onboarding cannot be dismissed
@@ -2027,11 +2034,11 @@ addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('b
 (()=>{
   const sm=HTMLDialogElement.prototype.showModal,cl=HTMLDialogElement.prototype.close;
   const origin=(d,el)=>{const r=d.getBoundingClientRect(),b=el&&el.isConnected?el.getBoundingClientRect():null;d.style.transformOrigin=(b?b.left+b.width/2-r.left:r.width/2)+'px '+(b?b.top+b.height/2-r.top:r.height/2)+'px'};
-  HTMLDialogElement.prototype.showModal=function(){sm.call(this);this._from=lastBtn;if(still())return;try{origin(this,lastBtn);this.animate([{opacity:0,transform:'scale(.2)'},{opacity:1,transform:'scale(1)'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(e){}};
+  HTMLDialogElement.prototype.showModal=function(){sm.call(this);this._from=lastBtn;if(still())return;try{origin(this,lastBtn);this.animate([{opacity:0,transform:'scale(.86)'},{opacity:1,transform:'scale(1)'}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(e){}};
   HTMLDialogElement.prototype.close=function(v){
     if(!this.open||this.dataset.closing||this.dataset.noanim||still())return cl.call(this,v);
     this.dataset.closing='1';let a;
-    try{origin(this,this._from);a=this.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.2)'}],{duration:180,easing:'ease-in'})}catch(e){}
+    try{origin(this,this._from);a=this.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.86)'}],{duration:200,easing:'ease-in'})}catch(e){}
     let fin=0;const done=()=>{if(fin++)return;delete this.dataset.closing;cl.call(this,v)};if(a){a.onfinish=done;setTimeout(done,260)}else done(); // the timer: a paused page (background tab) never finishes the animation
   };
 })();
