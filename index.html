@@ -400,7 +400,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .tabs{display:none}
 .btn[aria-pressed=true]{background:var(--ink);color:var(--bg-card);border-color:var(--ink)}
 .wkbar{margin-bottom:12px}
-.ph .wrap{padding-inline:12px;padding-bottom:calc(var(--tabh) + 96px + env(safe-area-inset-bottom,0px))}
+.ph .wrap{padding-inline:12px;padding-bottom:calc(var(--tabh) + 24px + env(safe-area-inset-bottom,0px))}
 .ph .top{flex-wrap:nowrap;align-items:center;gap:10px;padding-block:14px 10px}
 .ph h1{font-size:24px;margin:0}
 .ph .sub,.ph .eyebrow,.ph .seg{display:none}
@@ -427,15 +427,15 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph .day .stb{min-height:36px}
 .ph .day .dlist{margin-top:8px}
 .day .dlist .dli{display:flex;align-items:center;gap:4px;font-size:inherit}
-.day .dlist li.none{display:block}
+.day .dlist li.none{display:grid}
 .ph input[type=text],.ph input[type=time],.ph input[type=date],.ph input[type=password],.ph select,.ph textarea{font-size:16px;min-height:44px} /* 16px: iOS Safari zooms into smaller fields */
 .ph input[type=date]{height:46px} /* as tall as the select it stands in for, so the one-off dialog still fits 393x852 */
 .ph input[type=checkbox]{width:20px;height:20px}
-.ph .add{position:fixed;inset-inline-end:16px;bottom:calc(var(--tabh) + 16px + env(safe-area-inset-bottom,0px));z-index:15;width:56px;height:56px;padding:0;justify-content:center;border-radius:50%}
-.ph .add svg{width:24px;height:24px}
+.ph .add{display:none} /* the add button is the + in the tab bar (#tabAdd), which clicks this one */
+#tabAdd svg{width:48px;height:34px;padding:8px 14px;box-sizing:border-box;border-radius:12px;background:var(--accent);color:var(--accent-ink)}#tabAdd:disabled{opacity:.45}
 .ph #addLbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.ph .toast{bottom:calc(var(--tabh) + 84px + env(safe-area-inset-bottom,0px))}
-.ph .tabs{position:fixed;inset-inline:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg-card);border-top:1px solid var(--border-light);padding-bottom:env(safe-area-inset-bottom,0px)}
+.ph .toast{bottom:calc(var(--tabh) + 16px + env(safe-area-inset-bottom,0px))}
+.ph .tabs{position:fixed;inset-inline:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);background:var(--bg-card);border-top:1px solid var(--border-light);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tabs button{display:grid;justify-items:center;align-content:center;gap:2px;min-height:var(--tabh);padding:6px 0;border:0;background:none;color:var(--text-muted);font-size:11px;font-weight:600;cursor:pointer}
 .tabs svg{width:24px;height:24px}
 .tabs button[aria-current=page]{color:var(--accent-text)}
@@ -452,7 +452,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .dayhead h2{margin:0}
 .dayhead small{display:block;font-size:13px;font-weight:600;color:var(--soft-tx)}
 .dlist{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
-.dlist .none{text-align:center;color:var(--text-faint);font-size:16px;padding-block:48px}
+.dlist .none{text-align:center;color:var(--text-faint);font-size:16px;padding-block:36px;display:grid;justify-items:center;gap:6px}.dlist .none .em{font-size:34px;line-height:1}.dlist .none b{font-weight:600}.dlist .none .btn{margin-top:8px}
 .dli{display:flex;align-items:center;gap:4px}
 .dli.cancelled{opacity:.6}
 .dli.cancelled :is(.tm b,.tm span,.tx>b,.meta),.dli.done .tx>b{text-decoration:line-through} /* on the text itself: a decoration does not always reach inside a button */
@@ -593,6 +593,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <nav class="tabs" id="tabs" aria-label="תצוגות">
   <button type="button" data-v="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/><rect x="9" y="13" width="6" height="4" rx="1" fill="currentColor"/></svg><span>יום</span></button>
   <button type="button" data-v="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4M8 13.5h8M8 17h8"/></svg><span>שבוע</span></button>
+  <button type="button" id="tabAdd" aria-label="הוספה" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg></button>
   <button type="button" data-v="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01M16 17.5h.01" stroke-width="2.6"/></svg><span>חודש</span></button>
   <button type="button" data-v="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>מה מתקרב</span></button>
 </nav>
@@ -1094,6 +1095,7 @@ const canEdit=()=>mode==='db'||mode==='local'||mode==='srv'||mode==='gh'||mode==
 function go(sun){viewSun=clampSun(sun);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goMonth(ym){viewYm=clampYm(ym);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goDay(d){viewDay=clampDay(d);viewSun=sunOf(viewDay);viewYm=clampYm(ymOf(viewDay));render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()} // the three stay in step, so week and month tabs open on the picked day
+const emptyDay=(date,edit)=>{const off=!!(offDoc(date,items)||CAL[date]&&CAL[date].off);return`<li class="none"><span class="em" aria-hidden="true">${off?'🎉':dow(date)===6?'😴':'🌤️'}</span><b>${off?'לימודים בוטלו':'יום פנוי'}</b>${edit?'<button type="button" class="btn" data-add>הוספה ליום הזה</button>':''}</li>`}; // an empty day, with the add button in it
 const slide=d=>{if(still()||!d||!PHQ.matches||view!=='day')return;for(const e of [$('#dayHead'),$('#dayList')])e.animate([{opacity:0,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.8,.2,1)'})}; // the new day enters from the side the finger came from
 const step=n=>view==='month'?goMonth(addMonths(viewYm,n)):view==='day'?goDay(addDays(viewDay,n)):go(addDays(viewSun,7*n));
 function setView(v,date){ // v: day|week|month|up (day and up only on a phone); date: open the day view on that date
@@ -1137,7 +1139,7 @@ function render(){
       if(ph&&wkSeen!==viewSun){wkSeen=viewSun;gridTo(viewDay>=viewSun&&viewDay<=addDays(viewSun,6)?viewDay:todayIso()>=viewSun&&todayIso()<=addDays(viewSun,6)?todayIso():viewSun)} // only on entering the tab or a new week, never on a data refresh
     }
   }
-  $('#addBtn').disabled=!edit;$('#pasteBtn').hidden=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
+  $('#addBtn').disabled=!edit;$('#tabAdd').disabled=!edit||upv;$('#pasteBtn').hidden=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
 }
 function renderStore(){
   const m={loading:['ld','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],sb:['db','נשמר בחשבון Google'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
@@ -1279,7 +1281,7 @@ function renderDay(evs,an){ // phone day view: the week strip, the day's notes, 
   $('#dstrip').innerHTML=DAYI.map((l,k)=>{const d=addDays(viewSun,k);return`<button type="button" data-day="${d}" aria-pressed="${d===date}" aria-label="${DAYS[k]} ${dm(d)}"${d===today?' class="today"':''}><small>${l}</small><b>${Number(d.slice(8))}</b></button>`}).join('');
   $('#dayHead').innerHTML=`<h2>${DAYS[dow(date)]} ${dm(date)}</h2>`+(c?`<small>${esc(c.label)}</small>`:'')+(off?'<small>לימודים בוטלו</small>':'');
   dayL=dayLines(date,items,evs);
-  $('#dayList').innerHTML=dayL.length?dayL.map(l=>dayLi(l,an.clash,edit,today)).join(''):'<li class="none">יום פנוי</li>';
+  $('#dayList').innerHTML=dayL.length?dayL.map(l=>dayLi(l,an.clash,edit,today)).join(''):emptyDay(date,edit);
 }
 function dayLi(l,clash,edit,today){ // one line of a day, as a tappable row: time column, course colour bar, title and room (the phone day view and the phone week agenda)
   {
@@ -1298,7 +1300,7 @@ function renderMonthDay(){
   const d=monthSel,evs=evsForWeek(sunOf(d),items),an=analyze(evs,evsForWeek(addDays(sunOf(d),7),items).filter(e=>e.d===0)),L=dayLines(d,items,evs),edit=canEdit(),today=todayIso();
   mdL={};L.forEach(l=>mdL[l.key]=l);
   const c=CAL[d],off=offDoc(d,items);
-  $('#mDay').innerHTML=`<h3 class="mdh">${DAYS[dow(d)]} ${dm(d)}${c?` · ${esc(c.label)}`:off?' · לימודים בוטלו':''}</h3><ul class="dlist">`+(L.length?L.map(l=>dayLi(l,an.clash,edit,today)).join(''):'<li class="none">יום פנוי</li>')+'</ul>';
+  $('#mDay').innerHTML=`<h3 class="mdh">${DAYS[dow(d)]} ${dm(d)}${c?` · ${esc(c.label)}`:off?' · לימודים בוטלו':''}</h3><ul class="dlist">`+(L.length?L.map(l=>dayLi(l,an.clash,edit,today)).join(''):emptyDay(d,edit))+'</ul>';
   $('#mHandle').setAttribute('aria-expanded',String(mexp));
 }
 let mexp=false,mdL={}; // mexp: the list is pulled up, the month is hidden
@@ -1947,14 +1949,15 @@ async function removeItem(id,msg){
 
 $('#prev').addEventListener('click',()=>{step(-1);slide(-1)});$('#next').addEventListener('click',()=>{step(1);slide(1)});
 $('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?goDay(todayIso()):go(sunOf(todayIso())));
+$('#tabAdd').addEventListener('click',()=>$('#addBtn').click()); // same per-view logic as the desktop add button
 $('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(b){setView(b.dataset.v);scrollTo(0,0)}});
 $('#grid').addEventListener('click',x=>{const b=x.target.closest('[data-more]');if(!b)return;x.stopPropagation();const d=b.dataset.more;dueMore.has(d)?dueMore.delete(d):dueMore.add(d);render()});
 $('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b){const o=viewDay;goDay(b.dataset.day);slide(b.dataset.day>o?1:b.dataset.day<o?-1:0);$('#dstrip [aria-pressed=true]').focus({preventScroll:true})}}); // the strip is redrawn: keep the focus on the picked day
-$('#dayList').addEventListener('click',x=>{ // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
+$('#dayList').addEventListener('click',x=>{if(x.target.closest('[data-add]')){openAdd({day:dow(viewDay)});return} // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
   const b=x.target.closest('[data-key]'),l=b&&dayL.find(e=>e.key===b.dataset.key);if(!l)return;
   if(l.src==='base')openCancel(l);else openEdit(l.id);
 });
-$('#mDay').addEventListener('click',x=>{const b=x.target.closest('[data-key]'),l=b&&mdL[b.dataset.key];if(!l||!canEdit()&&l.src!=='base'&&false)return;if(l.src==='base')openCancel(l);else openEdit(l.id)});
+$('#mDay').addEventListener('click',x=>{if(x.target.closest('[data-add]')){openAdd({sun:sunOf(monthSel),day:dow(monthSel)});return}const b=x.target.closest('[data-key]'),l=b&&mdL[b.dataset.key];if(!l||!canEdit()&&l.src!=='base'&&false)return;if(l.src==='base')openCancel(l);else openEdit(l.id)});
 const mexpSet=v=>{mexp=v;renderMonthDay()};
 $('#mHandle').addEventListener('keydown',x=>{if(x.key==='Enter'||x.key===' '){x.preventDefault();mexpSet(!mexp)}}); // keyboard only; touch and mouse drag
 let drag=null,dragRaf=0; // {y0,h,from,cur,startExp}: the month shrinks while the finger pulls the list up and grows when it pulls down; it snaps open or closed on release
