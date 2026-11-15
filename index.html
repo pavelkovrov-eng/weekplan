@@ -511,11 +511,14 @@ button.dlb{cursor:pointer}
 .nowl::before{content:'';position:absolute;inset-inline-start:-1px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
 /* touch feel: no grey tap flash or double-tap zoom, buttons dip under the finger (not .blk/.mc/.mhandle/.col: their taps are measured) */
 html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,.upgo,button.dlb):not(:disabled){transition:transform .4s var(--ez-spring)} /* down fast (the :active rule), back up with a small spring */
-:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,.upgo,button.dlb):active:not(:disabled){transition-duration:.08s}
+:is(.btn,.nav>button,.nav .seg button,.dstrip button,.stb,.obopt,.chips label,.upgo,button.dlb):not(:disabled){transition:transform .4s var(--ez-spring)} /* down fast (the :active rule), back up with a small spring */
+:is(.btn,.nav>button,.nav .seg button,.dstrip button,.stb,.obopt,.chips label,.upgo,button.dlb):active:not(:disabled){transition-duration:.08s}
 .ph .wrap{transition:transform .5s var(--ez-out)}.ph.dlgo .wrap{transform:scale(.95)} /* the page steps back behind an open dialog (class dlgo, set in the dialog-motion IIFE) */
-:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label):active:not(:disabled){transform:scale(.96)}
+:is(.btn,.nav>button,.nav .seg button,.dstrip button,.stb,.obopt,.chips label):active:not(:disabled){transform:scale(.96)}
 :is(.upgo,button.dlb):active:not(:disabled){transform:scale(.98)}
+/* tab bar (iOS): the screen cuts at once, the motion is in the icon: it dips to .85 under the finger and springs back, the picked tab's icon pops once (pop() in the #tabs listener), its body fills (.bd) and its colour fades in */
+.tabs button{transition:color .2s ease-out}.tabs svg{transition:transform .4s var(--ez-spring),background-color .2s ease-out}.tabs button:active:not(:disabled) svg{transform:scale(.85);transition-duration:.1s,.2s}
+.tabs .bd{fill:currentColor;fill-opacity:0;transition:fill-opacity .15s ease-out}.tabs button[aria-current=page] .bd{fill-opacity:.25}
 </style>
 
 <div class="wrap" dir="rtl" lang="he">
@@ -610,11 +613,11 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 </div>
 
 <nav class="tabs" id="tabs" aria-label="תצוגות">
-  <button type="button" data-v="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/><rect x="9" y="13" width="6" height="4" rx="1" fill="currentColor"/></svg><span>יום</span></button>
-  <button type="button" data-v="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4M8 13.5h8M8 17h8"/></svg><span>שבוע</span></button>
+  <button type="button" data-v="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect class="bd" x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/><rect x="9" y="13" width="6" height="4" rx="1" fill="currentColor"/></svg><span>יום</span></button>
+  <button type="button" data-v="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect class="bd" x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4M8 13.5h8M8 17h8"/></svg><span>שבוע</span></button>
   <button type="button" id="tabAdd" aria-label="הוספה" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg></button>
-  <button type="button" data-v="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01M16 17.5h.01" stroke-width="2.6"/></svg><span>חודש</span></button>
-  <button type="button" data-v="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>מה מתקרב</span></button>
+  <button type="button" data-v="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect class="bd" x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01M16 17.5h.01" stroke-width="2.6"/></svg><span>חודש</span></button>
+  <button type="button" data-v="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle class="bd" cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>מה מתקרב</span></button>
 </nav>
 
 <dialog id="cdlg" aria-labelledby="cTitle">
@@ -1130,7 +1133,6 @@ function flipRun(P){if(!P)return;
     for(const[k,o]of m){if(seen.has(k))continue;const c=o.li;if(getComputedStyle(u).position==='static')u.style.position='relative'; // the old row, put back over its old place
       Object.assign(c.style,{position:'absolute',top:(o.r.top-ur.top-u.clientTop)+'px',left:(o.r.left-ur.left-u.clientLeft)+'px',width:o.r.width+'px',margin:'0',pointerEvents:'none'});u.appendChild(c);
       c.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.92)'}],{duration:260,easing:EZ.out,fill:'forwards'}).onfinish=()=>c.remove()}}}
-const fadeIn=()=>{if(still())return;document.querySelectorAll('.wrap>:is(.card,.sum,.att,.wkbar):not([hidden])').forEach(e=>e.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:180,easing:EZ.out}))}; // a tab switch: the cards rise in, the tab bar stays
 const PHQ=matchMedia('(max-width:600px)'); // phone width: day view + tab bar (class ph on <html>)
 let items=[], viewSun=clampSun(sunOf(todayIso())), viewDay=clampDay(todayIso()), viewYm=clampYm(ymOf(todayIso())), wkGrid=false, dayL=[], view=(()=>{try{const v=localStorage.getItem('wp.view');return v==='month'?v:PHQ.matches&&v!=='week'?'day':'week'}catch(e){return PHQ.matches?'day':'week'}})(), editSun=null, mode='loading', db=null, editing=null, timesTouched=false, delArmed=0, addTimes=null;
 const canEdit=()=>mode==='db'||mode==='local'||mode==='srv'||mode==='gh'||mode==='sb'; // srv = the local server (python3 server.py), gh = GitHub contents API
@@ -2005,7 +2007,7 @@ async function removeItem(id,msg){flipArm=Date.now();
 $('#prev').addEventListener('click',()=>{step(-1);slide(-1)});$('#next').addEventListener('click',()=>{step(1);slide(1)});
 $('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?goDay(todayIso()):go(sunOf(todayIso())));
 $('#tabAdd').addEventListener('click',()=>$('#addBtn').click()); // same per-view logic as the desktop add button
-$('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(!b)return;const o=view;setView(b.dataset.v);scrollTo(0,0);if(view!==o)fadeIn()});
+$('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(!b)return;const o=view;setView(b.dataset.v);scrollTo(0,0);if(view!==o)pop(b.querySelector('svg'))}); // an instant cut; only the icon moves
 $('#grid').addEventListener('click',x=>{const b=x.target.closest('[data-more]');if(!b)return;x.stopPropagation();const d=b.dataset.more;dueMore.has(d)?dueMore.delete(d):dueMore.add(d);render()});
 $('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b){const o=viewDay;goDay(b.dataset.day);slide(b.dataset.day>o?1:b.dataset.day<o?-1:0);$('#dstrip [aria-pressed=true]').focus({preventScroll:true})}}); // the strip is redrawn: keep the focus on the picked day
 $('#dayList').addEventListener('click',x=>{if(x.target.closest('[data-add]')){openAdd({day:dow(viewDay)});return} // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
