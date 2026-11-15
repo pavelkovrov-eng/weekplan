@@ -2040,13 +2040,13 @@ addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('b
   const ghost=(el,on)=>{try{gp.hidePopover();if(!on)return;const b=el.getBoundingClientRect();Object.assign(gp.style,{left:b.left+'px',top:b.top+'px',width:b.width+'px',height:b.height+'px'});gp.showPopover()}catch(e){}}; // a sharp copy of the + above the blurred page while its window is open
   const genie=(d,el)=>{ // keyframes of a genie: the window is a bulb joined to the button by a narrow neck; it swells and the neck widens into the full rectangle
     const r=d.getBoundingClientRect(),b=el&&el.isConnected?el.getBoundingClientRect():null;if(!b)return null;
-    const W=r.width,H=r.height,bx=b.left+b.width/2-r.left,by=b.top+b.height/2-r.top,N=16,M=10,K=[];
+    const W=r.width,H=r.height,bx=b.left+b.width/2-r.left,by=b.top+b.height/2-r.top,N=16,M=10,K=[],up=by<H/2; // up: the button is above the window (the header buttons), so the neck is at the top
     for(let i=0;i<=N;i++){
       const p=i/N,s=.12+.88*p,rn=Math.min(1,(28+(W-28)*Math.pow(p,3))/s/W),L=[],R=[]; // rn: neck width as a share of the window width (in the window's own, unscaled units)
-      for(let k=0;k<=M;k++){const y=k/M,w=1-(1-rn)*Math.pow(y,2.2),cx=W/2+(bx-W/2)*(1-rn)*Math.pow(y,2.2);L.push((cx-w*W/2).toFixed(1)+'px '+(y*H).toFixed(1)+'px');R.push((cx+w*W/2).toFixed(1)+'px '+(y*H).toFixed(1)+'px')}
-      K.push({offset:p,clipPath:'polygon('+L.concat(R.reverse()).join(',')+')',transform:`translateY(${((by-H)*(1-p)).toFixed(1)}px) scale(${s.toFixed(3)})`,opacity:Math.min(1,p*8)});
+      for(let k=0;k<=M;k++){const y=k/M,u=up?1-y:y,w=1-(1-rn)*Math.pow(u,2.2),cx=W/2+(bx-W/2)*(1-rn)*Math.pow(u,2.2);L.push((cx-w*W/2).toFixed(1)+'px '+(y*H).toFixed(1)+'px');R.push((cx+w*W/2).toFixed(1)+'px '+(y*H).toFixed(1)+'px')}
+      K.push({offset:p,clipPath:'polygon('+L.concat(R.reverse()).join(',')+')',transform:`translateY(${(((up?by:by-H))*(1-p)).toFixed(1)}px) scale(${s.toFixed(3)})`,opacity:Math.min(1,p*8)});
     }
-    d.style.transformOrigin=bx+'px '+H+'px';return K};
+    d.style.transformOrigin=bx+'px '+(up?0:H)+'px';return K};
   const origin=(d,el)=>{const r=d.getBoundingClientRect(),b=el&&el.isConnected?el.getBoundingClientRect():null;d.style.transformOrigin=(b?b.left+b.width/2-r.left:r.width/2)+'px '+(b?b.top+b.height/2-r.top:r.height/2)+'px'};
   HTMLDialogElement.prototype.showModal=function(){sm.call(this);this._from=lastBtn;
     if(lastBtn&&lastBtn.id==='tabAdd'){ghost(lastBtn,1);this.addEventListener('close',()=>ghost(null,0),{once:true})}
