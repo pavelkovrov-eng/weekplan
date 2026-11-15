@@ -397,7 +397,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 /* add/edit window: "when" is the hero. One row of kinds, big times, the week's days, a switch, optional fields folded */
 #frm .kseg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;background:var(--border-light);border-radius:12px;padding:3px}
 #frm .kseg label{justify-content:center;gap:5px;padding:8px 2px;border:0;background:none;color:var(--text-muted);border-radius:9px;font-size:13.5px;min-height:40px;white-space:nowrap}#frm .kseg label[hidden]{display:none}
-#frm .kseg label{position:relative;z-index:1}#frm .kseg label{transition:color .3s}#frm .kseg label:has(input:checked){color:var(--kt,var(--ink));font-weight:800}#kindPill{position:absolute;z-index:0;border-radius:9px;background:var(--kb,var(--bg-card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--kd,transparent) 55%,transparent);transition:background-color .35s,box-shadow .35s;pointer-events:none} /* the pill under the picked kind, tinted with that kind's colour (--kb/--kd/--kt set in kindPill); travels like #tabPill */
+#frm .kseg label{position:relative;z-index:1}#frm .kseg label{transition:color .3s}#frm .kseg label:has(input:checked){color:var(--kt,var(--ink));font-weight:800}#kindPill,#prePill{position:absolute;z-index:0;border-radius:9px;background:var(--kb,var(--bg-card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--kd,transparent) 55%,transparent);transition:background-color .35s,box-shadow .35s;pointer-events:none} /* the pill under the picked kind, tinted with that kind's colour (--kb/--kd/--kt set in kindPill); travels like #tabPill */
 #frm .ftime{display:flex;align-items:center;justify-content:center;gap:10px;direction:rtl;margin-top:4px}
 #frm .ftime input{width:auto;min-width:0;flex:0 1 auto;border:0;background:none;padding:2px 6px;border-radius:10px;font:700 38px/1.1 var(--font-mono);color:var(--ink);text-align:center;font-variant-numeric:tabular-nums;min-height:52px}
 #frm .ftime input:focus-visible{outline:2px solid var(--accent)}@media (hover:hover){#frm .ftime input:hover{background:var(--bg-sunk)}}
@@ -405,7 +405,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 #frm .ftime.due .arw{display:none}#frm .ftime.due::before{content:'עד';font-size:18px;font-weight:700;color:var(--text-muted)}
 #frm #fHint{background:none;padding:0;text-align:center;margin-top:-10px;height:20px;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* always one line: a clash never changes the window's height */
 #frm #fHint.bad{color:var(--bad-tx);font-weight:700;cursor:pointer}#frm #fHint.full{height:auto;white-space:normal}
-#frm .pre{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;min-height:44px;align-items:center} /* three equal buttons that always fit: nothing scrolls or is cut */#frm .pre button{min-width:0;padding:7px 4px;white-space:nowrap;min-height:44px}#frm .pre button.on{border-color:var(--kd,var(--ink));background:var(--kb,var(--bg-sunk));color:var(--kt,var(--ink))}
+#frm .pre{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;background:var(--border-light);border-radius:12px;padding:3px;min-height:44px;align-items:center} /* the quick times: one segmented row like the kinds; the picked one sits in the travelling #prePill, the others are dimmer */#frm .pre button{position:relative;z-index:1;min-width:0;padding:7px 4px;white-space:nowrap;min-height:40px;border:0;background:none;border-radius:9px;color:var(--text-muted);opacity:.7;transition:color .3s,opacity .3s}#frm .pre button.on{color:var(--kt,var(--ink));opacity:1;font-weight:800}
 #frm .fwhen{display:grid;gap:6px}
 #frm .fdays{display:flex;align-items:center;gap:6px}#frm #fDays{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 #frm #fDays button{min-height:42px;border:0;border-radius:50%;aspect-ratio:1;max-height:46px;justify-self:center;width:100%;max-width:46px;background:var(--bg-sunk);color:var(--text-main);font:inherit;font-weight:700;cursor:pointer;transition:transform .4s var(--ez-spring),background-color .15s}
@@ -1523,7 +1523,7 @@ $('#grid').addEventListener('click',async x=>{
 
 /* ---------- dialog ---------- */
 const dlg=$('#dlg'),frm=$('#frm');
-$('#kindChips').innerHTML=Object.entries(KINDS).map(([k,v])=>`<label data-shift="${v.shift?1:0}"><input type="radio" name="fKind" value="${k}" id="fk_${k}">${v.short}</label>`).join('');
+$('#kindChips').innerHTML=['due','study','open','close','other'].map(k=>[k,KINDS[k]]).map(([k,v])=>`<label data-shift="${v.shift?1:0}"><input type="radio" name="fKind" value="${k}" id="fk_${k}">${v.short}</label>`).join('');
 $('#fDay').innerHTML=DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
 $('#fDays').innerHTML=DAYI.map((l,i)=>`<button type="button" data-d="${i}" aria-label="${DAYS[i]}" aria-pressed="false">${l}</button>`).join(''); // the week's days: a tap picks the day (dated: in the week of the picked date)
 $('#fDays').addEventListener('click',x=>{const b=x.target.closest('[data-d]');if(!b)return;const fd=$('#fDate');$('#fDay').value=b.dataset.d;if(isDated())fd.value=clampDay(addDays(isoOk(fd.value)?sunOf(fd.value):editSun,Number(b.dataset.d)));syncFields();hint()});
@@ -1533,14 +1533,16 @@ function daysSync(){const dt=isDated(),v=$('#fDate').value,d=dt?isoOk(v)?dow(v):
 const getKind=()=>(frm.querySelector('input[name=fKind]:checked')||{}).value||'open';
 const getWeek=()=>$('#fRec').checked?'both':'date'; // "חוזר כל שבוע": a weekly item, otherwise one date
 function lastOf(kind){return items.filter(it=>it.kind===kind&&okTime(it.start)&&okTime(it.end)).sort((a,b)=>(b.updated||0)-(a.updated||0))[0]}
-const kindPill=(()=>{let el=null,cur=null;return anim=>{ // same motion as tabPill, for the kind row of the add/edit window (offset* so the dialog's own scale never matters)
-  const box=$('#kindChips');if(!el){el=document.createElement('i');el.id='kindPill';el.setAttribute('aria-hidden','true');box.prepend(el)}
-  const b=box.querySelector('label:has(input:checked)'),kc={open:'open',close:'close',study:'study',due:'bad',other:'other'}[getKind()];if(kc)for(const[v,x]of[['b','bg'],['d','bd'],['t','tx']])box.style.setProperty('--k'+v,`var(--${kc}-${x})`);if(!b||!b.offsetWidth||b.hidden){el.hidden=true;cur=null;return}el.hidden=false;
+const mkPill=(id,box,pick,r)=>{let el=null,cur=null;const f=anim=>{ // same motion as tabPill: the pill leaves the old spot, stretches like a drop, is drawn into the new one (a little smaller) and settles; offset* so the dialog's own scale never matters
+  if(!el||!el.isConnected){el=document.createElement('i');el.id=id;el.setAttribute('aria-hidden','true');box.prepend(el)}
+  const b=pick();if(!b||!b.offsetWidth||b.hidden){el.hidden=true;cur=null;return}el.hidden=false;
   const to={l:b.offsetLeft,t:b.offsetTop,w:b.offsetWidth,h:b.offsetHeight},from=cur,px=o=>({left:o.l+'px',top:o.t+'px',width:o.w+'px',height:o.h+'px'});cur=to;Object.assign(el.style,px(to));
   if(!anim||!from||still()||Math.abs(from.l-to.l)<1)return;
   const L=Math.min(from.l,to.l),R=Math.max(from.l+from.w,to.l+to.w);
-  el.animate([{...px(from),offset:0},{...px({l:L,t:to.t+to.h*.12,w:R-L,h:to.h*.76}),offset:.45},{...px({l:to.l+to.w*.08,t:to.t+to.h*.08,w:to.w*.84,h:to.h*.84}),offset:.8},{...px(to),offset:1}],{duration:600,easing:'cubic-bezier(.3,.7,.3,1)'})}})();
-new ResizeObserver(()=>kindPill(0)).observe($('#kindChips'));
+  el.animate([{...px(from),offset:0},{...px({l:L,t:to.t+to.h*.12,w:R-L,h:to.h*.76}),offset:.45},{...px({l:to.l+to.w*.08,t:to.t+to.h*.08,w:to.w*.84,h:to.h*.84}),offset:.8},{...px(to),offset:1}],{duration:600,easing:'cubic-bezier(.3,.7,.3,1)'})};f.reset=()=>{cur=null};new ResizeObserver(()=>f(0)).observe(box);return f};
+const kindPill0=mkPill('kindPill',$('#kindChips'),()=>$('#kindChips').querySelector('label:has(input:checked)'));
+const kindPill=anim=>{const kc={open:'open',close:'close',study:'study',due:'bad',other:'other'}[getKind()];if(kc)for(const[v,x]of[['b','bg'],['d','bd'],['t','tx']])frm.style.setProperty('--k'+v,`var(--${kc}-${x})`);kindPill0(anim)};
+const prePill=mkPill('prePill',$('#fPre'),()=>$('#fPre').querySelector('button.on'));
 function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true;if(!worksOn()&&!(KINDS[k]&&KINDS[k].shift))$('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=true);else $('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=false);kindPill(0)} // a student who works no shifts does not see the shift types (an existing shift keeps its own)
 function setWeek(w){$('#fRec').checked=w==='A'||w==='B'||w==='both'} // A/B docs of the retired rotation open as weekly
 const COURSE_OPTS=Object.entries(COURSE).map(([t,c])=>`<option value="${esc(c)}">${esc(t)}</option>`).join('');
@@ -1551,12 +1553,13 @@ let dated=false; // true while the date field (not the weekday select) is the on
 const isDated=()=>getKind()==='due'||getWeek()==='date';
 let preKey='',endTouched=false,prevS='',prevE=''; // endTouched: the end was typed by hand, so changing the start no longer drags it along
 const PRE0={open:[['08:00','16:00'],['10:00','18:00'],['07:00','15:00']],close:[['16:00','22:00'],['14:00','22:00'],['17:00','23:00']],study:[['10:00','12:00'],['14:00','16:00'],['18:00','20:00']],other:[['10:00','12:00'],['14:00','16:00'],['18:00','20:00']]};
+const firstPre=()=>{renderPre();const b=$('#fPre').querySelector('button');return b&&{s:b.dataset.s,e:b.dataset.e}};
 function renderPre(){ // always three two-line buttons (range, then what it is), so the row never changes shape: the kind's own most used times first, then that kind's defaults; a deadline gets three hours
   const k=getKind(),L=k==='due'?[{s:'23:59'},{s:'12:00'},{s:'08:00'}]:recentTimes(items,k,9).filter(x=>[x.s,x.e].every(t=>!t||/:(00|30)$/.test(t))).slice(0,3);
   if(k!=='due')for(const[s,e]of PRE0[k]||PRE0.other){if(L.length>=3)break;if(!L.some(y=>y.s===s&&y.e===e))L.push({s,e})}
   const key=k+'|'+L.map(x=>x.s+(x.e||'')).join();if(key===preKey){preMark();return}preKey=key;
   const b=$('#fPre');b.hidden=false;b.innerHTML=L.map(x=>`<button type="button" data-s="${x.s}"${x.e?` data-e="${x.e}"`:''}><b>${ltr(x.e?x.s+'–'+x.e:x.s)}</b></button>`).join('');preMark()}
-function preMark(){const s=$('#fStart').value,e=$('#fEnd').value,due=getKind()==='due';for(const b of $('#fPre').children)b.classList.toggle('on',b.dataset.s===s&&(due||b.dataset.e===e))} // the quick time that equals the fields is ringed
+function preMark(anim=1){const s=$('#fStart').value,e=$('#fEnd').value,due=getKind()==='due';for(const b of $('#fPre').children)b.classList.toggle('on',b.dataset.s===s&&(due||b.dataset.e===e));prePill(anim)} // the quick time that equals the fields is ringed
 function syncFields(){
   const due=getKind()==='due',dt=isDated(),fd=$('#fDate'),fy=$('#fDay'),rp=()=>isoOk(fd.value)&&dow(fd.value)===Number(fy.value)?fd.value:clampDay(addDays(editSun,Number(fy.value))); // rp: the date "only on this date" takes from a recurring form (the picked date while its weekday still matches)
   if(dt!==dated){dated=dt;if(dt)fd.value=rp();else if(isoOk(fd.value))fy.value=String(dow(fd.value))} // switching mode keeps the day and the date in step (a picked date survives a round trip)
@@ -1570,10 +1573,9 @@ function openAdd(pre={}){
   setKind(kind);$('#fTitle').value='';$('#fNote').value='';$('#fMore').open=false;
   $('#fDay').value=String(pre.day!=null?pre.day:sunOf(todayIso())===sun?dow(todayIso()):0); // no day given: today, if it is in that week
   if(pre.start!=null){const dur=last?span(last.start,last.end).reduce((a,b)=>b-a):180;$('#fStart').value=fm(pre.start);$('#fEnd').value=fm(pre.start+dur)}
-  else if(last){$('#fStart').value=last.start;$('#fEnd').value=last.end}
-  else{$('#fStart').value='18:00';$('#fEnd').value='21:00'}
+  else{const f=firstPre();$('#fStart').value=f?f.s:'18:00';$('#fEnd').value=f&&f.e?f.e:'21:00'}
   if(pre.start!=null&&pre.end!=null)$('#fEnd').value=fm(pre.end); // a block drawn in the grid
-  addTimes={s:$('#fStart').value,e:$('#fEnd').value};endTouched=false;prevS=$('#fStart').value;prevE=$('#fEnd').value;preKey='';
+  addTimes={s:$('#fStart').value,e:$('#fEnd').value};endTouched=false;prevS=$('#fStart').value;prevE=$('#fEnd').value;preKey='';prePill.reset();
   setWeek('date'); // a new item is one date unless "חוזר כל שבוע" is ticked
   dated=isDated();$('#fDate').value=clampDay(addDays(sun,Number($('#fDay').value)));$('#fCourse').value='';$('#fStatus').value='todo';
   $('#dlgTitle').textContent='הוספה';$('#fDel').hidden=true;$('#fSkip').hidden=true;resetDel();$('#fErr').hidden=true;
@@ -1625,7 +1627,7 @@ frm.addEventListener('input',x=>{
   if(x.target.id==='fEnd')endTouched=true;
   if(x.target.id==='fStart'&&!endTouched&&getKind()!=='due'&&okTime(prevS)&&okTime(prevE)&&okTime($('#fStart').value)){const[a,b]=span(prevS,prevE);$('#fEnd').value=fm((toMin($('#fStart').value)+b-a)%1440)}
   if(x.target.name==='fKind')kindPill(1);
-  if(x.target.name==='fKind'&&!editing){const l=lastOf(getKind());if(getKind()==='due')$('#fStart').value='23:59';else if(l&&!timesTouched){$('#fStart').value=l.start;$('#fEnd').value=l.end}else if(addTimes&&$('#fStart').value==='23:59'){$('#fStart').value=addTimes.s;$('#fEnd').value=addTimes.e}}
+  if(x.target.name==='fKind'&&!editing){const l=lastOf(getKind());if(getKind()==='due')$('#fStart').value='23:59';else if(!timesTouched&&firstPre()){const f=firstPre();$('#fStart').value=f.s;$('#fEnd').value=f.e}else if(addTimes&&$('#fStart').value==='23:59'){$('#fStart').value=addTimes.s;$('#fEnd').value=addTimes.e}}
   prevS=$('#fStart').value;prevE=$('#fEnd').value;syncFields();hint();
 });
 $('#fPre').addEventListener('click',x=>{const b=x.target.closest('button');if(!b)return;$('#fStart').value=b.dataset.s;if(b.dataset.e){$('#fEnd').value=b.dataset.e;endTouched=true}timesTouched=true;prevS=$('#fStart').value;prevE=$('#fEnd').value;hint()}); // a deadline's buttons carry only the hour
