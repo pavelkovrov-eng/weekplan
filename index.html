@@ -143,7 +143,7 @@ h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;line-height:1.12;margin:0 0 
 .blk .nm{font-size:12.5px;font-weight:700;display:flex;gap:4px;align-items:flex-start;justify-content:space-between}
 .blk .nm span{min-width:0}
 .blk .nm svg{flex:none;width:11px;height:11px;opacity:.55;margin-top:2px}
-.blk .tm{font-family:var(--font-mono);font-size:10.5px;opacity:.85;margin-top:2px}
+.blk .tm{direction:ltr;unicode-bidi:isolate;text-align:right;font-family:var(--font-mono);font-size:10.5px;opacity:.85;margin-top:2px}
 .blk .rm{font-size:10.5px;opacity:.8;margin-top:1px}
 .blk.tight .rm{display:none}
 .c-stat{--cc:var(--c-stat)} .c-math{--cc:var(--c-math)} .c-acc{--cc:var(--c-acc)} .c-micro{--cc:var(--c-micro)} .c-data{--cc:var(--c-data)} .c-ob{--cc:var(--c-ob)} .c-eng{--cc:var(--c-eng)}
@@ -166,13 +166,16 @@ button.blk.base{cursor:pointer;line-height:1.3;display:flex;flex-direction:colum
 .dh .cal{display:block;font-size:10.5px;font-weight:600;color:var(--soft-tx)}
 .dh .hl{display:block;margin:0 auto;border:0;background:none;padding:4px 6px;font-size:10.5px;font-weight:600;color:var(--accent-text);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
 .uplist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.uplist li{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.uplist li{display:flex;align-items:center;gap:10px}
 .uplist .none{color:var(--text-faint);font-size:14px}
-.upgo{flex:1 1 280px;display:grid;grid-template-columns:96px 104px minmax(0,1fr) auto;gap:10px;align-items:baseline;text-align:right;border:1px solid var(--border-light);background:var(--bg-sunk);border-radius:10px;padding:9px 12px;cursor:pointer;font:inherit;color:inherit}
-@media (hover:hover){.upgo:hover{border-color:var(--border-dark)}}
-.upgo .dl{font-weight:800;color:var(--ink)}
+.uplist .uph{font-size:12px;font-weight:800;letter-spacing:.05em;color:var(--text-muted);margin-top:10px}.uplist .uph:first-child{margin-top:0}
+.upgo{flex:1 1 0;min-width:0;display:grid;grid-template-columns:62px minmax(0,1fr);gap:12px;align-items:center;text-align:right;border:0;border-inline-start:4px solid var(--cc,var(--border-dark));background:var(--bg-sunk);border-radius:12px;padding:10px 12px;cursor:pointer;font:inherit;color:inherit} /* the nearer, the bigger: g-near (this week) > g-mid (this month) > g-far (a quiet line) */
+@media (hover:hover){.upgo:hover{background:color-mix(in srgb,var(--cc,var(--text-faint)) 12%,var(--bg-card))}}
+.upgo .dl{display:grid;justify-items:center;line-height:1.1;color:var(--ink)}.upgo .dl b{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}.upgo .dl b.w{font-size:15px}.upgo .dl small{font-size:11px;font-weight:600;color:var(--text-muted)}
+.upgo .tx{display:grid;gap:2px;min-width:0}.upgo .tx>b{font-size:15px;overflow-wrap:anywhere}
 .upgo .dt{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted)}
-.upgo .tg{font-size:11.5px;font-weight:700;padding:1px 9px;border-radius:999px;border:1px solid var(--border-dark);color:var(--text-muted);white-space:nowrap}
+.upgo.g-near{padding-block:14px;background:color-mix(in srgb,var(--cc,var(--text-faint)) 10%,var(--bg-card))}.upgo.g-near .dl b{font-size:26px}.upgo.g-near .dl b.w{font-size:17px}.upgo.g-near .tx>b{font-size:17px}
+.upgo.g-far{background:none;padding-block:3px;min-height:0}.upgo.g-far .dl small{display:none}.upgo.g-far .dl b{font-size:13.5px;font-weight:600;color:var(--text-muted)}.upgo.g-far .tx>b,.upgo.g-far.cd .tx>b{font-size:14px;font-weight:600;color:var(--text-main)}
 .shm{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 .shm th,.shm td{padding:9px 6px;text-align:start;border-bottom:1px solid var(--border-light)}
 .shm th{font-size:12px;font-weight:600;color:var(--text-muted)}
@@ -191,9 +194,7 @@ button.blk.base{cursor:pointer;line-height:1.3;display:flex;flex-direction:colum
 .dmore{border:0;background:none;padding:2px 4px;font:600 11.5px var(--font-body);color:var(--accent-text);cursor:pointer;text-align:center}
 /* a deadline with a course: class cd + c-<course> (which sets --cc); text is --cc pulled toward the ink so it reads on light and dark */
 .cd{--cx:color-mix(in srgb,var(--cc) 72%,var(--ink))}
-.dh .due.cd,.ml.d.cd,.day li.cd b,.upgo.cd b{color:var(--cx)}
-.upgo.cd{border-inline-start:4px solid var(--cc)}
-.upgo.cd .tg{border-color:var(--cc);color:var(--cx)}
+.dh .due.cd,.ml.d.cd,.day li.cd b,.upgo.cd .tx>b{color:var(--cx)}
 .day li.cd .dot{background:var(--cc)}
 .done{text-decoration:line-through;opacity:.6}
 details.card>summary{list-style:none;display:flex;align-items:center;gap:10px;flex-wrap:nowrap;cursor:pointer;min-height:32px}
@@ -219,7 +220,8 @@ details.card[open] .upsum{display:none}
 .upsub .dt{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted)}
 .upsub b{text-decoration:line-through;opacity:.75;font-weight:600}
 .day li.late b,.dli.late .tx>b,.upgo.late b,.upgo.late .dl{color:var(--bad-tx)}
-.upgo.late{border-inline-start:4px solid var(--bad-bd);background:var(--bad-bg)}
+.upgo.late.cd .tx>b{color:var(--bad-tx)}
+.upgo.late,.upgo.late.g-near{border-inline-start:4px solid var(--bad-bd);background:var(--bad-bg)}
 .ml.d.late{color:var(--bad-tx);font-weight:800}
 .ph .ml.d.late{background:var(--bad-bd);box-shadow:none}
 .pastebtn{margin-top:12px}
@@ -279,7 +281,6 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 .plist .pn{grid-column:2/-1;font-size:12px;color:var(--text-faint)}
 .plist input[type=checkbox]{width:20px;height:20px}
 @media (max-width:640px){.plist li{grid-template-columns:auto 52px minmax(0,1fr)}.plist select{grid-column:2/-1}}
-@media (max-width:640px){.upgo{grid-template-columns:auto auto}.upgo b{grid-column:1/-1}}
 .nav{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;background:var(--bg-card);border:1px solid var(--border-dark);border-radius:12px;padding:4px}
 .nav>button{border:0;background:transparent;padding:7px 12px;border-radius:9px;font-weight:700;cursor:pointer;color:var(--text-muted)}
 @media (hover:hover){.nav>button:hover{background:var(--bg-sunk);color:var(--ink)}}
@@ -289,7 +290,7 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 .blk.cancelled{opacity:.6;text-decoration:line-through}
 #grid .blk,#grid .col{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none} /* a long press lifts the block, not a text selection */
 #grid .blk.past:not(.sel){opacity:.5}
-#grid .blk.ghost{z-index:7;pointer-events:none;inset-inline:4px;background:var(--accent-soft);border:1.5px solid var(--accent);border-radius:8px;color:var(--accent-text);font:600 12px/1.3 var(--font-mono);padding:4px 8px;box-shadow:0 12px 24px -10px var(--shadow)} /* a block being drawn on an empty spot */
+#grid .blk.ghost{direction:ltr;text-align:right;z-index:7;pointer-events:none;inset-inline:4px;background:var(--accent-soft);border:1.5px solid var(--accent);border-radius:8px;color:var(--accent-text);font:600 12px/1.3 var(--font-mono);padding:4px 8px;box-shadow:0 12px 24px -10px var(--shadow)} /* a block being drawn on an empty spot */
 #grid .blk.sel{z-index:6;box-shadow:0 0 0 2px var(--accent),0 10px 24px -8px var(--shadow)}
 #grid .blk.lift{z-index:7;transition:none;box-shadow:0 0 0 2px var(--accent),0 20px 32px -10px var(--shadow)}
 .blk .rsz{display:none;position:absolute;inset-inline:0;bottom:0;height:22px;cursor:ns-resize;touch-action:none}
@@ -540,7 +541,6 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div>
     <div class="eyebrow">סמסטר א' · תשפ"ז · 18.10.26–15.01.27</div>
     <h1>השבוע שלי</h1>
-    <p class="sub">מערכת הלימודים קבועה ונעולה. משמרות, אימונים ושעות למידה מוסיפים מעליה, כל שבוע או לתאריך אחד.</p>
   </div>
   <div class="who"><button type="button" class="btn ib" id="setBtn" title="הגדרות" aria-label="הגדרות"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button><button type="button" class="btn ib" id="themeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button><span class="store" id="store" role="img"><i></i><span>⏳</span></span><button type="button" class="btn ib out" id="outBtn" title="התנתקות" aria-label="התנתקות" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="flip" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
 </header>
@@ -576,7 +576,6 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 </section>
 <section class="card" id="gridCard">
   <div class="ghead"><h2 id="gridTitle">השבוע</h2><div class="printbar"><button type="button" class="btn" id="printBtn">הדפסה</button><button type="button" class="edit-link" id="printFile">קובץ להדפסה</button></div></div>
-  <p class="lead">לחיצה על שטח פנוי ביום פותחת הוספה בשעה הזו. לחיצה על פריט שהוספת פותחת עריכה, ולחיצה ארוכה מאפשרת לגרור אותו (בקפיצות של רבע שעה) או למתוח את הסוף שלו. הלימודים לא ניתנים לשינוי.</p>
   <details class="mleg" open><summary>מקרא</summary>
   <div class="legend">
     <span class="c-stat"><i style="background:var(--cc);border-color:var(--cc)"></i>הסתברות</span>
@@ -606,7 +605,6 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <details class="card" id="upCard">
   <summary><h2>מה מתקרב</h2><span class="upsum" id="upSum"></span></summary>
-  <p class="lead">מבחנים והגשות לפי סדר. לחיצה עוברת אליהם בלוח. הגשה שהתאריך שלה עבר ולא סומנה כהוגשה מופיעה באדום בראש הרשימה.</p>
   <ol class="uplist" id="up"></ol>
   <details class="upsub" id="upDone" hidden><summary id="upDoneN"></summary><ol id="upDoneL"></ol></details>
   <button type="button" class="btn pastebtn" id="pasteBtn" hidden>הדבקה מהמודל</button>
@@ -1330,8 +1328,9 @@ function renderGrid(evs,clash){
     DAYS.forEach((_,i)=>{const f=document.createElement('div');f.className='df';f.innerHTML=dayDue(addDays(viewSun,i));g.appendChild(f)});
   }
   gridRange=[lo,hi];nowLine();gridAxisSync(g);
+  if(!ro&&!tipSeen&&g.offsetParent){tipSeen=1;try{if(!localStorage.getItem('wp.tip1')){localStorage.setItem('wp.tip1','1');setTimeout(()=>toast('טיפ: לחיצה ארוכה על משמרת מזיזה אותה'),900)}}catch(e){}} // once per device, the first time the grid is on screen
 }
-let gridRange=[480,1200];
+let gridRange=[480,1200],tipSeen=0;
 const nowMin=()=>{const p={};new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jerusalem',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).forEach(x=>p[x.type]=x.value);return Number(p.hour)*60+Number(p.minute)}; // minutes since midnight in Israel
 function nowLine(){ // a line at the current time in today's column, when the shown week is this week
   document.querySelectorAll('#grid .nowl').forEach(e=>e.remove());
@@ -1457,7 +1456,10 @@ function renderUp(){
   $('#upSum').innerHTML=(late?`<b class="lt">${late} באיחור</b>`:'')+(late&&nx?' · ':'')+(nx?'הבא: '+dm(nx.date)+' · '+esc(nx.title):'')||'אין הגשות קרובות'; // the line next to the title while the card is closed
   $('#upDone').hidden=!S.length;$('#upDoneN').textContent='הוגשו ('+S.length+')';
   $('#upDoneL').innerHTML=S.map(x=>`<li><span class="dt">${dm(x.date)}</span><b>${esc(x.title)}</b>${stBtn(x,edit,x.title)}</li>`).join('');
-  $('#up').innerHTML=L.length?L.map(x=>`<li><button type="button" class="upgo${x.late?' late':''} ${dueCls(x)}" data-go="${x.date}"><span class="dl">${x.daysLeft===0?'היום':x.daysLeft===1?'מחר':x.daysLeft===-1?'אתמול':x.daysLeft<0?'באיחור של '+(-x.daysLeft)+' ימים':'עוד '+x.daysLeft+' ימים'}</span><span class="dt">${dm(x.date)} · ${esc(x.time)}</span><b>${esc(x.title)}</b><span class="tg">${esc(x.tag)}</span></button>${x.id?stBtn(x,edit,x.title):''}</li>`).join(''):'<li class="none">אין מבחנים או הגשות קרובים.</li>';
+  const grp=x=>x.late?'באיחור':x.daysLeft<=7?'השבוע':x.daysLeft<=30?'החודש':'אחר כך',gc=x=>x.late||x.daysLeft<=7?'g-near':x.daysLeft<=30?'g-mid':'g-far'; // urgency decides the size
+  const cc=x=>x.exam&&COURSE[x.title]?'cd c-'+COURSE[x.title]:dueCls(x),dl=x=>x.daysLeft===0?'<b class="w">היום</b>':x.daysLeft===1?'<b class="w">מחר</b>':`<b>${Math.abs(x.daysLeft)}</b><small>${x.late?'ימי איחור':'ימים'}</small>`;
+  let g='';$('#up').innerHTML=L.length?L.map(x=>{const h=grp(x)!==g?`<li class="uph">${g=grp(x)}</li>`:'';
+    return h+`<li><button type="button" class="upgo ${gc(x)}${x.late?' late':''} ${cc(x)}" data-go="${x.date}"><span class="dl">${dl(x)}</span><span class="tx"><b>${esc(x.title)}</b><span class="dt">${dm(x.date)} · ${esc(x.time)} · ${esc(x.tag)}</span></span></button>${x.id?stBtn(x,edit,x.title):''}</li>`}).join(''):'<li class="none">אין מבחנים או הגשות קרובים.</li>';
 }
 const stBusy=new Set(); // deadlines whose status save is still running
 async function setSt(id,s){
@@ -2161,7 +2163,7 @@ async function gEnd(cancel){const g=gDrag;if(!g)return;gDrag=null;gT=Date.now();
   const ev=g.ev,it=items.find(x=>x.id===ev.id);
   if(cancel||!it||g.s===ev.s&&g.e===ev.e&&g.d===ev.d){g.b.style.transform=g.b.style.height='';const t=g.b.querySelector('.tm');if(t)t.textContent=tr(ev.s,ev.e);return}
   g.b.style.transform=g.b.style.transform.replace(/ scale\([^)]*\)/,''); // it lands where it was dropped until the redraw
-  const date=addDays(viewSun,g.d),st=fm(g.s),en=fm(g.e),now=Date.now(),msg=(g.mode==='end'?'עד ':'הוזז ל-')+(g.d!==ev.d?DAYS[g.d]+' ':'')+(g.mode==='end'?fm(g.e):tr(g.s,g.e));
+  const date=addDays(viewSun,g.d),st=fm(g.s),en=fm(g.e),now=Date.now(),msg=(g.mode==='end'?'עד ':'הוזז ל-')+(g.d!==ev.d?DAYS[g.d]+' ':'')+(g.mode==='end'?fm(g.e):ltr(tr(g.s,g.e)));
   const scope=isRec(it)?await gAsk():'one';if(!scope){render();return}
   const before=new Set(items.map(x=>x.id)),{id,...rest}=it;let ok;
   if(!isRec(it))ok=await fast({id,doc:{...rest,date,start:st,end:en,updated:now}},msg);
