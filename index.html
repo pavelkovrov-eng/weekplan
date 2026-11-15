@@ -446,7 +446,8 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph .tabs{position:fixed;inset-inline:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);background:var(--bg-card);border-top:1px solid var(--border-light);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tabs button{display:grid;justify-items:center;align-content:center;gap:2px;min-height:var(--tabh);padding:6px 0;border:0;background:none;color:var(--text-muted);font-size:11px;font-weight:600;cursor:pointer}
 .tabs svg{width:24px;height:24px;padding:3px 16px;box-sizing:content-box;border-radius:999px}
-.tabs button{padding:4px 0}.tabs button[aria-current=page] svg{background:var(--accent-soft)}
+.tabs button{padding:4px 0;position:relative;z-index:1}
+#tabPill{position:absolute;z-index:0;border-radius:999px;background:var(--accent-soft);pointer-events:none} /* the pink pill under the picked tab's icon: one element that travels between tabs (tabPill()) */
 .ph .tabs{background:color-mix(in srgb,var(--bg-card) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px)}
 .tabs button[aria-current=page]{color:var(--accent-text)}
 /* day view */
@@ -517,7 +518,8 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 :is(.btn,.nav>button,.nav .seg button,.dstrip button,.stb,.obopt,.chips label):active:not(:disabled){transform:scale(.96)}
 :is(.upgo,button.dlb):active:not(:disabled){transform:scale(.98)}
 /* tab bar (iOS): the screen cuts at once, the motion is in the icon: it dips to .85 under the finger and springs back, the picked tab's icon pops once (pop() in the #tabs listener), its body fills (.bd) and its colour fades in */
-.tabs button{transition:color .2s ease-out}.tabs svg{transition:transform .4s var(--ez-spring),background-color .2s ease-out}.tabs button:active:not(:disabled) svg{transform:scale(.85);transition-duration:.1s,.2s}
+.tabs button{transition:color .2s ease-out}.tabs svg{transition:transform .4s var(--ez-spring)}.tabs button:active:not(:disabled) svg{transform:scale(.85);transition-duration:.1s}
+.tabs button[aria-current=page],.tabs button[aria-current=page] .bd{transition-delay:.3s} /* the picked icon lights up when the pill reaches it */
 .tabs .bd{fill:currentColor;fill-opacity:0;transition:fill-opacity .15s ease-out}.tabs button[aria-current=page] .bd{fill-opacity:.25}
 </style>
 
@@ -1120,6 +1122,13 @@ const still=()=>matchMedia('(prefers-reduced-motion:reduce)').matches; // WAAPI 
 const EZ={out:'cubic-bezier(.32,.72,0,1)',spring:'cubic-bezier(.34,1.56,.64,1)',snap:'cubic-bezier(.2,.8,.2,1)'}; // the --ez-* curves, for WAAPI (it cannot read CSS variables)
 const shake=el=>{if(el&&!still())el.animate([0,-6,6,-4,4,0].map(x=>({transform:`translateX(${x}px)`})),{duration:400,easing:'ease-out'})}; // "no": an error or an armed two-click button
 const pop=el=>{if(el&&!still())el.animate([{transform:'scale(1)'},{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:380,easing:EZ.spring})};
+const tabPill=(()=>{let el=null,cur=null;return anim=>{ // the pill leaves the old tab, stretches toward the new one like a drop, is drawn into its icon (a little smaller) and settles; anim 0: just place it
+  const nav=$('#tabs');if(!el){el=document.createElement('i');el.id='tabPill';el.setAttribute('aria-hidden','true');nav.prepend(el)}
+  const b=PHQ.matches&&nav.querySelector('[aria-current=page] svg'),n=nav.getBoundingClientRect(),r=b&&b.getBoundingClientRect();if(!r||!r.width){el.hidden=true;cur=null;return}el.hidden=false;
+  const to={l:r.left-n.left,t:r.top-n.top,w:r.width,h:r.height},from=cur,px=o=>({left:o.l+'px',top:o.t+'px',width:o.w+'px',height:o.h+'px'});cur=to;Object.assign(el.style,px(to));
+  if(!anim||!from||still()||Math.abs(from.l-to.l)<1)return;
+  const L=Math.min(from.l,to.l),R=Math.max(from.l+from.w,to.l+to.w);
+  el.animate([{...px(from),offset:0},{...px({l:L,t:to.t+to.h*.12,w:R-L,h:to.h*.76}),offset:.45},{...px({l:to.l+to.w*.08,t:to.t+to.h*.08,w:to.w*.84,h:to.h*.84}),offset:.8},{...px(to),offset:1}],{duration:600,easing:'cubic-bezier(.3,.7,.3,1)'})}})();
 /* list motion (FLIP): after the user's own change, the rows of the day/month-day/what's-coming lists slide to their new places, a new row springs in and a removed one fades out where it was */
 let flipArm=0,flipCtx=''; // flipArm: set by saveItem/removeItem/fast; flipCtx: what was on screen, so a move to another day never animates as a change
 const FLIPL=['#dayList','#mDay .dlist','#up','#upDoneL'],flipKey=e=>e.querySelector('[data-key]')?.dataset.key||e.querySelector('[data-st]')?.dataset.st||e.textContent;
@@ -1169,7 +1178,7 @@ function render0(){
   $('#upCard').hidden=ph&&!upv;$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;document.querySelectorAll('.lg-sh').forEach(l=>l.hidden=!worksOn());$('#shCard').hidden=!worksOn();
   $('#gridCard').hidden=!wkv;$('#agCard').hidden=!wkv;$('#wkBar').hidden=true; // the phone week tab shows the two-day grid, the agenda is a closed card below it
   $('#addLbl').textContent=mon?'הוספה':day?'הוספה ליום זה':'הוספה לשבוע';$('#addBtn').hidden=upv;
-  document.querySelectorAll('#tabs [data-v]').forEach(b=>b.setAttribute('aria-current',b.dataset.v===view?'page':'false'));
+  document.querySelectorAll('#tabs [data-v]').forEach(b=>b.setAttribute('aria-current',b.dataset.v===view?'page':'false'));tabPill(1);
   {const pf=profileOf(items);$('.top h1').textContent=pf&&pf.name?'השבוע של '+pf.name:'השבוע שלי'}
   renderStore(); renderUp(); if(!$('#shCard').hidden)renderShifts();
   const pb=$('.printbar'),gh=$(mon?'#monthCard .ghead':'#gridCard .ghead');if(pb.parentNode!==gh)gh.appendChild(pb); // one print bar, in whichever card is shown
@@ -2007,7 +2016,8 @@ async function removeItem(id,msg){flipArm=Date.now();
 $('#prev').addEventListener('click',()=>{step(-1);slide(-1)});$('#next').addEventListener('click',()=>{step(1);slide(1)});
 $('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?goDay(todayIso()):go(sunOf(todayIso())));
 $('#tabAdd').addEventListener('click',()=>$('#addBtn').click()); // same per-view logic as the desktop add button
-$('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(!b)return;const o=view;setView(b.dataset.v);scrollTo(0,0);if(view!==o)pop(b.querySelector('svg'))}); // an instant cut; only the icon moves
+$('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(!b)return;const o=view;setView(b.dataset.v);scrollTo(0,0);if(view!==o&&!still())b.querySelector('svg').animate([{transform:'scale(1)'},{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:380,delay:330,easing:EZ.spring})}); // an instant cut; only the tab bar moves: the pill travels, then the icon pops
+addEventListener('resize',()=>tabPill(0));
 $('#grid').addEventListener('click',x=>{const b=x.target.closest('[data-more]');if(!b)return;x.stopPropagation();const d=b.dataset.more;dueMore.has(d)?dueMore.delete(d):dueMore.add(d);render()});
 $('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b){const o=viewDay;goDay(b.dataset.day);slide(b.dataset.day>o?1:b.dataset.day<o?-1:0);$('#dstrip [aria-pressed=true]').focus({preventScroll:true})}}); // the strip is redrawn: keep the focus on the picked day
 $('#dayList').addEventListener('click',x=>{if(x.target.closest('[data-add]')){openAdd({day:dow(viewDay)});return} // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
