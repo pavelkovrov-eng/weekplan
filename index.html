@@ -491,6 +491,13 @@ button.dlb{cursor:pointer}
   .grid,.month{min-width:0}
 }
 
+/* day rows take the colour of their course; today's rows dim when over and ring while on; a line marks the time in today's grid column */
+.dlb,.mday .dlb{background:color-mix(in srgb,var(--lc,var(--text-faint)) 9%,var(--bg-card));border-color:color-mix(in srgb,var(--lc,var(--border-light)) 22%,var(--bg-card))}
+.dli.ex .dlb,.mday .dli.ex .dlb{background:color-mix(in srgb,var(--lc) 16%,var(--bg-card))}
+.dli.past .dlb{opacity:.55}
+.dli.now .dlb,.mday .dli.now .dlb{box-shadow:inset 0 0 0 2px var(--accent)}
+.nowl{position:absolute;inset-inline:0;height:2px;background:var(--accent);z-index:3;pointer-events:none}
+.nowl::before{content:'';position:absolute;inset-inline-start:-1px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
 /* touch feel: no grey tap flash or double-tap zoom, buttons dip under the finger (not .blk/.mc/.mhandle/.col: their taps are measured) */
 html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 :is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,.upgo,button.dlb):not(:disabled){transition:transform .1s ease}
@@ -1244,8 +1251,16 @@ function renderGrid(evs,clash){
     const l=document.createElement('div');l.className='dfl';l.textContent='הגשות';g.appendChild(l) // the label sits in the hour-axis column
     DAYS.forEach((_,i)=>{const f=document.createElement('div');f.className='df';f.innerHTML=dayDue(addDays(viewSun,i));g.appendChild(f)});
   }
-  gridAxisSync(g);
+  gridRange=[lo,hi];nowLine();gridAxisSync(g);
 }
+let gridRange=[480,1200];
+const nowMin=()=>{const p={};new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jerusalem',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).forEach(x=>p[x.type]=x.value);return Number(p.hour)*60+Number(p.minute)}; // minutes since midnight in Israel
+function nowLine(){ // a line at the current time in today's column, when the shown week is this week
+  document.querySelectorAll('#grid .nowl').forEach(e=>e.remove());
+  const t=todayIso();if(viewSun!==sunOf(t))return;const n=nowMin(),[lo,hi]=gridRange;if(n<lo||n>hi)return;
+  const c=$('#grid .col[data-day="'+dow(t)+'"]');if(!c)return;const l=document.createElement('div');l.className='nowl';l.style.top=((n-lo)*PPM)+'px';c.appendChild(l)}
+function nowTick(){if(document.hidden||document.querySelector('dialog[open]'))return;if(PHQ.matches&&view==='day'&&viewDay===todayIso())render();else if(view==='week')nowLine()} // once a minute and on return: refresh only what shows the time
+setInterval(nowTick,60000);document.addEventListener('visibilitychange',nowTick);
 function gridTo(d){ // phone week grid: scroll so the column of day d is the first one (works in RTL: scrollLeft is the view position)
   const sc=$('#gridCard .scroller'),c=sc&&sc.querySelector('.col[data-day="'+dow(d)+'"]');if(c)sc.scrollLeft+=c.getBoundingClientRect().right-sc.getBoundingClientRect().right}
 function gridAxisSync(g){ // phone: copy the hour labels into the strip beside the scroller and line it up with the day columns
@@ -1288,10 +1303,11 @@ function renderDay(evs,an){ // phone day view: the week strip, the day's notes, 
 }
 function dayLi(l,clash,edit,today){ // one line of a day, as a tappable row: time column, course colour bar, title and room (the phone day view and the phone week agenda)
   {
-    const t=lineTxt(l),due=l.src==='due',tap=l.src!=='exam'&&(l.src!=='base'||edit),hit=clash.has(l.key),meta=[l.cancelled?'בוטל':'',due&&l.st!=='done'&&l.date<today?'באיחור':'',l.e>1440?'עד '+fm(l.e)+' (למחרת)':'',t.meta].filter(Boolean).join(' · ');
+    const now=l.date===today?nowMin():-1,cur=now>=0&&l.src!=='due'&&!l.cancelled&&l.s<=now&&now<l.e,past=now>=0&&l.src!=='due'&&!l.cancelled&&l.e<=now; // today's row: dimmed when over, ringed while on
+    const t=lineTxt(l),due=l.src==='due',tap=l.src!=='exam'&&(l.src!=='base'||edit),hit=clash.has(l.key),meta=[cur?'עכשיו':'',l.cancelled?'בוטל':'',due&&l.st!=='done'&&l.date<today?'באיחור':'',l.e>1440?'עד '+fm(l.e)+' (למחרת)':'',t.meta].filter(Boolean).join(' · ');
     const when=due?'עד '+fm(l.s):tr(l.s,l.e),act=l.src==='base'?l.cancelled?'החזרה':'ביטול':'עריכה';
-    return`<li class="dli${l.cancelled?' cancelled':''}${due&&l.done?' done':''}${due&&l.st!=='done'&&l.date<today?' late':''}">`
-      +`<${tap?`button type="button" data-key="${esc(l.key)}" data-date="${l.date}" aria-label="${esc(t.ttl+' · '+when+(meta?' · '+meta:'')+(edit?' · לחיצה ל'+act:''))}"`:'div'} class="dlb">`
+    return`<li class="dli${cur?' now':''}${past?' past':''}${l.src==='exam'?' ex':''}${l.cancelled?' cancelled':''}${due&&l.done?' done':''}${due&&l.st!=='done'&&l.date<today?' late':''}">`
+      +`<${tap?`button type="button" data-key="${esc(l.key)}" data-date="${l.date}" aria-label="${esc(t.ttl+' · '+when+(meta?' · '+meta:'')+(edit?' · לחיצה ל'+act:''))}"`:'div'} class="dlb" style="--lc:var(${t.col})">`
       +`<span class="tm">${due?`<span>עד</span><b>${fm(l.s)}</b>`:`<b>${fm(l.s)}</b><span>${fm(l.e)}</span>`}</span><i style="background:var(${t.col})"></i>`
       +`<span class="tx"><b>${esc(t.ttl)}</b>${meta||hit?`<span class="meta">${esc(meta)}${hit?'<span class="tag-clash">התנגשות</span>':''}</span>`:''}</span></${tap?'button':'div'}>${due?stBtn(l,edit,dueName(l)):''}</li>`; // the status pill after the row: on the left in RTL
   }
