@@ -147,7 +147,7 @@ h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;line-height:1.12;margin:0 0 
 .blk .rm{font-size:10.5px;opacity:.8;margin-top:1px}
 .blk.tight .rm{display:none}
 .c-stat{--cc:var(--c-stat)} .c-math{--cc:var(--c-math)} .c-acc{--cc:var(--c-acc)} .c-micro{--cc:var(--c-micro)} .c-data{--cc:var(--c-data)} .c-ob{--cc:var(--c-ob)} .c-eng{--cc:var(--c-eng)}
-.blk.base{cursor:default;background:color-mix(in srgb,var(--cc) 14%,var(--bg-card));border-color:color-mix(in srgb,var(--cc) 25%,var(--bg-card));border-left-color:var(--cc);color:color-mix(in srgb,var(--cc) 55%,var(--ink))}
+.blk.base{cursor:default;background:color-mix(in srgb,var(--cc) 8%,var(--bg-card));border-color:color-mix(in srgb,var(--cc) 16%,var(--bg-card));border-left-color:var(--cc);color:color-mix(in srgb,var(--cc) 35%,var(--ink))} /* quiet: the timetable is a soft tint with a course-colour edge, the user's own blocks and the exams stand out */
 .blk.base .nm{color:var(--ink)}
 .blk.k-tut{background:color-mix(in srgb,var(--cc) 6%,var(--bg-card));border-style:dashed;border-color:color-mix(in srgb,var(--cc) 55%,var(--bg-card));border-left-style:solid}
 button.blk{font:inherit;cursor:pointer;border-width:1.5px;border-left-width:4px;transition:transform .12s}
@@ -250,6 +250,8 @@ html:not(.ph) #setDlg{width:min(620px,calc(100% - 32px))} /* on a phone it is th
 .who{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;flex:none}
 .store{padding:0;width:42px;height:42px;justify-content:center;border-radius:50%;font-size:18px;line-height:1}
 .store i{display:none}
+.store[hidden]{display:none}.who .btn.ib{color:var(--text-main)}.who .btn.ib svg{width:22px;height:22px;transition:transform .4s var(--ez-spring)}.who .btn.ib:active svg{transform:scale(.85);transition-duration:.1s}.who svg.flip{transform:scaleX(-1)}.who .btn.ib:active svg.flip{transform:scaleX(-.85) scaleY(.85)} /* the header's line icons: the tab bar's style; the exit arrow points out to the left (RTL) */
+#outDlg::backdrop{background:rgb(0 0 0/.5)}
 .btn.ib,.ph .btn.ib{width:42px;height:42px;min-height:42px;padding:0;border-radius:50%;font-size:18px;line-height:1;display:inline-grid;place-items:center}
 .btn.out.armed{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad-tx)}
 .welcome{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:var(--bg-app)}
@@ -285,7 +287,9 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 .nav .wkl{font-family:var(--font-mono);font-weight:600;font-size:14px;color:var(--ink);padding-inline:6px;font-variant-numeric:tabular-nums}
 .blk.clash{outline:2px solid var(--bad-bd);outline-offset:-1px;z-index:3}
 .blk.cancelled{opacity:.6;text-decoration:line-through}
-#grid .blk{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none} /* a long press lifts the block, not a text selection */
+#grid .blk,#grid .col{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none} /* a long press lifts the block, not a text selection */
+#grid .blk.past:not(.sel){opacity:.5}
+#grid .blk.ghost{z-index:7;pointer-events:none;inset-inline:4px;background:var(--accent-soft);border:1.5px solid var(--accent);border-radius:8px;color:var(--accent-text);font:600 12px/1.3 var(--font-mono);padding:4px 8px;box-shadow:0 12px 24px -10px var(--shadow)} /* a block being drawn on an empty spot */
 #grid .blk.sel{z-index:6;box-shadow:0 0 0 2px var(--accent),0 10px 24px -8px var(--shadow)}
 #grid .blk.lift{z-index:7;transition:none;box-shadow:0 0 0 2px var(--accent),0 20px 32px -10px var(--shadow)}
 .blk .rsz{display:none;position:absolute;inset-inline:0;bottom:0;height:22px;cursor:ns-resize;touch-action:none}
@@ -538,7 +542,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <h1>השבוע שלי</h1>
     <p class="sub">מערכת הלימודים קבועה ונעולה. משמרות, אימונים ושעות למידה מוסיפים מעליה, כל שבוע או לתאריך אחד.</p>
   </div>
-  <div class="who"><button type="button" class="btn ib" id="setBtn" title="הגדרות" aria-label="הגדרות">⚙️</button><button type="button" class="btn ib" id="themeBtn">🌙</button><span class="store" id="store" role="img"><i></i><span>⏳</span></span><button type="button" class="btn ib out" id="outBtn" title="התנתקות" aria-label="התנתקות" hidden>🚪</button></div>
+  <div class="who"><button type="button" class="btn ib" id="setBtn" title="הגדרות" aria-label="הגדרות"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button><button type="button" class="btn ib" id="themeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button><span class="store" id="store" role="img"><i></i><span>⏳</span></span><button type="button" class="btn ib out" id="outBtn" title="התנתקות" aria-label="התנתקות" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="flip" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
 </header>
 
 <div class="bar">
@@ -734,6 +738,16 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   </form>
 </dialog>
 
+<dialog id="outDlg" tabindex="-1" aria-labelledby="outT">
+  <div class="dlg">
+    <h3 id="outT">לצאת מהחשבון?</h3>
+    <div class="hint">הנתונים שלך שמורים. כדי לראות אותם שוב תתחבר עם Google.</div>
+    <div class="actions">
+      <button type="button" class="btn del armed" id="outYes">כן, לצאת</button>
+      <button type="button" class="btn" id="outNo">לא</button>
+    </div>
+  </div>
+</dialog>
 <dialog id="setDlg" autofocus aria-labelledby="setTitle">
   <div class="dlg">
     <div class="sethead"><h3 id="setTitle">הגדרות</h3><button type="button" class="btn ib" id="setClose" title="סגירה" aria-label="סגירה">✕</button></div>
@@ -1215,7 +1229,8 @@ function render0(){
 }
 function renderStore(){
   const m={loading:['ld','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],sb:['db','נשמר בחשבון Google'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
-  const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent={loading:'⏳',db:'☁️',srv:'🖥️',gh:'☁️',sb:'☁️',local:'💾',ro:'👁️'}[mode]||'⏳';el.title=m[1];el.setAttribute('aria-label',m[1]);$('#obLink').hidden=$('#outBtn').hidden=mode!=='sb';$('#ghLink').hidden=mode==='srv'||mode==='db'||mode==='sb';$('#sbLink').hidden=mode==='srv'||mode==='db';
+  const el=$('#store');el.className='store '+m[0];el.lastElementChild.textContent={loading:'⏳',db:'☁️',srv:'🖥️',gh:'☁️',sb:'☁️',local:'💾',ro:'👁️'}[mode]||'⏳';el.title=m[1];el.setAttribute('aria-label',m[1]);el.hidden=m[0]==='db'; // a normal save needs no badge: only loading, read-only and this-browser-only show
+  $('#obLink').hidden=$('#outBtn').hidden=mode!=='sb';$('#ghLink').hidden=mode==='srv'||mode==='db'||mode==='sb';$('#sbLink').hidden=mode==='srv'||mode==='db';
 }
 function renderSum(s,an){
   const cells=[
@@ -1259,7 +1274,7 @@ function renderGrid(evs,clash){
   let lo=480,hi=1200;
   evs.forEach(e=>{lo=Math.min(lo,Math.floor(e.s/60)*60);hi=Math.max(hi,Math.ceil(e.e/60)*60)});
   lo=Math.max(360,lo);hi=Math.min(1620,hi);
-  const H=(hi-lo)*PPM, g=$('#grid'), ro=!canEdit();
+  const H=(hi-lo)*PPM, g=$('#grid'), ro=!canEdit(), tdy=todayIso(), nmin=nowMin();
   g.innerHTML='';
   g.appendChild(document.createElement('div'));
   DAYS.forEach((d,i)=>{
@@ -1286,6 +1301,7 @@ function renderGrid(evs,clash){
       else{b.className='blk base k-'+ev.kind+' c-'+ev.course+(ev.moed==='ב'?' m2':'');
         if(bb){b.type='button';b.setAttribute('aria-label',`${ev.title} · ${BKIND[ev.kind]||'אנגלית'} · ${tr(ev.s,ev.e)} · לחיצה ל${ev.cancelled?'החזרה':'ביטול'}`);b.addEventListener('click',x=>{x.stopPropagation();openCancel(ev)})}}
       if(clash.has(ev.key))b.classList.add('clash');
+      if(ev.date<tdy||ev.date===tdy&&ev.e<=nmin)b.classList.add('past'); // over: dimmed (nowTick redraws the week every minute)
       if(hgt<64)b.classList.add('tight');
       const w=`(100% - 8px) / ${ev.lanes}`;
       b.style.cssText=`top:${(s-lo)*PPM}px;height:${hgt}px;width:calc(${w} - 3px);inset-inline-start:calc(4px + ${ev.lane} * (${w}))`;
@@ -1303,7 +1319,7 @@ function renderGrid(evs,clash){
       col.appendChild(b);
     });
     col.addEventListener('click',x=>{
-      if(ro||x.target.closest('.blk'))return;
+      if(ro||x.target.closest('.blk')||Date.now()-gT<500)return; // gT: a drawn block already opened the dialog
       const r=col.getBoundingClientRect();let m=lo+Math.round((x.clientY-r.top)/PPM/15)*15;
       openAdd({day:i,start:Math.min(m,1425)});
     });
@@ -1321,7 +1337,7 @@ function nowLine(){ // a line at the current time in today's column, when the sh
   document.querySelectorAll('#grid .nowl').forEach(e=>e.remove());
   const t=todayIso();if(viewSun!==sunOf(t))return;const n=nowMin(),[lo,hi]=gridRange;if(n<lo||n>hi)return;
   const c=$('#grid .col[data-day="'+dow(t)+'"]');if(!c)return;const l=document.createElement('div');l.className='nowl';l.style.top=((n-lo)*PPM)+'px';c.appendChild(l)}
-function nowTick(){if(document.hidden||document.querySelector('dialog[open]'))return;if(PHQ.matches&&view==='day'&&viewDay===todayIso())render();else if(view==='week')nowLine()} // once a minute and on return: refresh only what shows the time
+function nowTick(){if(document.hidden||document.querySelector('dialog[open]'))return;if(PHQ.matches&&view==='day'&&viewDay===todayIso())render();else if(view==='week'&&!gDrag&&!gPend)render()} // the week: the now line and the dimmed past // once a minute and on return: refresh only what shows the time
 setInterval(nowTick,60000);document.addEventListener('visibilitychange',nowTick);
 function gridTo(d){ // phone week grid: scroll so the column of day d is the first one (works in RTL: scrollLeft is the view position)
   const sc=$('#gridCard .scroller'),c=sc&&sc.querySelector('.col[data-day="'+dow(d)+'"]');if(c)sc.scrollLeft+=c.getBoundingClientRect().right-sc.getBoundingClientRect().right}
@@ -1514,6 +1530,7 @@ function openAdd(pre={}){
   if(pre.start!=null){const dur=last?span(last.start,last.end).reduce((a,b)=>b-a):180;$('#fStart').value=fm(pre.start);$('#fEnd').value=fm(pre.start+dur)}
   else if(last){$('#fStart').value=last.start;$('#fEnd').value=last.end}
   else{$('#fStart').value='18:00';$('#fEnd').value='21:00'}
+  if(pre.start!=null&&pre.end!=null)$('#fEnd').value=fm(pre.end); // a block drawn in the grid
   addTimes={s:$('#fStart').value,e:$('#fEnd').value};endTouched=false;prevS=$('#fStart').value;prevE=$('#fEnd').value;preKey='';
   setWeek('date'); // a new item is one date unless "חוזר כל שבוע" is ticked
   dated=isDated();$('#fDate').value=clampDay(addDays(sun,Number($('#fDay').value)));$('#fCourse').value='';$('#fStatus').value='todo';
@@ -1911,18 +1928,15 @@ $('#setWipe').addEventListener('click',async()=>{ // two clicks: the first arms 
 });
 const THEME_LS='wp.theme';
 function themeNow(){return document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}
-function themeShow(){const d=themeNow()==='dark',b=$('#themeBtn');for(const m of document.querySelectorAll('meta[name=theme-color]'))m.content=d?'#0b111c':'#f4f7f9';b.textContent=d?'☀️':'🌙';b.title=b.dataset.t=d?'מעבר למצב בהיר':'מעבר למצב כהה';b.setAttribute('aria-label',b.title)}
+const TH_SV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',TH_MOON=TH_SV+'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',TH_SUN=TH_SV+'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>'; // line icons in the tab bar's style
+function themeShow(){const d=themeNow()==='dark',b=$('#themeBtn');for(const m of document.querySelectorAll('meta[name=theme-color]'))m.content=d?'#0b111c':'#f4f7f9';b.innerHTML=d?TH_SUN:TH_MOON;b.title=b.dataset.t=d?'מעבר למצב בהיר':'מעבר למצב כהה';b.setAttribute('aria-label',b.title)}
 try{const t=localStorage.getItem(THEME_LS);if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}
-$('#themeBtn').addEventListener('click',()=>{const n=themeNow()==='dark'?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem(THEME_LS,n)}catch(e){}themeShow()});
+$('#themeBtn').addEventListener('click',()=>{const n=themeNow()==='dark'?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem(THEME_LS,n)}catch(e){}themeShow();if(!still())$('#themeBtn svg').animate([{transform:'rotate(-180deg) scale(.4)',opacity:0},{transform:'none',opacity:1}],{duration:520,easing:EZ.spring})}); // the new icon turns in
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',themeShow);
 themeShow();
-let outArm=0;
-$('#outBtn').addEventListener('click',()=>{ // two clicks: the first only arms the button (signing out clears this device's cached data)
-  const b=$('#outBtn');
-  if(outArm){outArm=0;sbSignOut();return}
-  outArm=Date.now();b.classList.add('armed');shake(b);b.textContent='⚠️';b.title='לחץ שוב להתנתקות';
-  setTimeout(()=>{outArm=0;b.classList.remove('armed');b.textContent='🚪';b.title='התנתקות'},4000);
-});
+const outDlg=$('#outDlg');$('#outBtn').addEventListener('click',()=>{outDlg.showModal();outDlg.focus()}); // the focus is on the window, never on "כן" (Enter must not sign out) // a question in a window that grows out of the button (signing out clears this device's cached data)
+$('#outNo').addEventListener('click',()=>outDlg.close());outDlg.addEventListener('click',x=>{if(x.target===outDlg)outDlg.close()});
+$('#outYes').addEventListener('click',()=>{outDlg.dataset.noanim='1';outDlg.close();delete outDlg.dataset.noanim;sbSignOut()});
 $('#sbMove').addEventListener('click',async()=>{ // one-time: copy the items of the GitHub store into this account (ids that already exist are kept as they are)
   const b=$('#sbMove');b.disabled=true;$('#sbErr').hidden=true;
   try{
@@ -2108,7 +2122,7 @@ addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('b
   const origin=(d,el)=>{const r=d.getBoundingClientRect(),b=el&&el.isConnected?el.getBoundingClientRect():null;d.style.transformOrigin=(b?b.left+b.width/2-r.left:r.width/2)+'px '+(b?b.top+b.height/2-r.top:r.height/2)+'px'};
   const back=on=>{const h=document.documentElement;if(on&&PHQ.matches&&!still()){$('.wrap').style.transformOrigin='50% '+(scrollY+innerHeight/2)+'px';h.classList.add('dlgo')}else if(!on)h.classList.remove('dlgo')}; // the page behind a dialog steps back (phone)
   addEventListener('close',()=>{if(!document.querySelector('dialog[open]'))back(0)},true); // Esc closes without our close()
-  HTMLDialogElement.prototype.showModal=function(){sm.call(this);this._from=lastBtn;back(1);
+  HTMLDialogElement.prototype.showModal=function(){sm.call(this);if(this.hasAttribute('autofocus')){this.tabIndex=-1;this.focus()}this._from=lastBtn;back(1); // autofocus on a dialog is not honoured everywhere: the window itself takes the focus, not its first button
     if(lastBtn&&lastBtn.id==='tabAdd'){ghost(lastBtn,1);this.addEventListener('close',()=>ghost(null,0),{once:true})}
     if(still())return;
     try{const m=morph(this,lastBtn);if(m)setTimeout(()=>m.o.remove(),800);else{origin(this,lastBtn);this.animate([{opacity:0,transform:'scale(.3)'},{opacity:1,transform:'none'}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'})}}catch(e){}};
@@ -2127,7 +2141,12 @@ const q15=m=>Math.round(m/15)*15,gMin=(col,y)=>gridRange[0]+(y-col.getBoundingCl
 function gBegin(b,mode,x,y){const ev=b._ev;if(!ev||!b.isConnected)return;
   gDrag={b,ev,col:b.parentElement,mode,x,y,off:gMin(b.parentElement,y)-ev.s,s:ev.s,e:ev.e,d:ev.d};
   gSel=ev.key;document.querySelectorAll('#grid .blk.sel').forEach(k=>k!==b&&k.classList.remove('sel'));b.classList.add('sel','lift');gApply();gLoop()}
-function gApply(){const g=gDrag;if(!g)return;const ev=g.ev,len=ev.e-ev.s,[lo,hi]=gridRange;let c=g.col;
+function gNew(col,x,y){const a=Math.max(gridRange[0],Math.min(q15(gMin(col,y)),gridRange[1]-15)),k=document.createElement('div');k.className='blk ghost';col.appendChild(k); // draw a new block: from the held spot to the finger
+  gSel='';gDrag={mode:'new',col,ghost:k,a,x,y,s:a,e:a+60,d:+col.dataset.day};gApply();gLoop()}
+function gApply(){const g=gDrag;if(!g)return;
+  if(g.mode==='new'){const[lo,hi]=gridRange,m=Math.max(lo,Math.min(q15(gMin(g.col,g.y)),hi));if(Math.abs(g.y-g.y0)>6||g.moved){g.moved=1;g.s=Math.min(g.a,m);g.e=Math.max(g.a+15,m);if(m<g.a)g.e=g.a+15} // a hold alone gives one hour
+    Object.assign(g.ghost.style,{top:(g.s-lo)*PPM+'px',height:((g.e-g.s)*PPM-2)+'px'});g.ghost.textContent=tr(g.s,g.e);return}
+  const ev=g.ev,len=ev.e-ev.s,[lo,hi]=gridRange;let c=g.col;
   if(g.mode==='move'){const h=[...document.querySelectorAll('#grid .col')].find(k=>{const r=k.getBoundingClientRect();return g.x>=r.left&&g.x<r.right});if(h)c=h;
     g.s=Math.max(lo,Math.min(q15(gMin(c,g.y)-g.off),hi-len,1425));g.e=g.s+len;g.d=+c.dataset.day}
   else g.e=Math.max(g.s+15,Math.min(q15(gMin(g.col,g.y)),hi,g.s+1425));
@@ -2136,7 +2155,9 @@ function gApply(){const g=gDrag;if(!g)return;const ev=g.ev,len=ev.e-ev.s,[lo,hi]
   const t=g.b.querySelector('.tm');if(t)t.textContent=tr(g.s,g.e)}
 function gLoop(){const g=gDrag;if(!g)return;const v=g.y<70?-1:g.y>innerHeight-(PHQ.matches?130:70)?1:0;if(v){scrollBy(0,v*8);gApply()}requestAnimationFrame(gLoop)} // near the top or bottom edge the page scrolls with the block
 const gAsk=()=>new Promise(res=>{const d=$('#mvDlg');d.onclick=x=>{const b=x.target.closest('[data-mv]');if(b||x.target===d){res(b&&b.dataset.mv||null);d.close()}};d.addEventListener('close',()=>res(null),{once:true});d.showModal()}); // answers on the click itself: the close event can come late (a hidden page); Esc = no
-async function gEnd(cancel){const g=gDrag;if(!g)return;gDrag=null;gT=Date.now();g.b.classList.remove('lift');
+async function gEnd(cancel){const g=gDrag;if(!g)return;gDrag=null;gT=Date.now();
+  if(g.mode==='new'){if(cancel){g.ghost.remove();return}lastBtn=g.ghost;openAdd({day:g.d,start:g.s,end:g.e});setTimeout(()=>g.ghost.remove(),650);return} // the dialog grows out of the drawn block
+  g.b.classList.remove('lift');
   const ev=g.ev,it=items.find(x=>x.id===ev.id);
   if(cancel||!it||g.s===ev.s&&g.e===ev.e&&g.d===ev.d){g.b.style.transform=g.b.style.height='';const t=g.b.querySelector('.tm');if(t)t.textContent=tr(ev.s,ev.e);return}
   g.b.style.transform=g.b.style.transform.replace(/ scale\([^)]*\)/,''); // it lands where it was dropped until the redraw
@@ -2149,7 +2170,8 @@ async function gEnd(cancel){const g=gDrag;if(!g)return;gDrag=null;gT=Date.now();
   if(!ok){render();return}
   toast(msg,{label:'בטל',fn:async()=>{const add=items.find(x=>!before.has(x.id));if(add)await fast({id:add.id,doc:null},'בוטל');await fast({id,doc:{...rest,updated:Date.now()}},'ההזזה בוטלה')}})}
 const gGrid=$('#grid'),gBlk=t=>t.closest&&t.closest('#grid .blk[data-key]');
-gGrid.addEventListener('touchstart',x=>{if(!canEdit()||x.touches.length!==1)return;const t=x.touches[0],b=gBlk(x.target);if(!b)return;const h=!!x.target.closest('.rsz'),x0=t.clientX,y0=t.clientY;
+gGrid.addEventListener('touchstart',x=>{if(!canEdit()||x.touches.length!==1)return;const t=x.touches[0],b=gBlk(x.target);
+  if(!b){const col=x.target.closest('#grid .col');if(col&&!x.target.closest('.blk')){const x0=t.clientX,y0=t.clientY;gPend={x0,y0,t:setTimeout(()=>{gPend=null;gNew(col,x0,y0);gDrag.y0=y0},400)}}return} // hold an empty spot: draw a blockconst h=!!x.target.closest('.rsz'),x0=t.clientX,y0=t.clientY;
   gPend={b,h,x0,y0,now:h||b.classList.contains('sel'),t:h||b.classList.contains('sel')?0:setTimeout(()=>{gPend=null;gBegin(b,'move',x0,y0)},400)}},{passive:true});
 gGrid.addEventListener('touchmove',x=>{const t=x.touches[0],p=gPend;
   if(p&&Math.hypot(t.clientX-p.x0,t.clientY-p.y0)>6){gPend=null;clearTimeout(p.t);if(p.now)gBegin(p.b,p.h?'end':'move',p.x0,p.y0)} // a hold that moves early is a scroll; a picked block moves at once
@@ -2157,7 +2179,9 @@ gGrid.addEventListener('touchmove',x=>{const t=x.touches[0],p=gPend;
 gGrid.addEventListener('touchend',()=>{if(gPend){clearTimeout(gPend.t);gPend=null}if(gDrag)gEnd()},{passive:true});
 gGrid.addEventListener('touchcancel',()=>{if(gPend){clearTimeout(gPend.t);gPend=null}if(gDrag)gEnd(1)},{passive:true});
 gGrid.addEventListener('contextmenu',x=>{if(gBlk(x.target))x.preventDefault()});
-gGrid.addEventListener('mousedown',x=>{if(x.button||!canEdit())return;const b=gBlk(x.target);if(!b)return;const h=!!x.target.closest('.rsz'),x0=x.clientX,y0=x.clientY;let on=0;if(h)x.preventDefault();
+gGrid.addEventListener('mousedown',x=>{if(x.button||!canEdit())return;const b=gBlk(x.target);
+  if(!b){const col=x.target.closest('#grid .col');if(!col||x.target.closest('.blk'))return;const x0=x.clientX,y0=x.clientY;let on=0; // drag on an empty spot draws a block; a plain click still opens the dialog at that time
+    const mv=e=>{if(!on){if(Math.abs(e.clientY-y0)<6)return;on=1;gNew(col,x0,y0);gDrag.y0=y0}if(gDrag){gDrag.x=e.clientX;gDrag.y=e.clientY;gApply()}},up=()=>{removeEventListener('mousemove',mv);removeEventListener('mouseup',up);if(on)gEnd()};addEventListener('mousemove',mv);addEventListener('mouseup',up);return}const h=!!x.target.closest('.rsz'),x0=x.clientX,y0=x.clientY;let on=0;if(h)x.preventDefault();
   const mv=e=>{if(!on){if(Math.hypot(e.clientX-x0,e.clientY-y0)<5)return;on=1;gBegin(b,h?'end':'move',x0,y0)}if(gDrag){gDrag.x=e.clientX;gDrag.y=e.clientY;gApply()}},
     up=()=>{removeEventListener('mousemove',mv);removeEventListener('mouseup',up);if(on)gEnd()};addEventListener('mousemove',mv);addEventListener('mouseup',up)});
 addEventListener('keydown',x=>{if(x.key==='Escape'&&gDrag)gEnd(1)});
