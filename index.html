@@ -14,6 +14,7 @@
 <style>
 /* Layout: header, a dated week bar (prev · range · next · today · add), an upcoming exams/deadlines card, one summary strip, an attention list, the 7-day grid (Sun→Sat, right to left, past midnight when needed), a day-by-day agenda, then the calendar-export card. The course base is locked; personal blocks layer on top, weekly or on one date. */
 :root{
+  --ez-out:cubic-bezier(.32,.72,0,1); --ez-spring:cubic-bezier(.34,1.56,.64,1); --ez-snap:cubic-bezier(.2,.8,.2,1); /* motion curves (iOS-like), the same in every theme; JS copies them in EZ */
   --bg-app:#f4f7f9; --bg-card:#ffffff; --bg-sunk:#f8fafc;
   --ink:#0f172a; --text-main:#1e293b; --text-muted:#64748b; --text-faint:#94a3b8;
   --border-light:#e2e8f0; --border-dark:#cbd5e1;
@@ -509,7 +510,9 @@ button.dlb{cursor:pointer}
 .nowl::before{content:'';position:absolute;inset-inline-start:-1px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
 /* touch feel: no grey tap flash or double-tap zoom, buttons dip under the finger (not .blk/.mc/.mhandle/.col: their taps are measured) */
 html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,.upgo,button.dlb):not(:disabled){transition:transform .1s ease}
+:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,.upgo,button.dlb):not(:disabled){transition:transform .4s var(--ez-spring)} /* down fast (the :active rule), back up with a small spring */
+:is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label,.upgo,button.dlb):active:not(:disabled){transition-duration:.08s}
+.ph .wrap{transition:transform .5s var(--ez-out)}.ph.dlgo .wrap{transform:scale(.95)} /* the page steps back behind an open dialog (class dlgo, set in the dialog-motion IIFE) */
 :is(.btn,.nav>button,.nav .seg button,.dstrip button,.tabs button,.stb,.obopt,.chips label):active:not(:disabled){transform:scale(.96)}
 :is(.upgo,button.dlb):active:not(:disabled){transform:scale(.98)}
 </style>
@@ -1110,6 +1113,23 @@ function opNoop(store,op){return JSON.stringify(applyOp(store,op))===JSON.string
 </script>
 <script>
 const still=()=>matchMedia('(prefers-reduced-motion:reduce)').matches; // WAAPI animations ignore the CSS reduced-motion rule, so they ask this
+const EZ={out:'cubic-bezier(.32,.72,0,1)',spring:'cubic-bezier(.34,1.56,.64,1)',snap:'cubic-bezier(.2,.8,.2,1)'}; // the --ez-* curves, for WAAPI (it cannot read CSS variables)
+const shake=el=>{if(el&&!still())el.animate([0,-6,6,-4,4,0].map(x=>({transform:`translateX(${x}px)`})),{duration:400,easing:'ease-out'})}; // "no": an error or an armed two-click button
+const pop=el=>{if(el&&!still())el.animate([{transform:'scale(1)'},{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:380,easing:EZ.spring})};
+/* list motion (FLIP): after the user's own change, the rows of the day/month-day/what's-coming lists slide to their new places, a new row springs in and a removed one fades out where it was */
+let flipArm=0,flipCtx=''; // flipArm: set by saveItem/removeItem/fast; flipCtx: what was on screen, so a move to another day never animates as a change
+const FLIPL=['#dayList','#mDay .dlist','#up','#upDoneL'],flipKey=e=>e.querySelector('[data-key]')?.dataset.key||e.querySelector('[data-st]')?.dataset.st||e.textContent;
+function flipPrep(){const ctx=view+viewDay+monthSel+viewSun,on=flipArm&&Date.now()-flipArm<8000&&ctx===flipCtx&&!still();flipCtx=ctx;if(!on)return null;flipArm=0;
+  return FLIPL.map(sel=>{const u=$(sel),m=new Map();if(!u||!u.getBoundingClientRect().height)return null;const ur=u.getBoundingClientRect();for(const li of u.children){const r=li.getBoundingClientRect();if(r.height)m.set(flipKey(li),{r,li})}return{sel,ur,m}}).filter(Boolean)}
+function flipRun(P){if(!P)return;
+  for(const{sel,ur:u0,m}of P){const u=$(sel);if(!u)continue;const ur=u.getBoundingClientRect(),seen=new Set();
+    for(const li of u.children){const r=li.getBoundingClientRect();if(!r.height)continue;const k=flipKey(li),o=m.get(k);
+      if(o){seen.add(k);const dy=o.r.top-r.top;if(Math.abs(dy)>1)li.animate([{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:340,easing:EZ.out})}
+      else li.animate([{opacity:0,transform:'translateY(-10px) scale(.96)'},{opacity:1,transform:'none'}],{duration:450,easing:EZ.spring})}
+    for(const[k,o]of m){if(seen.has(k))continue;const c=o.li;if(getComputedStyle(u).position==='static')u.style.position='relative'; // the old row, put back over its old place
+      Object.assign(c.style,{position:'absolute',top:(o.r.top-ur.top-u.clientTop)+'px',left:(o.r.left-ur.left-u.clientLeft)+'px',width:o.r.width+'px',margin:'0',pointerEvents:'none'});u.appendChild(c);
+      c.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.92)'}],{duration:260,easing:EZ.out,fill:'forwards'}).onfinish=()=>c.remove()}}}
+const fadeIn=()=>{if(still())return;document.querySelectorAll('.wrap>:is(.card,.sum,.att,.wkbar):not([hidden])').forEach(e=>e.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:180,easing:EZ.out}))}; // a tab switch: the cards rise in, the tab bar stays
 const PHQ=matchMedia('(max-width:600px)'); // phone width: day view + tab bar (class ph on <html>)
 let items=[], viewSun=clampSun(sunOf(todayIso())), viewDay=clampDay(todayIso()), viewYm=clampYm(ymOf(todayIso())), wkGrid=false, dayL=[], view=(()=>{try{const v=localStorage.getItem('wp.view');return v==='month'?v:PHQ.matches&&v!=='week'?'day':'week'}catch(e){return PHQ.matches?'day':'week'}})(), editSun=null, mode='loading', db=null, editing=null, timesTouched=false, delArmed=0, addTimes=null;
 const canEdit=()=>mode==='db'||mode==='local'||mode==='srv'||mode==='gh'||mode==='sb'; // srv = the local server (python3 server.py), gh = GitHub contents API
@@ -1117,7 +1137,7 @@ function go(sun){viewSun=clampSun(sun);render();if(document.activeElement?.match
 function goMonth(ym){viewYm=clampYm(ym);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goDay(d){viewDay=clampDay(d);viewSun=sunOf(viewDay);viewYm=clampYm(ymOf(viewDay));render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()} // the three stay in step, so week and month tabs open on the picked day
 const emptyDay=(date,edit)=>{const off=!!(offDoc(date,items)||CAL[date]&&CAL[date].off);return`<li class="none"><span class="em" aria-hidden="true">${off?'🎉':dow(date)===6?'😴':'🌤️'}</span><b>${off?'לימודים בוטלו':'יום פנוי'}</b>${edit?'<button type="button" class="btn" data-add>הוספה ליום הזה</button>':''}</li>`}; // an empty day, with the add button in it
-const slide=d=>{if(still()||!d||!PHQ.matches||view!=='day')return;for(const e of [$('#dayHead'),$('#dayList')])e.animate([{opacity:0,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.8,.2,1)'})}; // the new day enters from the side the finger came from
+const slide=d=>{if(still()||!d||!PHQ.matches||view!=='day')return;for(const e of [$('#dayHead'),$('#dayList')])e.animate([{opacity:0,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:220,easing:EZ.snap})}; // the new day enters from the side the finger came from
 const step=n=>view==='month'?goMonth(addMonths(viewYm,n)):view==='day'?goDay(addDays(viewDay,n)):go(addDays(viewSun,7*n));
 function setView(v,date){ // v: day|week|month|up (day and up only on a phone); date: open the day view on that date
   if(v===view&&date==null)return;
@@ -1131,7 +1151,8 @@ function setView(v,date){ // v: day|week|month|up (day and up only on a phone); 
 /* ---------- render ---------- */
 let agAuto=0,legAuto=0,agL={},wkSeen=''; // wkSeen: the week whose grid was last scrolled to the picked day
 let agAuto0; // agL: the phone agenda's lines by date|key, for taps
-function render(){
+function render(){const f=flipPrep();render0();flipRun(f)} // the lists animate only after the user's own change (flipArm)
+function render0(){
   const ph=PHQ.matches; if(ph&&!legAuto){legAuto=1;document.querySelectorAll('.mleg').forEach(m=>m.open=false)} // the long legend starts folded on a phone
   const day=ph&&view==='day', upv=ph&&view==='up', mon=view==='month', wkv=!mon&&!day&&!upv; // phone views: day, week, month, up (what's coming)
   document.documentElement.classList.toggle('ph',ph);if(!wkv)wkSeen='';
@@ -1403,7 +1424,7 @@ async function setSt(id,s){
   const b=document.querySelector(`[data-st="${id}"]`);if(b)b.focus(); // the lists are redrawn: keep the keyboard on the same button
 }
 $('#up').addEventListener('click',x=>{const b=x.target.closest('[data-go]');if(!b)return;if(PHQ.matches){setView('day',b.dataset.go);scrollTo(0,0);return}if(view==='month')viewYm=clampYm(ymOf(b.dataset.go));go(sunOf(b.dataset.go))});
-document.addEventListener('click',x=>{const b=x.target.closest('[data-st]');if(b&&!b.disabled)setSt(b.dataset.st,b.dataset.s==='done'?'todo':'done')}); // one tap flips the status (there are only two)
+document.addEventListener('click',x=>{const b=x.target.closest('[data-st]');if(b&&!b.disabled){const id=b.dataset.st;setSt(id,b.dataset.s==='done'?'todo':'done');pop(document.querySelector(`[data-st="${id}"]`))}}); // sb redraws at once, so the pop lands on the new pill // one tap flips the status (there are only two)
 $('#agenda').addEventListener('click',x=>{
   const k=x.target.closest('[data-key]'),kl=k&&agL[k.dataset.date+'|'+k.dataset.key];
   if(kl){if(kl.src==='base')openCancel(kl);else openEdit(kl.id);return} // a phone agenda row acts like a day-view row
@@ -1520,14 +1541,14 @@ $('#fPre').addEventListener('click',x=>{const b=x.target.closest('button');if(!b
 $('#fCancel').addEventListener('click',()=>dlg.close());$('#dlgX').addEventListener('click',()=>dlg.close());
 function resetDel(){delArmed=0;const b=$('#fDel');b.classList.remove('armed');b.textContent='מחיקה'}
 $('#fDel').addEventListener('click',async()=>{
-  if(!delArmed){delArmed=Date.now();const b=$('#fDel');b.classList.add('armed');b.textContent='לחץ שוב למחיקה';setTimeout(()=>{if(delArmed&&Date.now()-delArmed>=3900)resetDel()},4000);return}
+  if(!delArmed){delArmed=Date.now();const b=$('#fDel');b.classList.add('armed');b.textContent='לחץ שוב למחיקה';shake(b);setTimeout(()=>{if(delArmed&&Date.now()-delArmed>=3900)resetDel()},4000);return}
   const id=editing;dlg.close();await removeItem(id);
 });
 const outOfView=date=>view==='month'?ymOf(date)!==viewYm:sunOf(date)!==viewSun; // the view never jumps to a saved date
 const dMsg=(date,dflt,sfx='')=>(outOfView(date)?'נשמר ל-'+dm(date):dflt)+sfx;
 frm.addEventListener('submit',async x=>{
   x.preventDefault();const d=readForm(),err=validate(d);
-  if(err){$('#fErr').textContent=err;$('#fErr').hidden=false;return}
+  if(err){$('#fErr').textContent=err;$('#fErr').hidden=false;$('#fErr').scrollIntoView({block:'nearest'});shake($('#fErr'));return}
   const prev=editing&&items.find(it=>it.id===editing);
   $('#fSave').disabled=true;let ok;
   if(prev&&isRec(prev)&&(d.week==='date'||d.kind==='due')){
@@ -1538,7 +1559,7 @@ frm.addEventListener('submit',async x=>{
     const m=editing?'עודכן':doc.date?'נוסף ל-'+dm(doc.date):'נוסף ל'+WKN[doc.week];
     ok=await saveItem(editing,doc,doc.date?dMsg(doc.date,m):m);
   }
-  $('#fSave').disabled=false;if(ok)dlg.close();else{$('#fErr').textContent='השמירה לא הצליחה. בדוק את החיבור ונסה שוב.';$('#fErr').hidden=false}
+  $('#fSave').disabled=false;if(ok)dlg.close();else{$('#fErr').textContent='השמירה לא הצליחה. בדוק את החיבור ונסה שוב.';$('#fErr').hidden=false;$('#fErr').scrollIntoView({block:'nearest'});shake($('#fErr'))}
 });
 $('#fSkip').addEventListener('click',async()=>{
   const it=items.find(x=>x.id===editing),date=$('#fSkip').dataset.date;if(!it||!date)return;
@@ -1849,7 +1870,7 @@ $('#setBackup').addEventListener('click',()=>offer('weekplan-backup-'+todayIso()
 let wipeArm=0;
 $('#setWipe').addEventListener('click',async()=>{ // two clicks: the first arms it for 4 s
   const b=$('#setWipe');
-  if(!wipeArm){wipeArm=Date.now();b.classList.add('armed');b.textContent='לחץ שוב: זה מוחק הכול';setTimeout(()=>{wipeArm=0;b.classList.remove('armed');b.textContent='מחיקת כל הנתונים שלי'},4000);return}
+  if(!wipeArm){wipeArm=Date.now();b.classList.add('armed');b.textContent='לחץ שוב: זה מוחק הכול';shake(b);setTimeout(()=>{wipeArm=0;b.classList.remove('armed');b.textContent='מחיקת כל הנתונים שלי'},4000);return}
   wipeArm=0;b.disabled=true;
   try{
     if(mode==='sb'){await sbFetch('/rest/v1/items?id=not.is.null',{method:'DELETE',headers:{Prefer:'return=minimal'}});await sbSignOut();return}
@@ -1868,7 +1889,7 @@ let outArm=0;
 $('#outBtn').addEventListener('click',()=>{ // two clicks: the first only arms the button (signing out clears this device's cached data)
   const b=$('#outBtn');
   if(outArm){outArm=0;sbSignOut();return}
-  outArm=Date.now();b.classList.add('armed');b.textContent='⚠️';b.title='לחץ שוב להתנתקות';
+  outArm=Date.now();b.classList.add('armed');shake(b);b.textContent='⚠️';b.title='לחץ שוב להתנתקות';
   setTimeout(()=>{outArm=0;b.classList.remove('armed');b.textContent='🚪';b.title='התנתקות'},4000);
 });
 $('#sbMove').addEventListener('click',async()=>{ // one-time: copy the items of the GitHub store into this account (ids that already exist are kept as they are)
@@ -1949,7 +1970,7 @@ function maybeOnboard(){ // a new account with no data: ask the opening question
   if(obAsked||mode!=='sb'||profileOf(items)||items.length||obDlg.open)return;
   obAsked=true;openOb(true);
 }
-async function saveItem(id,data,msg){
+async function saveItem(id,data,msg){flipArm=Date.now();
   if(mode==='sb'){const ok=await sbSave({id:id||newId(),doc:data});if(ok)toast(msg||(id?'עודכן':'נוסף'));return ok}
   if(mode==='gh'){const ok=await ghSave({id:id||newId(),doc:data});if(ok)toast(msg||(id?'עודכן':'נוסף'));return ok}
   if(mode==='srv'){const ok=await srvCall(id?'PUT':'POST',id?'/'+id:'',data);if(ok)toast(msg||(id?'עודכן':'נוסף'));return ok}
@@ -1966,12 +1987,12 @@ async function saveItem(id,data,msg){
 }
 async function fast(op,msg){ // one-tap actions: in sb mode the change shows at once, the save runs in the background and the change is taken back if it fails; other modes save as before. op: {id (null = new), doc (null = delete)}
   if(mode!=='sb')return op.doc==null?removeItem(op.id,msg):saveItem(op.id,op.doc,msg);
-  const id=op.id||newId(),prev=items;sbSeq++; // sbSeq: a load that started before this tap must not overwrite it
+  const id=op.id||newId(),prev=items;sbSeq++;flipArm=Date.now(); // sbSeq: a load that started before this tap must not overwrite it
   items=storeToItems(applyOp(itemsToStore(items),{id,doc:op.doc}));render();
   if(await sbSave({id,doc:op.doc})){toast(msg);return true}
   items=prev;render();return false;
 }
-async function removeItem(id,msg){
+async function removeItem(id,msg){flipArm=Date.now();
   if(mode==='sb'){const ok=await sbSave({id,doc:null});if(ok)toast(msg||'נמחק');return ok}
   if(mode==='gh'){const ok=await ghSave({id,doc:null});if(ok)toast(msg||'נמחק');return ok}
   if(mode==='srv'){const ok=await srvCall('DELETE','/'+id);if(ok)toast(msg||'נמחק');return ok}
@@ -1983,7 +2004,7 @@ async function removeItem(id,msg){
 $('#prev').addEventListener('click',()=>{step(-1);slide(-1)});$('#next').addEventListener('click',()=>{step(1);slide(1)});
 $('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?goDay(todayIso()):go(sunOf(todayIso())));
 $('#tabAdd').addEventListener('click',()=>$('#addBtn').click()); // same per-view logic as the desktop add button
-$('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(!b)return;setView(b.dataset.v);scrollTo(0,0)});
+$('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(!b)return;const o=view;setView(b.dataset.v);scrollTo(0,0);if(view!==o)fadeIn()});
 $('#grid').addEventListener('click',x=>{const b=x.target.closest('[data-more]');if(!b)return;x.stopPropagation();const d=b.dataset.more;dueMore.has(d)?dueMore.delete(d):dueMore.add(d);render()});
 $('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b){const o=viewDay;goDay(b.dataset.day);slide(b.dataset.day>o?1:b.dataset.day<o?-1:0);$('#dstrip [aria-pressed=true]').focus({preventScroll:true})}}); // the strip is redrawn: keep the focus on the picked day
 $('#dayList').addEventListener('click',x=>{if(x.target.closest('[data-add]')){openAdd({day:dow(viewDay)});return} // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
@@ -2009,7 +2030,7 @@ function dragEnd(){
   if(was.cur==null)return;
   const v=Date.now()-(was.lt||0)<120?was.v||0:0; // a flick (fast and still moving at release) decides the direction, whatever the distance
   const open=Math.abs(v)>0.45?v>0:was.cur>was.h*(was.startExp?0.25:0.7); // a short pull opens the month again; closing needs a longer pull up
-  sc.style.transition='max-height .28s cubic-bezier(.2,.8,.2,1)';sc.style.maxHeight=(open?was.h:0)+'px';
+  sc.style.transition='max-height .28s var(--ez-snap)';sc.style.maxHeight=(open?was.h:0)+'px';
   setTimeout(()=>{sc.style.transition='';sc.style.maxHeight='';sc.style.overflow='';mexpSet(!open)},300);
 }
 const dragStart=y=>{const sc=dragSc();drag={y0:y,h:mexp?0:sc.scrollHeight,from:mexp?0:null,startExp:mexp}};
@@ -2022,13 +2043,14 @@ $('#monthCard').addEventListener('mousedown',x=>{if(!dragZone(x.target))return;d
 /* phone: pull a dialog down (from its top) to close it; it follows the finger and snaps back after a short pull */
 (()=>{let d=null,y0=0,dy=0,t0=0;
   addEventListener('touchstart',x=>{const e=x.target.closest&&x.target.closest('dialog[open]');if(!PHQ.matches||!e||x.touches.length!==1){d=null;return}d=e;y0=x.touches[0].clientY;dy=0;t0=Date.now()},{passive:true});
-  addEventListener('touchmove',x=>{if(!d)return;const m=x.touches[0].clientY-y0;if(m<=0||((d.querySelector('.fbody')||d).scrollTop)>0){if(dy>0){dy=0;d.style.transform=''}return}dy=m;d.style.transition='none';d.style.transform=`translateY(${dy}px)`},{passive:true});
+  addEventListener('touchmove',x=>{if(!d)return;const m=x.touches[0].clientY-y0;if(m<=0||((d.querySelector('.fbody')||d).scrollTop)>0){if(dy>0){dy=0;d.style.transform=''}return}dy=m;d.style.transition='none';d.style.transform=`translateY(${dy}px)`;const w=$('.wrap');w.style.transition='none';w.style.transform=`scale(${Math.min(1,.95+.05*dy/300).toFixed(4)})`},{passive:true}); // the page comes forward with the finger
   addEventListener('touchend',()=>{if(!d)return;const e=d,m=dy,fast=m/(Date.now()-t0||1)>0.6;d=null;dy=0;
+    const w=$('.wrap');w.style.transition=w.style.transform=''; // back to the class rule: .95 while open, 1 after close
     e.style.transition='transform .18s ease';
     if(m>110||(m>40&&fast)){ // a first-run onboarding cannot be dismissed
       if(e.id==='obDlg'&&ob&&ob.first){e.style.transform='';return}
       e.style.transform='translateY(100%)';setTimeout(()=>{e.dataset.noanim='1';e.close();delete e.dataset.noanim;e.style.transform='';e.style.transition=''},170)}
-    else{e.style.transform='';setTimeout(()=>{e.style.transition=''},200)}
+    else{e.style.transition='transform .45s '+EZ.spring;e.style.transform='';setTimeout(()=>{e.style.transition=''},460)}
   },{passive:true});
 })();
 /* every dialog grows out of the button that opened it and shrinks back into it */
@@ -2048,11 +2070,14 @@ addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('b
     }
     d.style.transformOrigin=bx+'px '+(up?0:H)+'px';return K};
   const origin=(d,el)=>{const r=d.getBoundingClientRect(),b=el&&el.isConnected?el.getBoundingClientRect():null;d.style.transformOrigin=(b?b.left+b.width/2-r.left:r.width/2)+'px '+(b?b.top+b.height/2-r.top:r.height/2)+'px'};
-  HTMLDialogElement.prototype.showModal=function(){sm.call(this);this._from=lastBtn;
+  const back=on=>{const h=document.documentElement;if(on&&PHQ.matches&&!still()){$('.wrap').style.transformOrigin='50% '+(scrollY+innerHeight/2)+'px';h.classList.add('dlgo')}else if(!on)h.classList.remove('dlgo')}; // the page behind a dialog steps back (phone)
+  addEventListener('close',()=>{if(!document.querySelector('dialog[open]'))back(0)},true); // Esc closes without our close()
+  HTMLDialogElement.prototype.showModal=function(){sm.call(this);this._from=lastBtn;back(1);
     if(lastBtn&&lastBtn.id==='tabAdd'){ghost(lastBtn,1);this.addEventListener('close',()=>ghost(null,0),{once:true})}
     if(still())return;
     try{const K=genie(this,lastBtn);if(K)this.animate(K,{duration:700,easing:'cubic-bezier(.16,1,.3,1)'});else{origin(this,lastBtn);this.animate([{opacity:0,transform:'scale(.3)'},{opacity:1,transform:'none'}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'})}}catch(e){}};
   HTMLDialogElement.prototype.close=function(v){
+    if(this.open&&![...document.querySelectorAll('dialog[open]')].some(x=>x!==this))back(0); // the page comes forward while the dialog shrinks
     if(!this.open||this.dataset.closing||this.dataset.noanim||still()){const r=cl.call(this,v);ghost(null,0);return r}
     this.dataset.closing='1';let a;
     try{const K=genie(this,this._from);if(K)a=this.animate(K.reverse().map((k,i)=>({...k,offset:i/16})),{duration:450,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'});
