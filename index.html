@@ -434,7 +434,9 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph .toast{bottom:calc(var(--tabh) + 16px + env(safe-area-inset-bottom,0px))}
 .ph .tabs{position:fixed;inset-inline:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);background:var(--bg-card);border-top:1px solid var(--border-light);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tabs button{display:grid;justify-items:center;align-content:center;gap:2px;min-height:var(--tabh);padding:6px 0;border:0;background:none;color:var(--text-muted);font-size:11px;font-weight:600;cursor:pointer}
-.tabs svg{width:24px;height:24px}
+.tabs svg{width:24px;height:24px;padding:3px 16px;box-sizing:content-box;border-radius:999px}
+.tabs button{padding:4px 0}.tabs button[aria-current=page] svg{background:var(--accent-soft)}
+.ph .tabs{background:color-mix(in srgb,var(--bg-card) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px)}
 .tabs button[aria-current=page]{color:var(--accent-text)}
 /* day view */
 .ph #dayCard{min-height:60vh}
@@ -1950,7 +1952,7 @@ async function removeItem(id,msg){
 $('#prev').addEventListener('click',()=>{step(-1);slide(-1)});$('#next').addEventListener('click',()=>{step(1);slide(1)});
 $('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?goDay(todayIso()):go(sunOf(todayIso())));
 $('#tabAdd').addEventListener('click',()=>$('#addBtn').click()); // same per-view logic as the desktop add button
-$('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(b){setView(b.dataset.v);scrollTo(0,0)}});
+$('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(!b)return;setView(b.dataset.v);scrollTo(0,0)});
 $('#grid').addEventListener('click',x=>{const b=x.target.closest('[data-more]');if(!b)return;x.stopPropagation();const d=b.dataset.more;dueMore.has(d)?dueMore.delete(d):dueMore.add(d);render()});
 $('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b){const o=viewDay;goDay(b.dataset.day);slide(b.dataset.day>o?1:b.dataset.day<o?-1:0);$('#dstrip [aria-pressed=true]').focus({preventScroll:true})}}); // the strip is redrawn: keep the focus on the picked day
 $('#dayList').addEventListener('click',x=>{if(x.target.closest('[data-add]')){openAdd({day:dow(viewDay)});return} // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
@@ -1967,15 +1969,17 @@ function dragMove(y){
   if(!drag)return;const sc=dragSc(),dy=y-drag.y0;
   if(mexp&&dy>0){mexp=false;$('#monthCard').classList.remove('mexp');sc.style.display='';drag.h=sc.scrollHeight;sc.style.maxHeight='0px';sc.style.overflow='hidden';drag.from=0}
   else if(drag.from==null||!mexp){sc.style.overflow='hidden'}
+  const t=Date.now();if(drag.lt!=null&&t>drag.lt)drag.v=.6*(y-drag.ly)/(t-drag.lt)+.4*(drag.v||0);drag.ly=y;drag.lt=t; // v: px/ms, positive = pulling down (the month grows)
   const base=drag.from!=null?drag.from:drag.h;drag.cur=Math.max(0,Math.min(drag.h,base+dy));
   if(!dragRaf)dragRaf=requestAnimationFrame(dragApply);
 }
 function dragEnd(){
   if(!drag)return;const sc=dragSc(),was=drag;drag=null;if(dragRaf){cancelAnimationFrame(dragRaf);dragRaf=0}
   if(was.cur==null)return;
-  const open=was.cur>was.h*(was.startExp?0.25:0.7); // a short pull opens the month again; closing needs a longer pull up
-  sc.style.transition='max-height .18s ease';sc.style.maxHeight=(open?was.h:0)+'px';
-  setTimeout(()=>{sc.style.transition='';sc.style.maxHeight='';sc.style.overflow='';mexpSet(!open)},190);
+  const v=Date.now()-(was.lt||0)<120?was.v||0:0; // a flick (fast and still moving at release) decides the direction, whatever the distance
+  const open=Math.abs(v)>0.45?v>0:was.cur>was.h*(was.startExp?0.25:0.7); // a short pull opens the month again; closing needs a longer pull up
+  sc.style.transition='max-height .28s cubic-bezier(.2,.8,.2,1)';sc.style.maxHeight=(open?was.h:0)+'px';
+  setTimeout(()=>{sc.style.transition='';sc.style.maxHeight='';sc.style.overflow='';mexpSet(!open)},300);
 }
 const dragStart=y=>{const sc=dragSc();drag={y0:y,h:mexp?0:sc.scrollHeight,from:mexp?0:null,startExp:mexp}};
 const dragZone=t=>t.closest&&t.closest('#mHandle,.mdh'); // the handle and the day heading both pull
@@ -2001,12 +2005,12 @@ let lastBtn=null;
 addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('button,[role=button]')},true);
 (()=>{
   const sm=HTMLDialogElement.prototype.showModal,cl=HTMLDialogElement.prototype.close;
-  const origin=d=>{const r=d.getBoundingClientRect(),b=lastBtn&&lastBtn.isConnected?lastBtn.getBoundingClientRect():null;d.style.transformOrigin=(b?b.left+b.width/2-r.left:r.width/2)+'px '+(b?b.top+b.height/2-r.top:r.height/2)+'px'};
-  HTMLDialogElement.prototype.showModal=function(){sm.call(this);if(still())return;try{origin(this);this.animate([{opacity:0,transform:'scale(.2)'},{opacity:1,transform:'scale(1)'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(e){}};
+  const origin=(d,el)=>{const r=d.getBoundingClientRect(),b=el&&el.isConnected?el.getBoundingClientRect():null;d.style.transformOrigin=(b?b.left+b.width/2-r.left:r.width/2)+'px '+(b?b.top+b.height/2-r.top:r.height/2)+'px'};
+  HTMLDialogElement.prototype.showModal=function(){sm.call(this);this._from=lastBtn;if(still())return;try{origin(this,lastBtn);this.animate([{opacity:0,transform:'scale(.2)'},{opacity:1,transform:'scale(1)'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(e){}};
   HTMLDialogElement.prototype.close=function(v){
     if(!this.open||this.dataset.closing||this.dataset.noanim||still())return cl.call(this,v);
     this.dataset.closing='1';let a;
-    try{origin(this);a=this.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.2)'}],{duration:180,easing:'ease-in'})}catch(e){}
+    try{origin(this,this._from);a=this.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.2)'}],{duration:180,easing:'ease-in'})}catch(e){}
     let fin=0;const done=()=>{if(fin++)return;delete this.dataset.closing;cl.call(this,v)};if(a){a.onfinish=done;setTimeout(done,260)}else done(); // the timer: a paused page (background tab) never finishes the animation
   };
 })();
