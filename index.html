@@ -395,9 +395,9 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph #frm .actions{flex:none;background:var(--bg-card);border-top:1px solid var(--border-light);padding:10px 16px;margin:0;max-width:none;box-sizing:border-box}
 .actions .sp{flex:1}
 /* add/edit window: "when" is the hero. One row of kinds, big times, the week's days, a switch, optional fields folded */
-#frm .kseg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;background:var(--border-light);border-radius:12px;padding:3px}
+#frm .kseg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;background:var(--border-light);border-radius:12px;padding:3px}
 #frm .kseg label{justify-content:center;gap:5px;padding:8px 2px;border:0;background:none;color:var(--text-muted);border-radius:9px;font-size:13.5px;min-height:40px;white-space:nowrap}#frm .kseg label[hidden]{display:none}
-#frm .kseg label:has(input:checked){background:var(--bg-card);box-shadow:0 1px 5px var(--shadow);color:var(--ink);font-weight:800}
+#frm .kseg label{position:relative;z-index:1}#frm .kseg label:has(input:checked){color:var(--ink);font-weight:800}#kindPill{position:absolute;z-index:0;border-radius:9px;background:var(--bg-card);box-shadow:0 1px 5px var(--shadow);pointer-events:none} /* the white pill under the picked kind: travels like #tabPill */
 #frm .ftime{display:flex;align-items:center;justify-content:center;gap:10px;direction:rtl;margin-top:4px}
 #frm .ftime input{width:auto;min-width:0;flex:0 1 auto;border:0;background:none;padding:2px 6px;border-radius:10px;font:700 38px/1.1 var(--font-mono);color:var(--ink);text-align:center;font-variant-numeric:tabular-nums;min-height:52px}
 #frm .ftime input:focus-visible{outline:2px solid var(--accent)}@media (hover:hover){#frm .ftime input:hover{background:var(--bg-sunk)}}
@@ -1533,7 +1533,15 @@ function daysSync(){const dt=isDated(),v=$('#fDate').value,d=dt?isoOk(v)?dow(v):
 const getKind=()=>(frm.querySelector('input[name=fKind]:checked')||{}).value||'open';
 const getWeek=()=>$('#fRec').checked?'both':'date'; // "חוזר כל שבוע": a weekly item, otherwise one date
 function lastOf(kind){return items.filter(it=>it.kind===kind&&okTime(it.start)&&okTime(it.end)).sort((a,b)=>(b.updated||0)-(a.updated||0))[0]}
-function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true;if(!worksOn()&&!(KINDS[k]&&KINDS[k].shift))$('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=true);else $('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=false)} // a student who works no shifts does not see the shift types (an existing shift keeps its own)
+const kindPill=(()=>{let el=null,cur=null;return anim=>{ // same motion as tabPill, for the kind row of the add/edit window (offset* so the dialog's own scale never matters)
+  const box=$('#kindChips');if(!el){el=document.createElement('i');el.id='kindPill';el.setAttribute('aria-hidden','true');box.prepend(el)}
+  const b=box.querySelector('label:has(input:checked)');if(!b||!b.offsetWidth||b.hidden){el.hidden=true;cur=null;return}el.hidden=false;
+  const to={l:b.offsetLeft,t:b.offsetTop,w:b.offsetWidth,h:b.offsetHeight},from=cur,px=o=>({left:o.l+'px',top:o.t+'px',width:o.w+'px',height:o.h+'px'});cur=to;Object.assign(el.style,px(to));
+  if(!anim||!from||still()||Math.abs(from.l-to.l)<1)return;
+  const L=Math.min(from.l,to.l),R=Math.max(from.l+from.w,to.l+to.w);
+  el.animate([{...px(from),offset:0},{...px({l:L,t:to.t+to.h*.12,w:R-L,h:to.h*.76}),offset:.45},{...px({l:to.l+to.w*.08,t:to.t+to.h*.08,w:to.w*.84,h:to.h*.84}),offset:.8},{...px(to),offset:1}],{duration:600,easing:'cubic-bezier(.3,.7,.3,1)'})}})();
+new ResizeObserver(()=>kindPill(0)).observe($('#kindChips'));
+function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true;if(!worksOn()&&!(KINDS[k]&&KINDS[k].shift))$('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=true);else $('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=false);kindPill(0)} // a student who works no shifts does not see the shift types (an existing shift keeps its own)
 function setWeek(w){$('#fRec').checked=w==='A'||w==='B'||w==='both'} // A/B docs of the retired rotation open as weekly
 const COURSE_OPTS=Object.entries(COURSE).map(([t,c])=>`<option value="${esc(c)}">${esc(t)}</option>`).join('');
 $('#fCourse').innerHTML='<option value="">בלי מקצוע</option>'+COURSE_OPTS;
@@ -1614,6 +1622,7 @@ frm.addEventListener('input',x=>{
   if(x.target.id==='fStart'||x.target.id==='fEnd')timesTouched=true;
   if(x.target.id==='fEnd')endTouched=true;
   if(x.target.id==='fStart'&&!endTouched&&getKind()!=='due'&&okTime(prevS)&&okTime(prevE)&&okTime($('#fStart').value)){const[a,b]=span(prevS,prevE);$('#fEnd').value=fm((toMin($('#fStart').value)+b-a)%1440)}
+  if(x.target.name==='fKind')kindPill(1);
   if(x.target.name==='fKind'&&!editing){const l=lastOf(getKind());if(getKind()==='due')$('#fStart').value='23:59';else if(l&&!timesTouched){$('#fStart').value=l.start;$('#fEnd').value=l.end}else if(addTimes&&$('#fStart').value==='23:59'){$('#fStart').value=addTimes.s;$('#fEnd').value=addTimes.e}}
   prevS=$('#fStart').value;prevE=$('#fEnd').value;syncFields();hint();
 });
