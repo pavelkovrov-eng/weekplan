@@ -1,13 +1,13 @@
 """Writes the app icons (PNG, stdlib only): icon-192.png, icon-512.png, apple-touch-icon.png.
 
 A white calendar sheet on the accent colour. Run from anywhere: python3 tools/make_icons.py
-Colours are the --accent and --accent-text tokens of index.html; change both together.
+Colours are the --accent-fill and --accent-text tokens of index.html (beige coffee); change both together.
 """
 import struct
 import zlib
 from pathlib import Path
 
-ACCENT, DEEP, WHITE = (0xC0, 0x26, 0xD3), (0x86, 0x19, 0x8F), (255, 255, 255)
+ACCENT, DEEP, WHITE = (0xE3, 0xD2, 0xBF), (0x6B, 0x4A, 0x2B), (0xFC, 0xFA, 0xF6)
 SIZES = {"icon-192.png": 192, "icon-512.png": 512, "apple-touch-icon.png": 180}
 AA = 2  # AA x AA samples per pixel: smooth rounded corners, still a second or two
 

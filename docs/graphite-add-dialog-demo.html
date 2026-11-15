@@ -1,0 +1,95 @@
+<title>דוגמה: חלון הוספה בצבע</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one phone-sized sheet, centred; graphite is the only accent, kind colour is a single dot */
+:root{--a:#e6d7f5;--at:#4a2a73;--tn:#a855f7;--b-bg:#e9e9ec;--b-sheet:#fff;--b-track:#f0f0f2;--b-line:#e6e6ea;--bg:color-mix(in srgb,var(--tn) 12%,var(--b-bg));--sheet:color-mix(in srgb,var(--tn) 5%,var(--b-sheet));--track:color-mix(in srgb,var(--tn) 13%,var(--b-track));--line:color-mix(in srgb,var(--tn) 16%,var(--b-line));--day:var(--track);--ink:#1c1c1e;--ink-on:#fff;--muted:#8a8a90;--shadow:rgba(0,0,0,.12);--bad:#d1242f;
+ --c-due:#ef4444;--c-study:#06b6d4;--c-open:#f59e0b;--c-close:#6366f1;--c-other:#94a3b8;--font:-apple-system,"SF Pro Text","Segoe UI",Heebo,Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--b-bg:#0b0b0d;--b-sheet:#1c1c1f;--b-track:#2a2a2e;--b-line:#323236;--ink:#f2f2f4;--ink-on:#17171a;--muted:#9a9aa2;--shadow:rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{--b-bg:#0b0b0d;--b-sheet:#1c1c1f;--b-track:#2a2a2e;--b-line:#323236;--ink:#f2f2f4;--ink-on:#17171a;--muted:#9a9aa2;--shadow:rgba(0,0,0,.5);color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);margin:0;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));direction:rtl}
+.wrap{max-width:390px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.top button{font:inherit;color:var(--muted);background:none;border:1px solid var(--line);border-radius:99px;padding:5px 12px;cursor:pointer}
+.sheet{background:var(--sheet);border-radius:26px;padding:18px 16px 14px;box-shadow:0 10px 40px var(--shadow);display:flex;flex-direction:column;gap:14px}
+.hd{display:flex;align-items:center;justify-content:space-between}
+.hd b{font-size:17px}.dot{width:10px;height:10px;border-radius:50%;background:var(--k);transition:background-color .35s}
+.hd span{font-size:12px;color:var(--muted)}
+.seg{position:relative;display:grid;background:var(--track);border-radius:12px;padding:3px}
+.seg.k{grid-template-columns:repeat(5,1fr)}.seg.p{grid-template-columns:repeat(3,1fr);direction:ltr}
+.seg button{position:relative;z-index:1;min-height:40px;border:0;background:none;border-radius:9px;color:var(--muted);font:600 13.5px var(--font);cursor:pointer;transition:color .3s,opacity .3s;white-space:nowrap}
+.seg.p button{font:600 13px ui-monospace,Menlo,monospace;opacity:.7}
+.seg button.on{color:var(--at);font-weight:800;opacity:1}
+.pill{position:absolute;z-index:0;border-radius:9px;background:var(--a);pointer-events:none}
+.times{display:flex;align-items:center;justify-content:center;gap:18px;direction:ltr;font:300 44px ui-monospace,Menlo,monospace;letter-spacing:-1px;padding:6px 0 2px}
+.times i{font-style:normal;color:var(--muted);font-size:26px}
+.hint{text-align:center;font-size:12px;color:var(--muted);margin-top:-6px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.days button{aspect-ratio:1;max-width:44px;width:100%;justify-self:center;border:0;border-radius:50%;background:var(--day);color:var(--ink);font:700 14px var(--font);cursor:pointer;transition:background-color .25s,color .25s}
+.days button.on{background:var(--a);color:var(--at)}
+.row{display:flex;align-items:center;justify-content:space-between;font-size:14px;padding:2px 2px}
+.sw{appearance:none;-webkit-appearance:none;width:50px;height:30px;border-radius:99px;background:var(--track);position:relative;cursor:pointer;margin:0;transition:background-color .2s;border:1px solid var(--line)}
+.sw::after{content:'';position:absolute;top:2px;inset-inline-start:2px;width:24px;height:24px;border-radius:50%;background:var(--ink-on);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:inset-inline-start .25s cubic-bezier(.34,1.4,.5,1)}
+.sw:checked{background:var(--a);border-color:var(--a)}.sw:checked::after{inset-inline-start:21px;background:#fff}
+input.t{width:100%;font:inherit;font-size:16px;background:var(--track);color:var(--ink);border:0;border-radius:12px;padding:13px 14px;outline:none}
+input.t:focus-visible{box-shadow:0 0 0 2px var(--a)}
+.act{display:flex;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.act button{flex:1;min-height:46px;border-radius:14px;font:700 15px var(--font);cursor:pointer;border:1.5px solid var(--line);background:none;color:var(--ink)}
+.act .pri{background:var(--a);color:var(--at);border-color:var(--a)}
+.vars{display:flex;flex-direction:column;gap:10px}.vf{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}.vf b{font-size:12px;color:var(--muted);width:100%;text-align:center}.vars button{font:600 12px var(--font);border:1.5px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:99px;padding:6px 12px 6px 10px;cursor:pointer;display:flex;align-items:center;gap:7px}.vars button i{width:14px;height:14px;border-radius:50%;background:var(--v)}.vars button.on{border-color:var(--ink)}
+.note{font-size:12px;color:var(--muted);line-height:1.6;text-align:center}
+@media (prefers-reduced-motion:reduce){.pill{transition:none}}
+</style>
+<div class="wrap">
+ <div class="top"><span>דוגמה בלבד, לא קשורה לאפליקציה · 5 משפחות צבע למטה</span><button id="th" type="button">בהיר / כהה</button></div>
+ <div class="sheet" id="sh" style="--k:var(--c-open)">
+  <div class="hd"><b>הוספה</b><span class="dot" id="dot" aria-hidden="true"></span></div>
+  <div class="seg k" id="kinds" role="radiogroup" aria-label="סוג"></div>
+  <div class="times" id="tm"><span id="ts">16:00</span><i>←</i><span id="te">22:00</span></div>
+  <div class="hint">6 שעות · ללא התנגשות</div>
+  <div class="seg p" id="pre" aria-label="שעות מוצעות"></div>
+  <div class="days" id="days"></div>
+  <div class="row"><label for="rec">חוזר כל שבוע</label><input class="sw" id="rec" type="checkbox"></div>
+  <input class="t" id="ttl" placeholder="שם (לא חובה)">
+  <div class="act"><button type="button">ביטול</button><button type="button" class="pri">שמירה</button></div>
+ </div>
+ <div class="vars" id="vars"></div>
+ <p class="note">צבע אחד בחלון, בוחרים גוון למטה. צבע הסוג נשאר רק בנקודה הקטנה ובגריד עצמו.</p>
+</div>
+<script>
+const KINDS=[['due','הגשה','--c-due'],['study','למידה','--c-study'],['open','פתיחה','--c-open'],['close','סגירה','--c-close'],['other','אחר','--c-other']];
+const PRE={due:[['23:59'],['12:00'],['08:00']],study:[['10:00','12:00'],['14:00','16:00'],['18:00','20:00']],open:[['16:00','22:00'],['10:00','16:00'],['08:00','16:00']],close:[['16:00','22:00'],['14:00','22:00'],['17:00','23:00']]};PRE.other=PRE.study;
+const $=s=>document.querySelector(s),still=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
+const pill=(box,pick)=>{let el=null,cur=null;const f=anim=>{ // same travelling motion as the tab bar pill
+ if(!el||!el.isConnected){el=document.createElement('i');el.className='pill';box.prepend(el)}
+ const b=pick();if(!b||!b.offsetWidth){el.hidden=true;cur=null;return}el.hidden=false;
+ const to={l:b.offsetLeft,t:b.offsetTop,w:b.offsetWidth,h:b.offsetHeight},from=cur,px=o=>({left:o.l+'px',top:o.t+'px',width:o.w+'px',height:o.h+'px'});cur=to;Object.assign(el.style,px(to));
+ if(!anim||!from||still()||Math.abs(from.l-to.l)<1)return;
+ const L=Math.min(from.l,to.l),R=Math.max(from.l+from.w,to.l+to.w);
+ el.animate([{...px(from),offset:0},{...px({l:L,t:to.t+to.h*.12,w:R-L,h:to.h*.76}),offset:.45},{...px({l:to.l+to.w*.08,t:to.t+to.h*.08,w:to.w*.84,h:to.h*.84}),offset:.8},{...px(to),offset:1}],{duration:600,easing:'cubic-bezier(.3,.7,.3,1)'})};
+ new ResizeObserver(()=>f(0)).observe(box);return f};
+let kind='open',s='16:00',e='22:00';
+const kb=$('#kinds'),pb=$('#pre');
+kb.innerHTML=KINDS.map(k=>`<button type="button" data-k="${k[0]}" role="radio">${k[1]}</button>`).join('');
+const kp=pill(kb,()=>kb.querySelector('.on')),pp=pill(pb,()=>pb.querySelector('.on'));
+function pre(){const L=PRE[kind];pb.innerHTML=L.map(x=>`<button type="button" data-s="${x[0]}" data-e="${x[1]||''}">${x[1]?x[0]+'–'+x[1]:x[0]}</button>`).join('');mark(0)}
+function mark(a){for(const b of pb.children)b.classList.toggle('on',b.dataset.s===s&&b.dataset.e===e);pp(a)}
+function paint(a){for(const b of kb.children){b.classList.toggle('on',b.dataset.k===kind);b.setAttribute('aria-checked',b.dataset.k===kind)}
+ $('#sh').style.setProperty('--k',`var(${KINDS.find(k=>k[0]===kind)[2]})`);$('#dot').style.background='var(--k)';kp(a)}
+function setT(a,b2){s=a;e=b2||'';$('#ts').textContent=s;$('#te').textContent=e||'';$('#tm i').style.visibility=$('#te').style.visibility=e?'visible':'hidden'}
+kb.addEventListener('click',x=>{const b=x.target.closest('[data-k]');if(!b)return;kind=b.dataset.k;const f=PRE[kind][0];setT(f[0],f[1]);paint(1);pre()});
+pb.addEventListener('click',x=>{const b=x.target.closest('[data-s]');if(!b)return;setT(b.dataset.s,b.dataset.e);mark(1)});
+const D='אבגדהוש';$('#days').innerHTML=[...D].map((l,i)=>`<button type="button" data-d="${i}">${l}</button>`).join('');
+$('#days').addEventListener('click',x=>{const b=x.target.closest('[data-d]');if(!b)return;for(const o of $('#days').children)o.classList.toggle('on',o===b)});
+$('#days').children[4].classList.add('on');
+$('#th').addEventListener('click',()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark';setTimeout(()=>{kp(0);pp(0)},30)});
+const FAM={'לילך':{tn:'#a855f7',L:[['לילך-פודרה','#e6d7f5','#4a2a73'],['לבנדר','#b9a7ee','#241552'],['לילך אפור','#c4b5d9','#2e1f47']]},
+'ליים':{tn:'#84cc16',L:[['ליים-אפונה','#b7e36a','#233a0a'],['ליים רך','#bef264','#1a2e05']]},
+'כחול':{tn:'#4f86d6',L:[['תכלת אבקתי','#bcd7f0','#12304d'],['כחול אפרפר','#a9bfe0','#14284a']]},
+'חום':{tn:'#a1764b',L:[['בז׳ קפה','#e3d2bf','#4a3320'],['קרמל','#d3b08a','#3d2412']]},
+'כתום':{tn:'#f97316',L:[['אפרסק','#ffd9bf','#7a2e0a'],['כתום רך','#fdba8c','#5a1f05']]}};
+const vb=$('#vars');vb.innerHTML=Object.entries(FAM).map(([f,F])=>`<div class="vf"><b>${f}</b>${F.L.map((v,i)=>`<button type="button" data-f="${f}" data-i="${i}" style="--v:${v[1]}"><i></i>${i+1} · ${v[0]}</button>`).join('')}</div>`).join('');
+vb.addEventListener('click',x=>{const b=x.target.closest('[data-i]');if(!b)return;const F=FAM[b.dataset.f],v=F.L[b.dataset.i],r=document.documentElement.style;r.setProperty('--tn',F.tn);r.setProperty('--a',v[1]);r.setProperty('--at',v[2]);for(const o of vb.querySelectorAll('button'))o.classList.toggle('on',o===b)});
+vb.querySelector('button').classList.add('on');
+setT(s,e);paint(0);pre();
+</script>

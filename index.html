@@ -5,8 +5,8 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="השבוע">
-<meta name="theme-color" content="#f4f7f9" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0b111c" media="(prefers-color-scheme: dark)">
-<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#f4f7f9;color:#141413}@media (prefers-color-scheme:dark){html:not([data-theme=light]) body{background:#0b111c}}html[data-theme=dark] body{background:#0b111c}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>try{var t=localStorage.getItem("wp.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script></head><body>
+<meta name="theme-color" content="#f1ebe3" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#15110d" media="(prefers-color-scheme: dark)">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#f1ebe3;color:#141413}@media (prefers-color-scheme:dark){html:not([data-theme=light]) body{background:#15110d}}html[data-theme=dark] body{background:#15110d}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>try{var t=localStorage.getItem("wp.theme");document.documentElement.dataset.theme=t==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}</script></head><body>
 <title>תכנון השבוע בסמסטר א'</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,10 +15,10 @@
 /* Layout: header, a dated week bar (prev · range · next · today · add), an upcoming exams/deadlines card, one summary strip, an attention list, the 7-day grid (Sun→Sat, right to left, past midnight when needed), a day-by-day agenda, then the calendar-export card. The course base is locked; personal blocks layer on top, weekly or on one date. */
 :root{
   --ez-out:cubic-bezier(.32,.72,0,1); --ez-spring:cubic-bezier(.34,1.56,.64,1); --ez-snap:cubic-bezier(.2,.8,.2,1); /* motion curves (iOS-like), the same in every theme; JS copies them in EZ */
-  --bg-app:#f4f7f9; --bg-card:#ffffff; --bg-sunk:#f8fafc;
-  --ink:#0f172a; --text-main:#1e293b; --text-muted:#64748b; --text-faint:#94a3b8;
-  --border-light:#e2e8f0; --border-dark:#cbd5e1;
-  --accent:#c026d3; --accent-ink:#ffffff; --accent-soft:#fae8ff; --accent-text:#86198f;
+  --bg-app:#f1ebe3; --bg-card:#fcfaf6; --bg-sunk:#f6f1ea;
+  --ink:#2a1d12; --text-main:#3b2a1c; --text-muted:#76624e; --text-faint:#a39080;
+  --border-light:#e4dacd; --border-dark:#d2c4b2;
+  --accent:#9a7650; --accent-fill:#e3d2bf; --accent-ink:#4a3320; --accent-soft:#eadccb; --accent-text:#6b4a2b; /* beige coffee: fill = bubbles and the +, soft = quiet tint, accent = lines and rings, text on light */
   --c-stat:#1d4ed8; --c-math:#15803d; --c-acc:#be123c; --c-micro:#7e22ce; --c-data:#c2410c; --c-ob:#a21caf; --c-eng:#4d7c0f; --on-course:#ffffff;
   --open-bg:#fffbeb; --open-bd:#f59e0b; --open-tx:#92400e;
   --close-bg:#eef2ff; --close-bd:#6366f1; --close-tx:#3730a3;
@@ -33,10 +33,10 @@
   --font-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg-app:#0b111c; --bg-card:#111827; --bg-sunk:#0e1522;
-  --ink:#f1f5f9; --text-main:#e2e8f0; --text-muted:#9aa8bc; --text-faint:#64748b;
-  --border-light:#1e293b; --border-dark:#334155;
-  --accent:#e879f9; --accent-ink:#1a0420; --accent-soft:#2a1131; --accent-text:#f5d0fe;
+  --bg-app:#15110d; --bg-card:#1d1814; --bg-sunk:#18130f;
+  --ink:#f5efe8; --text-main:#e8e0d6; --text-muted:#a8998a; --text-faint:#7a6c5e;
+  --border-light:#2e2720; --border-dark:#43382d;
+  --accent:#c9ab88; --accent-fill:#e3d2bf; --accent-ink:#2b1d0e; --accent-soft:#3a2e22; --accent-text:#ecdcc8;
   --c-stat:#60a5fa; --c-math:#4ade80; --c-acc:#fb7185; --c-micro:#c084fc; --c-data:#fb923c; --c-ob:#e879f9; --c-eng:#a3e635; --on-course:#0b111c;
   --open-bg:#2a1d06; --open-bd:#fbbf24; --open-tx:#fde68a;
   --close-bg:#1b1d3f; --close-bd:#818cf8; --close-tx:#c7d2fe;
@@ -50,10 +50,10 @@
   color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg-app:#0b111c; --bg-card:#111827; --bg-sunk:#0e1522;
-  --ink:#f1f5f9; --text-main:#e2e8f0; --text-muted:#9aa8bc; --text-faint:#64748b;
-  --border-light:#1e293b; --border-dark:#334155;
-  --accent:#e879f9; --accent-ink:#1a0420; --accent-soft:#2a1131; --accent-text:#f5d0fe;
+  --bg-app:#15110d; --bg-card:#1d1814; --bg-sunk:#18130f;
+  --ink:#f5efe8; --text-main:#e8e0d6; --text-muted:#a8998a; --text-faint:#7a6c5e;
+  --border-light:#2e2720; --border-dark:#43382d;
+  --accent:#c9ab88; --accent-fill:#e3d2bf; --accent-ink:#2b1d0e; --accent-soft:#3a2e22; --accent-text:#ecdcc8;
   --c-stat:#60a5fa; --c-math:#4ade80; --c-acc:#fb7185; --c-micro:#c084fc; --c-data:#fb923c; --c-ob:#e879f9; --c-eng:#a3e635; --on-course:#0b111c;
   --open-bg:#2a1d06; --open-bd:#fbbf24; --open-tx:#fde68a;
   --close-bg:#1b1d3f; --close-bd:#818cf8; --close-tx:#c7d2fe;
@@ -86,7 +86,7 @@ h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;line-height:1.12;margin:0 0 
 
 /* controls */
 .bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.add{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14.5px;
+.add{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--accent-fill);color:var(--accent-ink);font-weight:700;font-size:14.5px;
   padding:10px 18px;border-radius:11px;cursor:pointer;box-shadow:0 4px 12px -4px var(--accent)}
 .add:disabled,.btn:disabled,.dh .hl:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 .add svg{width:16px;height:16px}
@@ -227,7 +227,7 @@ details.card[open] .upsum{display:none}
 .pastebtn{margin-top:12px}
 .sethead{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .sethead h3{margin:0}
-#setDlg .setsec{margin-top:12px;box-shadow:none}
+#setDlg .setsec{margin-top:12px;box-shadow:none}#palCard{padding:14px 16px}.palh{font-size:15px;margin:0 0 10px}.pals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px}.pals button{display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:none;padding:4px;min-height:64px;cursor:pointer;font:600 11.5px var(--font-body);color:var(--text-muted)}.pals button i{width:36px;height:36px;border-radius:50%;background:var(--pf);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--pl) 55%,transparent);transition:transform .4s var(--ez-spring)}.pals button[aria-checked=true]{color:var(--ink);font-weight:800}.pals button[aria-checked=true] i{box-shadow:0 0 0 2px var(--bg-card),0 0 0 4px var(--accent)}.pals button:active i{transform:scale(.9)}
 .setrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .btn.del.armed{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad-tx)}
 html:not(.ph) #setDlg{width:min(620px,calc(100% - 32px))} /* on a phone it is the full-width bottom sheet like every dialog */
@@ -352,7 +352,7 @@ dialog{border:0;padding:0;border-radius:16px;background:var(--bg-card);color:var
   box-shadow:0 24px 60px -12px var(--shadow)}
 dialog::backdrop{background:var(--scrim);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)} /* the page behind a dialog is blurred */
 dialog[open]::backdrop{animation:bdIn .45s ease}
-#ghostPlus{margin:0;padding:0;border:0;background:none;overflow:visible;inset:auto;position:fixed;place-items:center;color:var(--accent-ink);pointer-events:none}#ghostPlus:popover-open{display:grid}#ghostPlus:not(:popover-open){display:none}#ghostPlus svg{width:48px;height:34px;padding:8px 14px;box-sizing:border-box;border-radius:12px;background:var(--accent)}
+#ghostPlus{margin:0;padding:0;border:0;background:none;overflow:visible;inset:auto;position:fixed;place-items:center;color:var(--accent-ink);pointer-events:none}#ghostPlus:popover-open{display:grid}#ghostPlus:not(:popover-open){display:none}#ghostPlus svg{width:48px;height:34px;padding:8px 14px;box-sizing:border-box;border-radius:12px;background:var(--accent-fill)}
 dialog:focus,dialog:focus-visible{outline:none}
 .mph{position:absolute;inset-inline:0;z-index:60;pointer-events:none} /* the opening button's colour over a dialog while it morphs */ /* the dialog takes the initial focus (autofocus), so no field or X shows a focus ring on open */
 @keyframes bdIn{from{opacity:0}to{opacity:1}}
@@ -395,9 +395,9 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph #frm .actions{flex:none;background:var(--bg-card);border-top:1px solid var(--border-light);padding:10px 16px;margin:0;max-width:none;box-sizing:border-box}
 .actions .sp{flex:1}
 /* add/edit window: "when" is the hero. One row of kinds, big times, the week's days, a switch, optional fields folded */
-#frm .kseg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;background:var(--border-light);border-radius:12px;padding:3px}
+#frm .kseg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;background:var(--bg-app);border-radius:12px;padding:3px}
 #frm .kseg label{justify-content:center;gap:5px;padding:8px 2px;border:0;background:none;color:var(--text-muted);border-radius:9px;font-size:13.5px;min-height:40px;white-space:nowrap}#frm .kseg label[hidden]{display:none}
-#frm .kseg label{position:relative;z-index:1}#frm .kseg label{transition:color .3s}#frm .kseg label:has(input:checked){color:var(--kt,var(--ink));font-weight:800}#kindPill,#prePill{position:absolute;z-index:0;border-radius:9px;background:var(--kb,var(--bg-card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--kd,transparent) 55%,transparent);transition:background-color .35s,box-shadow .35s;pointer-events:none} /* the pill under the picked kind, tinted with that kind's colour (--kb/--kd/--kt set in kindPill); travels like #tabPill */
+#frm .kseg label{position:relative;z-index:1}#frm .kseg label{transition:color .3s}#frm .kseg label:has(input:checked){color:var(--accent-ink);font-weight:800}#kindPill,#prePill{position:absolute;z-index:0;border-radius:9px;background:var(--accent-fill);pointer-events:none} /* the pill under the picked kind, beige (--accent-fill); travels like #tabPill; the kind's colour is the dot before #dlgTitle (--kc set in kindPill) */
 #frm .ftime{display:flex;align-items:center;justify-content:center;gap:10px;direction:rtl;margin-top:4px}
 #frm .ftime input{width:auto;min-width:0;flex:0 1 auto;border:0;background:none;padding:2px 6px;border-radius:10px;font:700 38px/1.1 var(--font-mono);color:var(--ink);text-align:center;font-variant-numeric:tabular-nums;min-height:52px}
 #frm .ftime input:focus-visible{outline:2px solid var(--accent)}@media (hover:hover){#frm .ftime input:hover{background:var(--bg-sunk)}}
@@ -405,11 +405,11 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 #frm .ftime.due .arw{display:none}#frm .ftime.due::before{content:'עד';font-size:18px;font-weight:700;color:var(--text-muted)}
 #frm #fHint{background:none;padding:0;text-align:center;margin-top:-10px;height:20px;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* always one line: a clash never changes the window's height */
 #frm #fHint.bad{color:var(--bad-tx);font-weight:700;cursor:pointer}#frm #fHint.full{height:auto;white-space:normal}
-#frm .pre{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;background:var(--border-light);border-radius:12px;padding:3px;min-height:44px;align-items:center} /* the quick times: one segmented row like the kinds; the picked one sits in the travelling #prePill, the others are dimmer */#frm .pre button{position:relative;z-index:1;min-width:0;padding:7px 4px;white-space:nowrap;min-height:40px;border:0;background:none;border-radius:9px;color:var(--text-muted);opacity:.7;transition:color .3s,opacity .3s}#frm .pre button.on{color:var(--kt,var(--ink));opacity:1;font-weight:800}
+#frm .pre{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;background:var(--bg-app);border-radius:12px;padding:3px;min-height:44px;align-items:center} /* the quick times: one segmented row like the kinds; the picked one sits in the travelling #prePill, the others are dimmer */#frm .pre button{position:relative;z-index:1;min-width:0;padding:7px 4px;white-space:nowrap;min-height:40px;border:0;background:none;border-radius:9px;color:var(--text-muted);opacity:.7;transition:color .3s,opacity .3s}#frm .pre button.on{color:var(--accent-ink);opacity:1;font-weight:800}#dlgTitle::before{content:'';display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:8px;background:var(--kc,transparent);transition:background-color .35s}
 #frm .fwhen{display:grid;gap:6px}
 #frm .fdays{display:flex;align-items:center;gap:6px}#frm #fDays{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 #frm #fDays button{min-height:42px;border:0;border-radius:50%;aspect-ratio:1;max-height:46px;justify-self:center;width:100%;max-width:46px;background:var(--bg-sunk);color:var(--text-main);font:inherit;font-weight:700;cursor:pointer;transition:transform .4s var(--ez-spring),background-color .15s}
-#frm #fDays button:active{transform:scale(.88);transition-duration:.08s}#frm #fDays button[aria-pressed=true]{background:var(--ink);color:var(--bg-card)}
+#frm #fDays button:active{transform:scale(.88);transition-duration:.08s}#frm #fDays button[aria-pressed=true]{background:var(--accent-fill);color:var(--accent-ink)}
 #frm .fcal{position:relative;flex:none;width:42px;height:42px;display:grid;place-items:center;border-radius:50%;border:1.5px solid var(--border-dark);color:var(--text-muted);cursor:pointer;overflow:hidden}#frm .fcal[hidden]{display:none}
 #frm .fcal svg{width:20px;height:20px}#frm .fcal input{position:absolute;inset:0;width:100%;height:100%;min-height:0;opacity:0;padding:0;border:0;cursor:pointer}
 #frm .fwcap{text-align:center;font-size:14px;font-weight:600;color:var(--text-muted)}
@@ -424,7 +424,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 #frm .fmore[open]{display:grid;gap:8px}
 .ph #dlg{max-height:88vh;max-height:88dvh}.ph #dlg .fbody{gap:12px;padding-bottom:10px}
 .btn{border:1px solid var(--border-dark);background:var(--bg-card);padding:9px 16px;border-radius:10px;font-weight:600;cursor:pointer}
-.btn.pri{background:var(--ink);color:var(--bg-card);border-color:var(--ink)}
+.btn.pri{background:var(--ink);color:var(--bg-card);border-color:var(--ink)}#frm .btn.pri{background:var(--accent-fill);color:var(--accent-ink);border-color:var(--accent-fill)}
 .btn.del{color:var(--bad-tx);border-color:var(--bad-bd);background:transparent}
 .btn.del.armed{background:var(--bad-bd);color:var(--bg-card)}
 .exp{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
@@ -484,7 +484,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph input[type=date]{height:46px} /* as tall as the select it stands in for, so the one-off dialog still fits 393x852 */
 .ph input[type=checkbox]{width:20px;height:20px}
 .ph .add{display:none} /* the add button is the + in the tab bar (#tabAdd), which clicks this one */
-#tabAdd svg{width:48px;height:34px;padding:8px 14px;box-sizing:border-box;border-radius:12px;background:var(--accent);color:var(--accent-ink)}#tabAdd:disabled{opacity:.45}
+#tabAdd svg{width:48px;height:34px;padding:8px 14px;box-sizing:border-box;border-radius:12px;background:var(--accent-fill);color:var(--accent-ink)}#tabAdd:disabled{opacity:.45}
 .ph #addLbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .ph .toast{bottom:calc(var(--tabh) + 16px + env(safe-area-inset-bottom,0px))}
 .ph .tabs{position:fixed;inset-inline:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);background:var(--bg-card);border-top:1px solid var(--border-light);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -771,6 +771,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <dialog id="setDlg" autofocus aria-labelledby="setTitle">
   <div class="dlg">
     <div class="sethead"><h3 id="setTitle">הגדרות</h3><button type="button" class="btn ib" id="setClose" title="סגירה" aria-label="סגירה">✕</button></div>
+    <section class="card setsec" id="palCard"><h2 class="palh">צבע האפליקציה</h2><div class="pals" id="pals" role="radiogroup" aria-label="צבע האפליקציה"></div></section>
     <details class="card setsec" id="setProf"><summary><h2>הפרופיל שלי</h2><span class="upsum" id="setProfSum"></span></summary>
       <p class="lead">המקבץ, השם והאם אתה עובד במשמרות.</p>
       <button type="button" class="btn" id="obLink" hidden>עריכה</button>
@@ -1541,7 +1542,7 @@ const mkPill=(id,box,pick,r)=>{let el=null,cur=null;const f=anim=>{ // same moti
   const L=Math.min(from.l,to.l),R=Math.max(from.l+from.w,to.l+to.w);
   el.animate([{...px(from),offset:0},{...px({l:L,t:to.t+to.h*.12,w:R-L,h:to.h*.76}),offset:.45},{...px({l:to.l+to.w*.08,t:to.t+to.h*.08,w:to.w*.84,h:to.h*.84}),offset:.8},{...px(to),offset:1}],{duration:600,easing:'cubic-bezier(.3,.7,.3,1)'})};f.reset=()=>{cur=null};new ResizeObserver(()=>f(0)).observe(box);return f};
 const kindPill0=mkPill('kindPill',$('#kindChips'),()=>$('#kindChips').querySelector('label:has(input:checked)'));
-const kindPill=anim=>{const kc={open:'open',close:'close',study:'study',due:'bad',other:'other'}[getKind()];if(kc)for(const[v,x]of[['b','bg'],['d','bd'],['t','tx']])frm.style.setProperty('--k'+v,`var(--${kc}-${x})`);kindPill0(anim)};
+const kindPill=anim=>{const kc={open:'open',close:'close',study:'study',due:'bad',other:'other'}[getKind()];if(kc)frm.style.setProperty('--kc',`var(--${kc}-bd)`);kindPill0(anim)}; // the pills are beige; only the dot in the title carries the kind's colour
 const prePill=mkPill('prePill',$('#fPre'),()=>$('#fPre').querySelector('button.on'));
 function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true;if(!worksOn()&&!(KINDS[k]&&KINDS[k].shift))$('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=true);else $('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=false);kindPill(0)} // a student who works no shifts does not see the shift types (an existing shift keeps its own)
 function setWeek(w){$('#fRec').checked=w==='A'||w==='B'||w==='both'} // A/B docs of the retired rotation open as weekly
@@ -1973,11 +1974,21 @@ $('#setWipe').addEventListener('click',async()=>{ // two clicks: the first arms 
     toast('הנתונים נמחקו');setDlg.close();
   }catch(e){toast('המחיקה לא הצליחה. נסה שוב.');b.disabled=false;b.classList.remove('armed');b.textContent='מחיקת כל הנתונים שלי'}
 });
+const PAL_LS='wp.pal',PALS={beige:{n:'בז׳ קפה',f:'#e3d2bf',l:'#9a7650'},lilac:{n:'לילך',tn:'#a855f7',f:'#e6d7f5',i:'#4a2a73',l:'#8b6fb8',t:'#5b3a8a'},lavender:{n:'לבנדר',tn:'#7c6ad6',f:'#b9a7ee',i:'#241552',l:'#7a64c9',t:'#3b2a7a'},pea:{n:'ירוק אפונה',tn:'#84cc16',f:'#b7e36a',i:'#233a0a',l:'#6a9a1f',t:'#3f6212'},blue:{n:'תכלת',tn:'#4f86d6',f:'#bcd7f0',i:'#12304d',l:'#5b8fc4',t:'#1f4a7a'},peach:{n:'אפרסק',tn:'#f97316',f:'#ffd9bf',i:'#7a2e0a',l:'#d9803f',t:'#9a3f10'}};
+const hexMix=(a,b,t)=>{const A=[1,3,5].map(i=>parseInt(a.slice(i,i+2),16)),B=[1,3,5].map(i=>parseInt(b.slice(i,i+2),16));return'#'+B.map((v,i)=>Math.round(v*(1-t)+A[i]*t).toString(16).padStart(2,'0')).join('')};
+const palKeys=['--accent','--accent-fill','--accent-ink','--accent-soft','--accent-text','--bg-app','--bg-card','--bg-sunk','--border-light','--border-dark','--ink','--text-main','--text-muted','--text-faint'];
+function palVars(P,dark){const m=(b,t)=>hexMix(P.tn,b,t);return dark?{'--accent':P.f,'--accent-fill':P.f,'--accent-ink':P.i,'--accent-soft':m('#1c1c1c',.22),'--accent-text':hexMix(P.f,'#ffffff',.5),'--bg-app':m('#111111',.08),'--bg-card':m('#1a1a1a',.07),'--bg-sunk':m('#151515',.07),'--border-light':m('#2a2a2a',.15),'--border-dark':m('#3d3d3d',.15),'--ink':m('#f4f4f4',.06),'--text-main':m('#e6e6e6',.06),'--text-muted':m('#a5a5a5',.1),'--text-faint':m('#777777',.1)}:{'--accent':P.l,'--accent-fill':P.f,'--accent-ink':P.i,'--accent-soft':hexMix(P.f,'#ffffff',.5),'--accent-text':P.t,'--bg-app':m('#f3f2f2',.12),'--bg-card':m('#ffffff',.04),'--bg-sunk':m('#f8f8f8',.08),'--border-light':m('#e5e5e5',.18),'--border-dark':m('#cfcfcf',.2),'--ink':m('#161616',.12),'--text-main':m('#262626',.14),'--text-muted':m('#6b6b6b',.2),'--text-faint':m('#9c9c9c',.2)}}
+const palNow=()=>{try{const k=localStorage.getItem(PAL_LS);return PALS[k]?k:'beige'}catch(e){return'beige'}};
+function palApply(){const k=palNow(),st=document.documentElement.style;for(const v of palKeys)st.removeProperty(v);if(k!=='beige'){const d=themeNow()==='dark';for(const[v,c]of Object.entries(palVars(PALS[k],d)))st.setProperty(v,c)}
+  for(const m of document.querySelectorAll('meta[name=theme-color]'))m.content=getComputedStyle(document.documentElement).getPropertyValue('--bg-app').trim()||m.content;
+  for(const b of $('#pals').children)b.setAttribute('aria-checked',String(b.dataset.p===k))} // beige = the stylesheet's own tokens; another palette sets them inline for the shown theme (re-applied when the theme flips)
+$('#pals').innerHTML=Object.entries(PALS).map(([k,P])=>`<button type="button" role="radio" data-p="${k}" style="--pf:${P.f};--pl:${P.l}"><i></i>${P.n}</button>`).join('');
+$('#pals').addEventListener('click',x=>{const b=x.target.closest('[data-p]');if(!b)return;try{localStorage.setItem(PAL_LS,b.dataset.p)}catch(e){}palApply();if(!still())$('#pals [aria-checked=true] i').animate([{transform:'scale(.7)'},{transform:'none'}],{duration:420,easing:EZ.spring})});
 const THEME_LS='wp.theme';
 function themeNow(){return document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}
 const TH_SV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',TH_MOON=TH_SV+'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',TH_SUN=TH_SV+'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>'; // line icons in the tab bar's style
-function themeShow(){const d=themeNow()==='dark',b=$('#themeBtn');for(const m of document.querySelectorAll('meta[name=theme-color]'))m.content=d?'#0b111c':'#f4f7f9';b.innerHTML=d?TH_SUN:TH_MOON;b.title=b.dataset.t=d?'מעבר למצב בהיר':'מעבר למצב כהה';b.setAttribute('aria-label',b.title)}
-try{const t=localStorage.getItem(THEME_LS);if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}
+function themeShow(){const d=themeNow()==='dark',b=$('#themeBtn');for(const m of document.querySelectorAll('meta[name=theme-color]'))m.content=d?'#15110d':'#f1ebe3';b.innerHTML=d?TH_SUN:TH_MOON;b.title=b.dataset.t=d?'מעבר למצב בהיר':'מעבר למצב כהה';b.setAttribute('aria-label',b.title);palApply()}
+try{const t=localStorage.getItem(THEME_LS);document.documentElement.dataset.theme=t==='dark'?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'} // light unless the user chose dark (2026-11-15)
 $('#themeBtn').addEventListener('click',()=>{const n=themeNow()==='dark'?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem(THEME_LS,n)}catch(e){}themeShow();if(!still())$('#themeBtn svg').animate([{transform:'rotate(-180deg) scale(.4)',opacity:0},{transform:'none',opacity:1}],{duration:520,easing:EZ.spring})}); // the new icon turns in
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',themeShow);
 themeShow();
