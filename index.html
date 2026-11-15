@@ -1369,7 +1369,7 @@ async function setSt(id,s){
   stBusy.add(id);
   try{
     const{id:_,status:__,...rest}=it; // status: a leftover field of an earlier build
-    if(!await saveItem(id,{...rest,done:s==='done',updated:Date.now()},s==='done'?'סומן כהוגש':'סומן כלא התחלתי'))render();
+    await fast({id,doc:{...rest,done:s==='done',updated:Date.now()}},s==='done'?'סומן כהוגש':'סומן כלא התחלתי');
   }finally{stBusy.delete(id)}
   const b=document.querySelector(`[data-st="${id}"]`);if(b)b.focus(); // the lists are redrawn: keep the keyboard on the same button
 }
@@ -1383,7 +1383,7 @@ $('#agenda').addEventListener('click',x=>{
   if(c&&!c.disabled){c.disabled=true;const[date,i]=c.dataset.cancel.split('|');toggleCancel(date,Number(i))}
 });
 async function toggleCancel(date,i){
-  const c=cancelOf(date,i,items),ok=await(c?removeItem(c.id,'השיעור הוחזר'):saveItem(null,{kind:'cancel',date,base:i,track:trackOf(items),updated:Date.now()},'השיעור בוטל ב-'+dm(date)));
+  const c=cancelOf(date,i,items),ok=await(c?fast({id:c.id,doc:null},'השיעור הוחזר'):fast({id:null,doc:{kind:'cancel',date,base:i,track:trackOf(items),updated:Date.now()}},'השיעור בוטל ב-'+dm(date)));
   if(!ok)render();return ok;
 }
 const cdlg=$('#cdlg');let cEv;
@@ -1391,7 +1391,8 @@ function openCancel(ev){ // confirm dialog for one grid class block
   cEv=ev;$('#cTitle').textContent=ev.title+' · '+(BKIND[ev.kind]||'אנגלית');$('#cWhen').textContent=`${DAYS[ev.d]} ${dm(ev.date)} · ${tr(ev.s,ev.e)} · ${ev.room}`;
   const g=$('#cGo');g.disabled=false;g.textContent=ev.cancelled?'החזרת השיעור':'ביטול השיעור בתאריך זה';cdlg.showModal();
 }
-$('#cGo').addEventListener('click',async x=>{const g=x.currentTarget;if(g.disabled)return;g.disabled=true;if(await toggleCancel(cEv.date,cEv.i))cdlg.close();else g.disabled=false});
+$('#cGo').addEventListener('click',async x=>{const g=x.currentTarget;if(g.disabled)return;g.disabled=true;const p=toggleCancel(cEv.date,cEv.i);if(mode==='sb'){cdlg.close();return} // sb: already shown, the save finishes in the background
+  if(await p)cdlg.close();else g.disabled=false});
 $('#cClose').addEventListener('click',()=>cdlg.close());
 cdlg.addEventListener('click',x=>{if(x.target===cdlg)cdlg.close()});
 $('#grid').addEventListener('click',async x=>{
@@ -1929,6 +1930,13 @@ async function saveItem(id,data,msg){
     const ok=saveLocal();render();toast(ok?(msg||(id?'עודכן':'נוסף')):'הדפדפן חוסם שמירה. הפריט יימחק ברענון.');return true;
   }
   return false;
+}
+async function fast(op,msg){ // one-tap actions: in sb mode the change shows at once, the save runs in the background and the change is taken back if it fails; other modes save as before. op: {id (null = new), doc (null = delete)}
+  if(mode!=='sb')return op.doc==null?removeItem(op.id,msg):saveItem(op.id,op.doc,msg);
+  const id=op.id||newId(),prev=items;sbSeq++; // sbSeq: a load that started before this tap must not overwrite it
+  items=storeToItems(applyOp(itemsToStore(items),{id,doc:op.doc}));render();
+  if(await sbSave({id,doc:op.doc})){toast(msg);return true}
+  items=prev;render();return false;
 }
 async function removeItem(id,msg){
   if(mode==='sb'){const ok=await sbSave({id,doc:null});if(ok)toast(msg||'נמחק');return ok}
