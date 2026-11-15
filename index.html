@@ -285,6 +285,12 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 .nav .wkl{font-family:var(--font-mono);font-weight:600;font-size:14px;color:var(--ink);padding-inline:6px;font-variant-numeric:tabular-nums}
 .blk.clash{outline:2px solid var(--bad-bd);outline-offset:-1px;z-index:3}
 .blk.cancelled{opacity:.6;text-decoration:line-through}
+#grid .blk{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none} /* a long press lifts the block, not a text selection */
+#grid .blk.sel{z-index:6;box-shadow:0 0 0 2px var(--accent),0 10px 24px -8px var(--shadow)}
+#grid .blk.lift{z-index:7;transition:none;box-shadow:0 0 0 2px var(--accent),0 20px 32px -10px var(--shadow)}
+.blk .rsz{display:none;position:absolute;inset-inline:0;bottom:0;height:22px;cursor:ns-resize;touch-action:none}
+.blk .rsz::after{content:'';position:absolute;left:50%;bottom:4px;width:24px;height:4px;margin-left:-12px;border-radius:2px;background:var(--accent)}
+.blk.sel .rsz{display:block}
 .seg{display:inline-flex;border:1px solid var(--border-dark);border-radius:9px;overflow:hidden;margin-inline-start:4px}
 .nav .seg button{border:0;background:transparent;padding:6px 12px;font-weight:700;cursor:pointer;color:var(--text-muted)}
 .nav .seg button:focus-visible{outline-offset:-2px} /* .seg clips (overflow:hidden) a ring drawn outside */
@@ -391,6 +397,7 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .exp p{margin:6px 0 0;font-size:13px;color:var(--text-muted)}
 
 .toast{margin:0;padding:0;border:0;background:none;width:auto;height:auto;overflow:visible;inset-block-start:auto;position:fixed;inset-inline:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:50}
+.toast #toastAct{pointer-events:auto;margin-inline-start:6px;border:0;font:inherit;font-size:14px;font-weight:700;background:var(--ink);color:var(--accent-soft);padding:9px 16px;border-radius:10px;cursor:pointer;box-shadow:0 8px 20px -6px var(--shadow)}
 .toast span{background:var(--ink);color:var(--bg-card);padding:9px 16px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 8px 20px -6px var(--shadow)}
 
 @media (max-width:820px){.sum{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -565,7 +572,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 </section>
 <section class="card" id="gridCard">
   <div class="ghead"><h2 id="gridTitle">השבוע</h2><div class="printbar"><button type="button" class="btn" id="printBtn">הדפסה</button><button type="button" class="edit-link" id="printFile">קובץ להדפסה</button></div></div>
-  <p class="lead">לחיצה על שטח פנוי ביום פותחת הוספה בשעה הזו. לחיצה על פריט שהוספת פותחת עריכה. הלימודים לא ניתנים לשינוי.</p>
+  <p class="lead">לחיצה על שטח פנוי ביום פותחת הוספה בשעה הזו. לחיצה על פריט שהוספת פותחת עריכה, ולחיצה ארוכה מאפשרת לגרור אותו (בקפיצות של רבע שעה) או למתוח את הסוף שלו. הלימודים לא ניתנים לשינוי.</p>
   <details class="mleg" open><summary>מקרא</summary>
   <div class="legend">
     <span class="c-stat"><i style="background:var(--cc);border-color:var(--cc)"></i>הסתברות</span>
@@ -622,6 +629,17 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <button type="button" data-v="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle class="bd" cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>מה מתקרב</span></button>
 </nav>
 
+<dialog id="mvDlg" autofocus aria-labelledby="mvT">
+  <div class="dlg">
+    <h3 id="mvT">משמרת שחוזרת כל שבוע</h3>
+    <div class="hint">להזיז רק בשבוע הזה, או בכל השבועות?</div>
+    <div class="actions">
+      <button type="button" class="btn pri" data-mv="one">רק בשבוע הזה</button>
+      <button type="button" class="btn" data-mv="all">כל השבועות</button>
+      <button type="button" class="btn" data-mv="">ביטול</button>
+    </div>
+  </div>
+</dialog>
 <dialog id="cdlg" aria-labelledby="cTitle">
   <div class="dlg">
     <h3 id="cTitle"></h3>
@@ -781,7 +799,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   </form>
 </dialog>
 
-<div class="toast" id="toast" popover="manual" aria-live="polite" hidden><span></span></div>
+<div class="toast" id="toast" popover="manual" aria-live="polite" hidden><span></span><button type="button" id="toastAct" hidden></button></div>
 
 <script id="core">
 const DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
@@ -1264,7 +1282,7 @@ function renderGrid(evs,clash){
     list.forEach(ev=>{
       const s=Math.max(ev.s,lo),e=Math.min(ev.e,hi),hgt=(e-s)*PPM-2;
       const bb=ev.src==='base'&&!ro,b=document.createElement(ev.src==='user'||bb?'button':'div');
-      if(ev.src==='user'){b.type='button';b.className='blk u-'+ev.kind;b.addEventListener('click',x=>{x.stopPropagation();openEdit(ev.id)})}
+      if(ev.src==='user'){b.type='button';b.className='blk u-'+ev.kind+(ev.key===gSel?' sel':'');b.dataset.key=ev.key;b._ev=ev;b.addEventListener('click',x=>{x.stopPropagation();if(Date.now()-gT>500)openEdit(ev.id)})} // a click right after a drag is the drag's own
       else{b.className='blk base k-'+ev.kind+' c-'+ev.course+(ev.moed==='ב'?' m2':'');
         if(bb){b.type='button';b.setAttribute('aria-label',`${ev.title} · ${BKIND[ev.kind]||'אנגלית'} · ${tr(ev.s,ev.e)} · לחיצה ל${ev.cancelled?'החזרה':'ביטול'}`);b.addEventListener('click',x=>{x.stopPropagation();openCancel(ev)})}}
       if(clash.has(ev.key))b.classList.add('clash');
@@ -1280,7 +1298,7 @@ function renderGrid(evs,clash){
         b.title=`${ev.title} · ${ltr(tr(ev.s,ev.e))}${ev.note?' · '+ev.note:''} · ${WKN[ev.week]} · לחיצה לעריכה`;
         b.innerHTML=`<span class="kd">${KINDS[ev.kind].short}${ev.week!=='date'?' <span class="wk">· כל שבוע</span>':''}</span>`+
           `<div class="nm"><span>${esc(showTitle?ev.title:KINDS[ev.kind].label)}</span></div><div class="tm">${tr(ev.s,ev.e)}</div>`+
-          (ev.note?`<div class="rm">${esc(ev.note)}</div>`:'');
+          (ev.note?`<div class="rm">${esc(ev.note)}</div>`:'')+(ro?'':'<i class="rsz" aria-hidden="true"></i>'); // the handle that drags the end (shown on a picked block)
       }
       col.appendChild(b);
     });
@@ -1619,8 +1637,9 @@ $('#pFrm').addEventListener('submit',async x=>{
 
 /* ---------- storage ---------- */
 let toastT=0;
-function toast(t){const el=$('#toast');el.firstElementChild.textContent=t;el.hidden=false;try{el.hidePopover();el.showPopover()}catch(e){} // re-shown in the top layer, so it sits above an open dialog
-  clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true;try{el.hidePopover()}catch(e){}},2600)}
+function toast(t,act){const el=$('#toast'),a=$('#toastAct');el.firstElementChild.textContent=t;el.hidden=false; // act {label,fn}: a button in the toast (e.g. undo), shown 5 s
+  a.hidden=!act;a.onclick=act?()=>{a.hidden=el.hidden=true;try{el.hidePopover()}catch(e){};act.fn()}:null;if(act)a.textContent=act.label;try{el.hidePopover();el.showPopover()}catch(e){} // re-shown in the top layer, so it sits above an open dialog
+  clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true;try{el.hidePopover()}catch(e){}},act?5000:2600)}
 let dl=null;
 async function offer(filename,data){
   if(dl){try{await dl.save({filename,data});toast('הקובץ ירד')}catch(e){const c=e&&e.code;if(c!=='declined')toast(c==='rate_limited'?'כבר פתוח חלון הורדה':'ההורדה לא זמינה כאן')}return}
@@ -2102,6 +2121,47 @@ addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('b
     let fin=0;const done=()=>{if(fin++)return;delete this.dataset.closing;cl.call(this,v);ghost(null,0);if(o)o.remove();if(a)try{a.cancel()}catch(e){}};if(a){a.onfinish=done;setTimeout(done,560)}else done(); // the timer: a paused page (background tab) never finishes the animation
   };
 })();
+/* week grid: hold an own block (touch 0.4 s; mouse: just drag) to lift it and drag it in 15-minute steps, also to another shown day; a picked block (.sel) drags at once and its handle (.rsz) drags its end. A weekly item asks: this week only (detach) or every week. The toast offers undo. */
+let gSel='',gDrag=null,gPend=null,gT=0; // gSel: key of the picked block; gPend: a touch waiting (hold timer, or a picked block before it moves); gT: when a drag ended
+const q15=m=>Math.round(m/15)*15,gMin=(col,y)=>gridRange[0]+(y-col.getBoundingClientRect().top)/PPM;
+function gBegin(b,mode,x,y){const ev=b._ev;if(!ev||!b.isConnected)return;
+  gDrag={b,ev,col:b.parentElement,mode,x,y,off:gMin(b.parentElement,y)-ev.s,s:ev.s,e:ev.e,d:ev.d};
+  gSel=ev.key;document.querySelectorAll('#grid .blk.sel').forEach(k=>k!==b&&k.classList.remove('sel'));b.classList.add('sel','lift');gApply();gLoop()}
+function gApply(){const g=gDrag;if(!g)return;const ev=g.ev,len=ev.e-ev.s,[lo,hi]=gridRange;let c=g.col;
+  if(g.mode==='move'){const h=[...document.querySelectorAll('#grid .col')].find(k=>{const r=k.getBoundingClientRect();return g.x>=r.left&&g.x<r.right});if(h)c=h;
+    g.s=Math.max(lo,Math.min(q15(gMin(c,g.y)-g.off),hi-len,1425));g.e=g.s+len;g.d=+c.dataset.day}
+  else g.e=Math.max(g.s+15,Math.min(q15(gMin(g.col,g.y)),hi,g.s+1425));
+  const dx=c.getBoundingClientRect().left-g.col.getBoundingClientRect().left;
+  g.b.style.transform=`translate(${dx}px,${(g.s-ev.s)*PPM}px) scale(${g.mode==='move'?1.04:1})`;g.b.style.height=((g.e-Math.max(g.s,lo))*PPM-2)+'px';
+  const t=g.b.querySelector('.tm');if(t)t.textContent=tr(g.s,g.e)}
+function gLoop(){const g=gDrag;if(!g)return;const v=g.y<70?-1:g.y>innerHeight-(PHQ.matches?130:70)?1:0;if(v){scrollBy(0,v*8);gApply()}requestAnimationFrame(gLoop)} // near the top or bottom edge the page scrolls with the block
+const gAsk=()=>new Promise(res=>{const d=$('#mvDlg');d.onclick=x=>{const b=x.target.closest('[data-mv]');if(b||x.target===d){res(b&&b.dataset.mv||null);d.close()}};d.addEventListener('close',()=>res(null),{once:true});d.showModal()}); // answers on the click itself: the close event can come late (a hidden page); Esc = no
+async function gEnd(cancel){const g=gDrag;if(!g)return;gDrag=null;gT=Date.now();g.b.classList.remove('lift');
+  const ev=g.ev,it=items.find(x=>x.id===ev.id);
+  if(cancel||!it||g.s===ev.s&&g.e===ev.e&&g.d===ev.d){g.b.style.transform=g.b.style.height='';const t=g.b.querySelector('.tm');if(t)t.textContent=tr(ev.s,ev.e);return}
+  g.b.style.transform=g.b.style.transform.replace(/ scale\([^)]*\)/,''); // it lands where it was dropped until the redraw
+  const date=addDays(viewSun,g.d),st=fm(g.s),en=fm(g.e),now=Date.now(),msg=(g.mode==='end'?'עד ':'הוזז ל-')+(g.d!==ev.d?DAYS[g.d]+' ':'')+(g.mode==='end'?fm(g.e):tr(g.s,g.e));
+  const scope=isRec(it)?await gAsk():'one';if(!scope){render();return}
+  const before=new Set(items.map(x=>x.id)),{id,...rest}=it;let ok;
+  if(!isRec(it))ok=await fast({id,doc:{...rest,date,start:st,end:en,updated:now}},msg);
+  else if(scope==='all')ok=await fast({id,doc:{...rest,day:g.d,start:st,end:en,week:'both',updated:now}},msg);
+  else{const{one,series}=detach(it,{kind:it.kind,title:it.title,note:it.note||'',updated:now,week:'date',date,day:g.d,start:st,end:en},viewSun,ev.date);ok=await fast({id:null,doc:one},msg)&&await fast({id,doc:series},msg)}
+  if(!ok){render();return}
+  toast(msg,{label:'בטל',fn:async()=>{const add=items.find(x=>!before.has(x.id));if(add)await fast({id:add.id,doc:null},'בוטל');await fast({id,doc:{...rest,updated:Date.now()}},'ההזזה בוטלה')}})}
+const gGrid=$('#grid'),gBlk=t=>t.closest&&t.closest('#grid .blk[data-key]');
+gGrid.addEventListener('touchstart',x=>{if(!canEdit()||x.touches.length!==1)return;const t=x.touches[0],b=gBlk(x.target);if(!b)return;const h=!!x.target.closest('.rsz'),x0=t.clientX,y0=t.clientY;
+  gPend={b,h,x0,y0,now:h||b.classList.contains('sel'),t:h||b.classList.contains('sel')?0:setTimeout(()=>{gPend=null;gBegin(b,'move',x0,y0)},400)}},{passive:true});
+gGrid.addEventListener('touchmove',x=>{const t=x.touches[0],p=gPend;
+  if(p&&Math.hypot(t.clientX-p.x0,t.clientY-p.y0)>6){gPend=null;clearTimeout(p.t);if(p.now)gBegin(p.b,p.h?'end':'move',p.x0,p.y0)} // a hold that moves early is a scroll; a picked block moves at once
+  if(gDrag){x.preventDefault();gDrag.x=t.clientX;gDrag.y=t.clientY;gApply()}},{passive:false});
+gGrid.addEventListener('touchend',()=>{if(gPend){clearTimeout(gPend.t);gPend=null}if(gDrag)gEnd()},{passive:true});
+gGrid.addEventListener('touchcancel',()=>{if(gPend){clearTimeout(gPend.t);gPend=null}if(gDrag)gEnd(1)},{passive:true});
+gGrid.addEventListener('contextmenu',x=>{if(gBlk(x.target))x.preventDefault()});
+gGrid.addEventListener('mousedown',x=>{if(x.button||!canEdit())return;const b=gBlk(x.target);if(!b)return;const h=!!x.target.closest('.rsz'),x0=x.clientX,y0=x.clientY;let on=0;if(h)x.preventDefault();
+  const mv=e=>{if(!on){if(Math.hypot(e.clientX-x0,e.clientY-y0)<5)return;on=1;gBegin(b,h?'end':'move',x0,y0)}if(gDrag){gDrag.x=e.clientX;gDrag.y=e.clientY;gApply()}},
+    up=()=>{removeEventListener('mousemove',mv);removeEventListener('mouseup',up);if(on)gEnd()};addEventListener('mousemove',mv);addEventListener('mouseup',up)});
+addEventListener('keydown',x=>{if(x.key==='Escape'&&gDrag)gEnd(1)});
+addEventListener('pointerdown',x=>{if(gSel&&!(x.target.closest&&x.target.closest('#grid .blk.sel,#mvDlg,#toast'))){gSel='';document.querySelectorAll('#grid .blk.sel').forEach(b=>b.classList.remove('sel'))}},true); // a tap elsewhere drops the pick
 let swipe0=null; // swipe on the day card: a finger moving right is the next day (RTL, see swipeDir)
 $('#dayCard').addEventListener('touchstart',x=>{swipe0=x.touches.length===1?[x.touches[0].clientX,x.touches[0].clientY]:null},{passive:true});
 $('#dayCard').addEventListener('touchend',x=>{if(!swipe0)return;const t=x.changedTouches[0],d=swipeDir(t.clientX-swipe0[0],t.clientY-swipe0[1]);swipe0=null;if(d){step(d);slide(d)}},{passive:true});
