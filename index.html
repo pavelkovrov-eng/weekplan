@@ -394,6 +394,35 @@ input[dir=ltr]{font-family:var(--font-mono);font-size:14px}
 .ph #frm .fbody{display:grid;gap:16px;overflow-y:auto;overflow-x:hidden;min-height:0;padding:18px 16px 16px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 .ph #frm .actions{flex:none;background:var(--bg-card);border-top:1px solid var(--border-light);padding:10px 16px;margin:0;max-width:none;box-sizing:border-box}
 .actions .sp{flex:1}
+/* add/edit window: "when" is the hero. One row of kinds, big times, the week's days, a switch, optional fields folded */
+#frm .kseg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;background:var(--border-light);border-radius:12px;padding:3px}
+#frm .kseg label{justify-content:center;gap:5px;padding:8px 2px;border:0;background:none;color:var(--text-muted);border-radius:9px;font-size:13.5px;min-height:40px;white-space:nowrap}#frm .kseg label[hidden]{display:none}
+#frm .kseg label:has(input:checked){background:var(--bg-card);box-shadow:0 1px 5px var(--shadow);color:var(--ink);font-weight:800}
+#frm .ftime{display:flex;align-items:center;justify-content:center;gap:10px;direction:rtl;margin-top:4px}
+#frm .ftime input{width:auto;min-width:0;flex:0 1 auto;border:0;background:none;padding:2px 6px;border-radius:10px;font:700 38px/1.1 var(--font-mono);color:var(--ink);text-align:center;font-variant-numeric:tabular-nums;min-height:52px}
+#frm .ftime input:focus-visible{outline:2px solid var(--accent)}@media (hover:hover){#frm .ftime input:hover{background:var(--bg-sunk)}}
+#frm .ftime .arw{font-size:22px;color:var(--text-faint)}#frm .ftime .fld{display:block}
+#frm .ftime.due .arw{display:none}#frm .ftime.due::before{content:'עד';font-size:18px;font-weight:700;color:var(--text-muted)}
+#frm #fHint{background:none;padding:0;text-align:center;margin-top:-10px;height:20px;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* always one line: a clash never changes the window's height */
+#frm #fHint.bad{color:var(--bad-tx);font-weight:700;cursor:pointer}#frm #fHint.full{height:auto;white-space:normal}
+#frm .pre{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;min-height:44px;align-items:center} /* three equal buttons that always fit: nothing scrolls or is cut */#frm .pre button{min-width:0;padding:7px 4px;white-space:nowrap}
+#frm .fwhen{display:grid;gap:6px}
+#frm .fdays{display:flex;align-items:center;gap:6px}#frm #fDays{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+#frm #fDays button{min-height:42px;border:0;border-radius:50%;aspect-ratio:1;max-height:46px;justify-self:center;width:100%;max-width:46px;background:var(--bg-sunk);color:var(--text-main);font:inherit;font-weight:700;cursor:pointer;transition:transform .4s var(--ez-spring),background-color .15s}
+#frm #fDays button:active{transform:scale(.88);transition-duration:.08s}#frm #fDays button[aria-pressed=true]{background:var(--ink);color:var(--bg-card)}
+#frm .fcal{position:relative;flex:none;width:42px;height:42px;display:grid;place-items:center;border-radius:50%;border:1.5px solid var(--border-dark);color:var(--text-muted);cursor:pointer;overflow:hidden}#frm .fcal[hidden]{display:none}
+#frm .fcal svg{width:20px;height:20px}#frm .fcal input{position:absolute;inset:0;width:100%;height:100%;min-height:0;opacity:0;padding:0;border:0;cursor:pointer}
+#frm .fwcap{text-align:center;font-size:14px;font-weight:600;color:var(--text-muted)}
+#frm .fslot{min-height:46px;display:grid;align-items:center} /* one row, always there: the weekly switch, or a deadline's course and status */
+#frm .due2{grid-template-columns:repeat(2,minmax(0,1fr))}#frm .due2:not(:has(.fld:not([hidden]))){display:none}
+#frm .swrow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;font-weight:600;cursor:pointer}#frm .swrow[hidden]{display:none}
+#frm .sw{-webkit-appearance:none;appearance:none;flex:none;width:50px;height:30px;border-radius:999px;background:var(--border-dark);position:relative;cursor:pointer;transition:background-color .2s;margin:0}
+#frm .sw::after{content:'';position:absolute;top:3px;inset-inline-start:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgb(0 0 0/.3);transition:inset-inline-start .25s var(--ez-spring)}
+#frm .sw:checked{background:var(--accent)}#frm .sw:checked::after{inset-inline-start:23px}
+#frm .fmore summary{cursor:pointer;font-weight:600;color:var(--text-muted);min-height:40px;display:flex;align-items:center;gap:6px;list-style:none}#frm .fmore summary::-webkit-details-marker{display:none}
+#frm .fmore summary::before{content:'＋';font-weight:800}#frm .fmore[open] summary::before{content:'－'}
+#frm .fmore[open]{display:grid;gap:8px}
+.ph #dlg{max-height:88vh;max-height:88dvh}.ph #dlg .fbody{gap:12px;padding-bottom:10px}
 .btn{border:1px solid var(--border-dark);background:var(--bg-card);padding:9px 16px;border-radius:10px;font-weight:600;cursor:pointer}
 .btn.pri{background:var(--ink);color:var(--bg-card);border-color:var(--ink)}
 .btn.del{color:var(--bad-tx);border-color:var(--bad-bd);background:transparent}
@@ -657,34 +686,23 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <form class="dlg" id="frm" novalidate>
     <div class="fbody">
     <div class="sethead"><h3 id="dlgTitle">הוספה לשבוע</h3><button type="button" class="btn ib" id="dlgX" title="סגירה" aria-label="סגירה">✕</button></div>
-    <div class="fld">
-      <span class="lbl" id="kindLbl">סוג</span>
-      <div class="chips" role="radiogroup" aria-labelledby="kindLbl" id="kindChips"></div>
-    </div>
-    <div class="fld">
-      <label for="fTitle">כותרת <span style="font-weight:400">(לא חובה)</span></label>
-      <input type="text" id="fTitle" maxlength="60" autocomplete="off">
-    </div>
-    <div class="row2">
-      <div class="fld" id="fDayF"><label for="fDay">יום</label><select id="fDay"></select></div>
-      <div class="fld" id="fDateF" hidden><label for="fDate">תאריך</label><input type="date" id="fDate"></div>
-      <div class="fld"><label for="fStart">התחלה</label><input type="time" id="fStart" step="900" required></div>
-      <div class="fld"><label for="fEnd">סיום</label><input type="time" id="fEnd" step="900" required></div>
-    </div>
-    <div class="chips pre" id="fPre" hidden></div>
-    <div class="fld" id="fCourseF" hidden><label for="fCourse">מקצוע</label><select id="fCourse"></select></div>
-    <div class="fld" id="fStatusF" hidden><label for="fStatus">סטטוס</label><select id="fStatus"></select></div>
-    <div class="fld" id="fWeekF">
-      <span class="lbl" id="wkLbl">האם זה חוזר על עצמו?</span>
-      <div class="chips" role="group" aria-labelledby="wkLbl">
-        <label><input type="checkbox" id="fRec">חוזר כל שבוע</label>
-      </div>
-    </div>
-    <div class="fld">
-      <label for="fNote">הערה <span style="font-weight:400">(לא חובה)</span></label>
-      <input type="text" id="fNote" maxlength="80" autocomplete="off">
-    </div>
+    <div class="chips kseg" role="radiogroup" aria-label="סוג" id="kindChips"></div>
+    <div class="ftime" id="fTime"><input type="time" id="fStart" step="900" required aria-label="התחלה"><span class="arw" aria-hidden="true">←</span><span class="fld"><input type="time" id="fEnd" step="900" required aria-label="סיום"></span></div>
     <div class="hint" id="fHint"></div>
+    <div class="chips pre" id="fPre" hidden></div>
+    <div class="fwhen">
+      <div class="fdays"><span id="fDays" role="group" aria-label="יום בשבוע"></span><label class="fcal" id="fDateF" hidden title="תאריך אחר" aria-label="תאריך אחר"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/></svg><input type="date" id="fDate"></label></div>
+      <div class="fwcap" id="fWhen"></div>
+      <div id="fDayF" hidden><select id="fDay" aria-label="יום"></select></div>
+    </div>
+    <div class="fslot">
+      <label class="swrow" id="fWeekF"><span>חוזר כל שבוע</span><input type="checkbox" id="fRec" class="sw"></label>
+      <div class="row2 due2"><div class="fld" id="fCourseF" hidden><select id="fCourse" aria-label="מקצוע"></select></div><div class="fld" id="fStatusF" hidden><select id="fStatus" aria-label="סטטוס"></select></div></div>
+    </div>
+    <input type="text" id="fTitle" maxlength="60" autocomplete="off" aria-label="כותרת">
+    <details class="fmore" id="fMore"><summary>הערה</summary>
+      <input type="text" id="fNote" maxlength="80" autocomplete="off" aria-label="הערה">
+    </details>
     <div class="err" id="fErr" hidden></div>
     </div>
     <div class="actions">
@@ -1503,32 +1521,40 @@ $('#grid').addEventListener('click',async x=>{
 const dlg=$('#dlg'),frm=$('#frm');
 $('#kindChips').innerHTML=Object.entries(KINDS).map(([k,v])=>`<label data-shift="${v.shift?1:0}"><input type="radio" name="fKind" value="${k}" id="fk_${k}"><i style="background:var(${v.color})"></i>${v.short}</label>`).join('');
 $('#fDay').innerHTML=DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
+$('#fDays').innerHTML=DAYI.map((l,i)=>`<button type="button" data-d="${i}" aria-label="${DAYS[i]}" aria-pressed="false">${l}</button>`).join(''); // the week's days: a tap picks the day (dated: in the week of the picked date)
+$('#fDays').addEventListener('click',x=>{const b=x.target.closest('[data-d]');if(!b)return;const fd=$('#fDate');$('#fDay').value=b.dataset.d;if(isDated())fd.value=clampDay(addDays(isoOk(fd.value)?sunOf(fd.value):editSun,Number(b.dataset.d)));syncFields();hint()});
+function daysSync(){const dt=isDated(),v=$('#fDate').value,d=dt?isoOk(v)?dow(v):-1:Number($('#fDay').value);
+  $('#fDays').querySelectorAll('[data-d]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.d===d)));
+  $('#fWhen').textContent=d<0?'בחר תאריך':dt?'יום '+DAYS[d]+' '+dm(v):'כל יום '+DAYS[d]}
 const getKind=()=>(frm.querySelector('input[name=fKind]:checked')||{}).value||'open';
 const getWeek=()=>$('#fRec').checked?'both':'date'; // "חוזר כל שבוע": a weekly item, otherwise one date
 function lastOf(kind){return items.filter(it=>it.kind===kind&&okTime(it.start)&&okTime(it.end)).sort((a,b)=>(b.updated||0)-(a.updated||0))[0]}
 function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true;if(!worksOn()&&!(KINDS[k]&&KINDS[k].shift))$('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=true);else $('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=false)} // a student who works no shifts does not see the shift types (an existing shift keeps its own)
 function setWeek(w){$('#fRec').checked=w==='A'||w==='B'||w==='both'} // A/B docs of the retired rotation open as weekly
 const COURSE_OPTS=Object.entries(COURSE).map(([t,c])=>`<option value="${esc(c)}">${esc(t)}</option>`).join('');
-$('#fCourse').innerHTML='<option value="">ללא</option>'+COURSE_OPTS;
+$('#fCourse').innerHTML='<option value="">בלי מקצוע</option>'+COURSE_OPTS;
 $('#fStatus').innerHTML=Object.entries(STAT).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
 $('#fDate').min=SEM.start;$('#fDate').max=SEM.last;
 let dated=false; // true while the date field (not the weekday select) is the one in use: a deadline, or "only on this date"
 const isDated=()=>getKind()==='due'||getWeek()==='date';
 let preKey='',endTouched=false,prevS='',prevE=''; // endTouched: the end was typed by hand, so changing the start no longer drags it along
-function renderPre(){
-  const k=getKind(),L=k==='due'?[]:recentTimes(items,k),key=k+'|'+L.map(x=>x.s+x.e).join();if(key===preKey)return;preKey=key;
-  const b=$('#fPre');b.hidden=!L.length;b.innerHTML=L.map(x=>`<button type="button" data-s="${x.s}" data-e="${x.e}">${ltr(x.s+'–'+x.e)}</button>`).join('')}
+function renderPre(){ // always three buttons, so the row never appears or disappears: the kind's own most used times, then the other kinds', then defaults; a deadline gets three hours
+  const k=getKind(),L=k==='due'?[{s:'23:59'},{s:'12:00'},{s:'08:00'}]:recentTimes(items,k);
+  if(k!=='due')for(const x of Object.keys(KINDS).flatMap(o=>o===k||o==='due'?[]:recentTimes(items,o)).concat([{s:'16:00',e:'22:00'},{s:'10:00',e:'16:00'},{s:'18:00',e:'21:00'}])){if(L.length>=3)break;if(!L.some(y=>y.s===x.s&&y.e===x.e))L.push(x)}
+  const key=k+'|'+L.map(x=>x.s+(x.e||'')).join();if(key===preKey)return;preKey=key;
+  const b=$('#fPre');b.hidden=false;b.innerHTML=L.map(x=>`<button type="button" data-s="${x.s}"${x.e?` data-e="${x.e}"`:''}>${ltr(x.e&&x.s.endsWith(':00')&&x.e.endsWith(':00')?+x.s.slice(0,2)+'–'+ +x.e.slice(0,2):x.s+(x.e?'–'+x.e:''))}</button>`).join('')} // round hours are short: 16–22
 function syncFields(){
   const due=getKind()==='due',dt=isDated(),fd=$('#fDate'),fy=$('#fDay'),rp=()=>isoOk(fd.value)&&dow(fd.value)===Number(fy.value)?fd.value:clampDay(addDays(editSun,Number(fy.value))); // rp: the date "only on this date" takes from a recurring form (the picked date while its weekday still matches)
   if(dt!==dated){dated=dt;if(dt)fd.value=rp();else if(isoOk(fd.value))fy.value=String(dow(fd.value))} // switching mode keeps the day and the date in step (a picked date survives a round trip)
-  renderPre();$('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due;$('#fCourseF').hidden=$('#fStatusF').hidden=!due;$('#fDayF').hidden=dt;$('#fDateF').hidden=!dt;
+  renderPre();$('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due;$('#fCourseF').hidden=$('#fStatusF').hidden=!due;$('#fDayF').hidden=true;$('#fDateF').hidden=!dt;
+  $('#fTime').classList.toggle('due',due);$('#fTitle').placeholder=due?'שם המטלה':getKind()==='other'?'מה זה?':'כותרת (לא חובה)';daysSync();
 }
 function openAdd(pre={}){
   const sun=pre.sun||viewSun; // the week to add to (month view passes its own)
   editing=null;timesTouched=pre.start!=null;editSun=sun;
   const kind=pre.kind||(worksOn()?'open':'study'),last=lastOf(kind); // a student without shifts starts from a study block
-  setKind(kind);$('#fTitle').value='';$('#fNote').value='';
-  $('#fDay').value=String(pre.day!=null?pre.day:4);
+  setKind(kind);$('#fTitle').value='';$('#fNote').value='';$('#fMore').open=false;
+  $('#fDay').value=String(pre.day!=null?pre.day:sunOf(todayIso())===sun?dow(todayIso()):0); // no day given: today, if it is in that week
   if(pre.start!=null){const dur=last?span(last.start,last.end).reduce((a,b)=>b-a):180;$('#fStart').value=fm(pre.start);$('#fEnd').value=fm(pre.start+dur)}
   else if(last){$('#fStart').value=last.start;$('#fEnd').value=last.end}
   else{$('#fStart').value='18:00';$('#fEnd').value='21:00'}
@@ -1537,21 +1563,22 @@ function openAdd(pre={}){
   setWeek('date'); // a new item is one date unless "חוזר כל שבוע" is ticked
   dated=isDated();$('#fDate').value=clampDay(addDays(sun,Number($('#fDay').value)));$('#fCourse').value='';$('#fStatus').value='todo';
   $('#dlgTitle').textContent='הוספה';$('#fDel').hidden=true;$('#fSkip').hidden=true;resetDel();$('#fErr').hidden=true;
-  syncFields();hint();dlg.showModal();
+  syncFields();hint();dlg.showModal();lockH();
 }
+const lockH=()=>{dlg.style.height='';if(PHQ.matches)dlg.style.height=dlg.getBoundingClientRect().height+'px'}; // the window keeps the height it opened with: an opened note or an error scrolls inside
 function openEdit(id,sun=viewSun){ // sun: the week of the clicked occurrence
   const it=items.find(x=>x.id===id);if(!it)return;
   if(!canEdit()){toast('הדף פתוח לצפייה בלבד');return}
   editing=id;timesTouched=true;editSun=it.date?sunOf(it.date):sun;
   setKind(KINDS[it.kind]?it.kind:'other');$('#fTitle').value=it.title&&it.title!==KINDS[it.kind]?.label?it.title:'';
-  $('#fDay').value=String(it.date?dow(it.date):it.day);$('#fStart').value=it.start||'';$('#fEnd').value=it.end||'';$('#fNote').value=it.note||'';
+  $('#fDay').value=String(it.date?dow(it.date):it.day);$('#fStart').value=it.start||'';$('#fEnd').value=it.end||'';$('#fNote').value=it.note||'';$('#fMore').open=!!it.note;
   const rec=isRec(it),date=rec?addDays(sun,Number(it.day)):'';
   setWeek(rec?it.week:'date');
   dated=isDated();$('#fDate').value=it.date||date;$('#fCourse').value=courseOk(it.course)?it.course:'';$('#fStatus').value=dueSt(it);
   endTouched=false;prevS=$('#fStart').value;prevE=$('#fEnd').value;preKey='';
   $('#fSkip').hidden=!rec;$('#fSkip').dataset.date=date;$('#fSkip').textContent=rec?'דילוג ב-'+dm(date):'';
   $('#dlgTitle').textContent='עריכה';$('#fDel').hidden=false;resetDel();$('#fErr').hidden=true;
-  syncFields();hint();dlg.showModal();
+  syncFields();hint();dlg.showModal();lockH();
 }
 function readForm(){
   const kind=getKind(),date=isDated()?$('#fDate').value:'';
@@ -1566,15 +1593,15 @@ function validate(d){
   return'';
 }
 function hint(){
-  const d=readForm(),h=$('#fHint');
+  const d=readForm(),h=$('#fHint');h.classList.remove('full');
   if(isDated()&&!isoOk(d.date)){h.className='hint';h.textContent='בחר תאריך';return}
   if(d.kind==='due'){h.className='hint';h.textContent=`הגשה ב-${dm(d.date)} עד ${okTime(d.start)?d.start:'23:59'}`;return}
   if(!okTime(d.start)||!okTime(d.end)||d.start===d.end){h.className='hint';h.textContent='בחר שעת התחלה וסיום. סיום מוקדם מההתחלה נחשב עד אחרי חצות.';return}
   const[s,e]=span(d.start,d.end);
   const hits=[],pv=editing&&items.find(x=>x.id===editing),det=pv&&isRec(pv)&&d.week==='date',its=det?items.map(x=>x===pv?{...x,skip:[...(x.skip||[]),$('#fSkip').dataset.date]}:x):items; // detaching one occurrence: compare with the items as they will be saved (the series stays, minus that date); otherwise the edited item itself is left out
   const suns=d.week==='date'?[sunOf(d.date)]:[editSun,addDays(editSun,7)]; // a weekly item: this week and the next (an off day or a one-off can hide a clash in one of them)
-  suns.forEach(w=>evsForWeek(w,its,det?null:editing).forEach(o=>{if(!o.cancelled&&o.d===d.day&&s<o.e&&o.s<e){const t=`${o.title} (${tr(o.s,o.e)})`;if(!hits.includes(t))hits.push(t)}}));
-  const len=hrs(e-s)+' שעות'+(e>1440?' · נגמר אחרי חצות':'');
+  suns.forEach(w=>evsForWeek(w,its,det?null:editing).forEach(o=>{if(!o.cancelled&&o.d===d.day&&s<o.e&&o.s<e){const t=`${o.title} (${ltr(tr(o.s,o.e))})`;if(!hits.includes(t))hits.push(t)}}));
+  const len=(e-s===60?'שעה':hrs(e-s)+' שעות')+(e>1440?' · נגמר אחרי חצות':'');
   const pre=det?`רק ב-${dm(d.date)} · שאר הסדרה נשארת כל שבוע · `:''; // unticking "חוזר כל שבוע" on a series moves only this date
   if(hits.length){h.className='hint bad';h.textContent=`${pre}${len} · חפיפה עם ${hits.join(', ')}`}
   else{h.className='hint ok';h.textContent=`${pre}${len} · אין חפיפה`}
@@ -1586,7 +1613,8 @@ frm.addEventListener('input',x=>{
   if(x.target.name==='fKind'&&!editing){const l=lastOf(getKind());if(getKind()==='due')$('#fStart').value='23:59';else if(l&&!timesTouched){$('#fStart').value=l.start;$('#fEnd').value=l.end}else if(addTimes&&$('#fStart').value==='23:59'){$('#fStart').value=addTimes.s;$('#fEnd').value=addTimes.e}}
   prevS=$('#fStart').value;prevE=$('#fEnd').value;syncFields();hint();
 });
-$('#fPre').addEventListener('click',x=>{const b=x.target.closest('button');if(!b)return;$('#fStart').value=b.dataset.s;$('#fEnd').value=b.dataset.e;timesTouched=endTouched=true;prevS=b.dataset.s;prevE=b.dataset.e;hint()});
+$('#fPre').addEventListener('click',x=>{const b=x.target.closest('button');if(!b)return;$('#fStart').value=b.dataset.s;if(b.dataset.e){$('#fEnd').value=b.dataset.e;endTouched=true}timesTouched=true;prevS=$('#fStart').value;prevE=$('#fEnd').value;hint()}); // a deadline's buttons carry only the hour
+$('#fHint').addEventListener('click',x=>x.currentTarget.classList.toggle('full')); // one line; a tap shows a long clash list in full
 $('#fCancel').addEventListener('click',()=>dlg.close());$('#dlgX').addEventListener('click',()=>dlg.close());
 function resetDel(){delArmed=0;const b=$('#fDel');b.classList.remove('armed');b.textContent='מחיקה'}
 $('#fDel').addEventListener('click',async()=>{
