@@ -13,9 +13,9 @@ Source: the owner's notes. Semester A is built into `index.html` (`BASE` = track
 
 ### Track ב' (the owner's)
 - Sun 10:15–17:30: 10:15–11:45 Prob&Stat tutorial (103) · 12:00–13:30 Math A tutorial (208) · 14:00–15:30 Accounting A tutorial (205) · 16:00–17:30 Accounting A lecture (205)
-- Mon: same as track א'
+- Mon: same as track א', except rooms (changed 2026-11-16): Prob&Stat lecture 109, Intro Micro lecture 107
 - Tue 10:15–16:30: 10:15–11:45 Micro tutorial (212) · 12:15–14:45 Data tools & AI lab (209) · 15:00–16:30 Micro lecture (101)
-- Wed: same as track א'
+- Wed: same as track א', except the Math A lecture room is 101 (changed 2026-11-16)
 - Thu free
 
 ## Semester ב' (starts 21.02.27) — not built

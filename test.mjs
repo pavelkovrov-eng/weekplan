@@ -312,7 +312,7 @@ test('dayLines: one day, ordered by time, deadlines included',()=>{
 test('lineTxt: colour, title and meta of a list line',()=>{
   const ev=d=>core.evsForWeek('2026-10-18',[{id:'a',kind:'anchor',date:A,updated:1},{id:'u',kind:'open',day:4,start:'07:00',end:'15:00',week:'both',note:'חנות'},{id:'v',kind:'study',date:'2026-10-24',start:'10:00',end:'12:00'}]).find(d);
   assert.deepEqual(core.lineTxt(ev(e=>e.key==='b0')),{col:'--c-stat',ttl:'הסתברות וסטטיסטיקה · תרגיל',meta:'כלכלה 103'});
-  assert.deepEqual(core.lineTxt(ev(e=>e.key==='b11')),{col:'--c-math',ttl:"מתמטיקה א' · שיעור",meta:'כלכלה 107'});
+  assert.deepEqual(core.lineTxt(ev(e=>e.key==='b11')),{col:'--c-math',ttl:"מתמטיקה א' · שיעור",meta:'כלכלה 101'});
   assert.deepEqual(core.lineTxt(ev(e=>e.id==='u')),{col:'--open-bd',ttl:'משמרת פתיחה',meta:'כל שבוע · חנות'});
   assert.deepEqual(core.lineTxt(ev(e=>e.id==='v')),{col:'--study-bd',ttl:'למידה עצמית',meta:'חד-פעמי'});
   const x=core.evsForWeek('2027-01-17',[]).find(e=>e.src==='exam'&&e.date==='2027-01-22');
