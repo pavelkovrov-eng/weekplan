@@ -172,6 +172,8 @@ button.blk.base{cursor:pointer;line-height:1.3;display:flex;flex-direction:colum
 .upgo{flex:1 1 0;min-width:0;display:grid;grid-template-columns:62px minmax(0,1fr);gap:12px;align-items:center;text-align:right;border:0;border-inline-start:4px solid var(--cc,var(--border-dark));background:var(--bg-sunk);border-radius:12px;padding:10px 12px;cursor:pointer;font:inherit;color:inherit} /* the nearer, the bigger: g-near (this week) > g-mid (this month) > g-far (a quiet line) */
 @media (hover:hover){.upgo:hover{background:color-mix(in srgb,var(--cc,var(--text-faint)) 12%,var(--bg-card))}}
 .upgo .dl{display:grid;justify-items:center;line-height:1.1;color:var(--ink)}.upgo .dl b{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}.upgo .dl b.w{font-size:15px}.upgo .dl small{font-size:11px;font-weight:600;color:var(--text-muted)}
+#frm.task :is(#fTime,#fPre,.fwhen,#fWeekF){display:none}
+.upgo.tk{grid-template-columns:minmax(0,1fr);background:none;padding-block:3px}.upgo.tk .tx>b{font-size:14px;font-weight:600}
 .upgo .tx{display:grid;gap:2px;min-width:0}.upgo .tx>b{font-size:15px;overflow-wrap:anywhere}
 .upgo .dt{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted)}
 .upgo.g-near{padding-block:14px;background:color-mix(in srgb,var(--cc,var(--text-faint)) 10%,var(--bg-card))}.upgo.g-near .dl b{font-size:26px}.upgo.g-near .dl b.w{font-size:17px}.upgo.g-near .tx>b{font-size:17px}
@@ -874,6 +876,7 @@ const KINDS={
   close:{label:'משמרת סגירה',short:'סגירה',shift:1,color:'--close-bd'},
   study:{label:'למידה עצמית',short:'למידה',color:'--study-bd'},
   due:{label:'הגשה',short:'הגשה',color:'--bad-bd'},
+  task:{label:'משימה',short:'משימה',color:'--other-bd'},
   other:{label:'אחר',short:'אחר',color:'--other-bd'}
 };
 const WKN={A:'כל שבוע',B:'כל שבוע',both:'כל שבוע',date:'תאריך אחד'}; // A/B: docs of the retired week-A/B rotation, now weekly
@@ -916,7 +919,7 @@ const EXAMS=[ // mtamn.mta.ac.il exam search, תשפ"ז. Live system: dates can 
  {c:'יסודות התנהגות ארגונית',m:'א',date:'2027-02-14',s:'14:00'},{c:'יסודות התנהגות ארגונית',m:'ב',date:'2027-03-08',s:'14:00'},
 ];
 const EXAM_MIN=180; // ponytail: assumed 3h; the listing gives start time only
-const SPECIAL={due:1,off:1,anchor:1,cancel:1,profile:1};
+const SPECIAL={due:1,task:1,off:1,anchor:1,cancel:1,profile:1};
 const profileOf=items=>items.filter(x=>x.kind==='profile').sort((p,q)=>(q.updated||0)-(p.updated||0))[0]||null; // the newest profile doc: {track,name,works}
 const trackOf=items=>{const p=profileOf(items);return p&&TRACKS[p.track]?p.track:'b'}; // the timetable of the signed-in student; track ב' is the default (the owner's data has no profile)
 const baseOf=items=>TRACKS[trackOf(items)].base;
@@ -937,6 +940,7 @@ const courseOk=c=>Object.values(COURSE).includes(c); // a known course colour id
 const dueName=x=>{const c=courseOk(x.course)?CSHORT[x.course]:'';return c&&x.title?c+' · '+x.title:c||x.title||''}; // a deadline's name: course short name, then the title
 const dueLbl=x=>{const n=dueName(x);return n?'הגשה: '+n:'הגשה'};
 const dueCls=x=>courseOk(x.course)?'cd c-'+x.course:''; // classes of a deadline drawn in its course colour (c-<course> sets --cc)
+const TSTAT={todo:'לא בוצע',done:'בוצע'}; // the same two states for a task
 const STAT={todo:'לא התחלתי',done:'הוגש'}; // a deadline's status: the doc stores only done:true/false (exports read it)
 const dueSt=x=>x&&x.done?'done':'todo';
 const dueLate=(x,today)=>x.kind==='due'&&isoOk(x.date)&&x.date<today&&dueSt(x)!=='done'; // past its date and not submitted
@@ -997,6 +1001,7 @@ function evsForWeek(sun,items,skipId){
   return out;
 }
 const submitted=items=>items.filter(x=>x.kind==='due'&&isoOk(x.date)&&x.done).map(x=>({id:x.id,date:x.date,time:okTime(x.start)?x.start:'23:59',title:dueName(x)||'הגשה',st:'done',...(courseOk(x.course)&&{course:x.course})})).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0); // the submitted deadlines, newest first: the record under "what's coming"
+const tasksOf=(items,done)=>items.filter(x=>x.kind==='task'&&!!x.done===done).map(x=>({id:x.id,title:x.title||'משימה',st:done?'done':'todo',...(courseOk(x.course)&&{course:x.course}),u:x.updated||0})).sort((a,b)=>b.u-a.u); // dateless tasks, newest first: done=false the open ones (the "בלי תאריך" group of what's coming), true the finished ones
 function recentTimes(items,kind,n=3){ // the most used start-end pairs of one kind (ties: the more recently saved), for the quick time buttons of the add dialog
   const m=new Map();for(const it of items)if(it.kind===kind&&okTime(it.start)&&okTime(it.end)){const k=it.start+'-'+it.end,o=m.get(k)||{s:it.start,e:it.end,n:0,u:0};o.n++;o.u=Math.max(o.u,it.updated||0);m.set(k,o)}
   return[...m.values()].sort((a,b)=>b.n-a.n||b.u-a.u).slice(0,n)
@@ -1068,6 +1073,7 @@ function stats(evs){
 }
 function toDoc(f,sun){
   const b={kind:f.kind,title:f.title,note:f.note,updated:f.updated},date=()=>isoOk(f.date)?f.date:addDays(sun,f.day); // f.date = the picked date; without one, the weekday in the dialog's week
+  if(f.kind==='task')return{...b,done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course})}; // no date, no times
   if(f.kind==='due')return{...b,date:date(),start:okTime(f.start)?f.start:'23:59',done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course})}; // f.status (the dialog's select) wins over f.done
   if(f.week==='date')return{...b,date:date(),start:f.start,end:f.end};
   return{...b,day:f.day,start:f.start,end:f.end,week:f.week,skip:f.skip||[]};
@@ -1246,7 +1252,7 @@ function render0(){
       if(ph&&wkSeen!==viewSun){wkSeen=viewSun;gridTo(viewDay>=viewSun&&viewDay<=addDays(viewSun,6)?viewDay:todayIso()>=viewSun&&todayIso()<=addDays(viewSun,6)?todayIso():viewSun)} // only on entering the tab or a new week, never on a data refresh
     }
   }
-  $('#addBtn').disabled=!edit;$('#tabAdd').disabled=!edit||upv;$('#pasteBtn').hidden=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
+  $('#addBtn').disabled=!edit;$('#tabAdd').disabled=!edit;$('#pasteBtn').hidden=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
 }
 function renderStore(){
   const m={loading:['ld','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],sb:['db','נשמר בחשבון Google'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
@@ -1288,8 +1294,8 @@ function dayDue(date){ // a day's deadlines as quiet chips for the foot of its g
     +(L.length>2?`<button type="button" class="dmore" data-more="${date}">${open?'פחות':'+'+(L.length-2)+' עוד'}</button>`:'');
 }
 function stBtn(x,edit,name){ // the status pill of a deadline: its state in words; one tap flips it (לא התחלתי / הוגש)
-  const s=x.st||dueSt(x);
-  return`<button type="button" class="stb s-${s}" data-st="${esc(x.id)}" data-s="${s}"${edit?` aria-pressed="${s==='done'}"`:' disabled'} aria-label="${esc((name||'הגשה')+' · '+STAT[s]+(edit?' · לחיצה להחלפה':''))}">${STAT[s]}</button>`;
+  const s=x.st||dueSt(x),ST=x.task?TSTAT:STAT;
+  return`<button type="button" class="stb s-${s}" data-st="${esc(x.id)}" data-s="${s}"${edit?` aria-pressed="${s==='done'}"`:' disabled'} aria-label="${esc((name||'הגשה')+' · '+ST[s]+(edit?' · לחיצה להחלפה':''))}">${ST[s]}</button>`;
 }
 function renderGrid(evs,clash){
   let lo=480,hi=1200;
@@ -1474,15 +1480,16 @@ function renderShifts(){
     +`</tbody><tfoot><tr><td>סה"כ בסמסטר</td><td>${hrs(S.min)}</td><td>${S.n}</td></tr></tfoot>`;
 }
 function renderUp(){
-  const L=upcoming(todayIso(),items,PHQ.matches?30:6),edit=canEdit(),S=submitted(items);
+  const L=upcoming(todayIso(),items,PHQ.matches?30:6),edit=canEdit(),S=submitted(items),TK=tasksOf(items,false).map(x=>({...x,task:1})),TD=tasksOf(items,true).map(x=>({...x,task:1}));
   const late=L.filter(x=>x.late).length,nx=L.find(x=>!x.late);
-  $('#upSum').innerHTML=(late?`<b class="lt">${late} באיחור</b>`:'')+(late&&nx?' · ':'')+(nx?'הבא: '+dm(nx.date)+' · '+esc(nx.title):'')||'אין הגשות קרובות'; // the line next to the title while the card is closed
-  $('#upDone').hidden=!S.length;$('#upDoneN').textContent='הוגשו ('+S.length+')';
-  $('#upDoneL').innerHTML=S.map(x=>`<li><span class="dt">${dm(x.date)}</span><b>${esc(x.title)}</b>${stBtn(x,edit,x.title)}</li>`).join('');
+  $('#upSum').innerHTML=[late?`<b class="lt">${late} באיחור</b>`:'',nx?'הבא: '+dm(nx.date)+' · '+esc(nx.title):'',TK.length?(TK.length===1?'משימה אחת':TK.length+' משימות'):''].filter(Boolean).join(' · ')||'אין הגשות קרובות'; // the line next to the title while the card is closed
+  $('#upDone').hidden=!S.length&&!TD.length;$('#upDoneN').textContent=(TD.length?'הושלמו (':'הוגשו (')+(S.length+TD.length)+')';
+  $('#upDoneL').innerHTML=S.map(x=>`<li><span class="dt">${dm(x.date)}</span><b>${esc(x.title)}</b>${stBtn(x,edit,x.title)}</li>`).join('')+TD.map(x=>`<li><b>${esc(x.title)}</b>${stBtn(x,edit,x.title)}</li>`).join('');
   const grp=x=>x.late?'באיחור':x.daysLeft<=7?'השבוע':x.daysLeft<=30?'החודש':'אחר כך',gc=x=>x.late||x.daysLeft<=7?'g-near':x.daysLeft<=30?'g-mid':'g-far'; // urgency decides the size
   const cc=x=>x.exam&&COURSE[x.title]?'cd c-'+COURSE[x.title]:dueCls(x),dl=x=>x.daysLeft===0?'<b class="w">היום</b>':x.daysLeft===1?'<b class="w">מחר</b>':`<b>${Math.abs(x.daysLeft)}</b><small>${x.late?'ימי איחור':'ימים'}</small>`;
-  let g='';$('#up').innerHTML=L.length?L.map(x=>{const h=grp(x)!==g?`<li class="uph">${g=grp(x)}</li>`:'';
-    return h+`<li><button type="button" class="upgo ${gc(x)}${x.late?' late':''} ${cc(x)}" data-go="${x.date}"><span class="dl">${dl(x)}</span><span class="tx"><b>${esc(x.title)}</b><span class="dt">${dm(x.date)} · ${esc(x.time)} · ${esc(x.tag)}</span></span></button>${x.id?stBtn(x,edit,x.title):''}</li>`}).join(''):'<li class="none">אין מבחנים או הגשות קרובים.</li>';
+  const tk=TK.length?'<li class="uph">בלי תאריך</li>'+TK.map(x=>`<li><button type="button" class="upgo tk ${dueCls(x)}" data-edit="${esc(x.id)}"><span class="tx"><b>${esc(x.title)}</b></span></button>${stBtn(x,edit,x.title)}</li>`).join(''):'';
+  let g='';$('#up').innerHTML=(L.length?L.map(x=>{const h=grp(x)!==g?`<li class="uph">${g=grp(x)}</li>`:'';
+    return h+`<li><button type="button" class="upgo ${gc(x)}${x.late?' late':''} ${cc(x)}" data-go="${x.date}"><span class="dl">${dl(x)}</span><span class="tx"><b>${esc(x.title)}</b><span class="dt">${dm(x.date)} · ${esc(x.time)} · ${esc(x.tag)}</span></span></button>${x.id?stBtn(x,edit,x.title):''}</li>`}).join(''):TK.length?'':'<li class="none">אין מבחנים או הגשות קרובים.</li>')+tk;
 }
 const stBusy=new Set(); // deadlines whose status save is still running
 async function setSt(id,s){
@@ -1490,11 +1497,11 @@ async function setSt(id,s){
   stBusy.add(id);
   try{
     const{id:_,status:__,...rest}=it; // status: a leftover field of an earlier build
-    await fast({id,doc:{...rest,done:s==='done',updated:Date.now()}},s==='done'?'סומן כהוגש':'סומן כלא התחלתי');
+    await fast({id,doc:{...rest,done:s==='done',updated:Date.now()}},it.kind==='task'?(s==='done'?'סומן כבוצע':'סומן כלא בוצע'):s==='done'?'סומן כהוגש':'סומן כלא התחלתי');
   }finally{stBusy.delete(id)}
   const b=document.querySelector(`[data-st="${id}"]`);if(b)b.focus(); // the lists are redrawn: keep the keyboard on the same button
 }
-$('#up').addEventListener('click',x=>{const b=x.target.closest('[data-go]');if(!b)return;if(PHQ.matches){setView('day',b.dataset.go);scrollTo(0,0);return}if(view==='month')viewYm=clampYm(ymOf(b.dataset.go));go(sunOf(b.dataset.go))});
+$('#up').addEventListener('click',x=>{const t=x.target.closest('[data-edit]');if(t){openEdit(t.dataset.edit);return}const b=x.target.closest('[data-go]');if(!b)return;if(PHQ.matches){setView('day',b.dataset.go);scrollTo(0,0);return}if(view==='month')viewYm=clampYm(ymOf(b.dataset.go));go(sunOf(b.dataset.go))});
 document.addEventListener('click',x=>{const b=x.target.closest('[data-st]');if(b&&!b.disabled){const id=b.dataset.st;setSt(id,b.dataset.s==='done'?'todo':'done');pop(document.querySelector(`[data-st="${id}"]`))}}); // sb redraws at once, so the pop lands on the new pill // one tap flips the status (there are only two)
 $('#agenda').addEventListener('click',x=>{
   const k=x.target.closest('[data-key]'),kl=k&&agL[k.dataset.date+'|'+k.dataset.key];
@@ -1524,7 +1531,7 @@ $('#grid').addEventListener('click',async x=>{
 
 /* ---------- dialog ---------- */
 const dlg=$('#dlg'),frm=$('#frm');
-$('#kindChips').innerHTML=['due','study','open','close','other'].map(k=>[k,KINDS[k]]).map(([k,v])=>`<label data-shift="${v.shift?1:0}"><input type="radio" name="fKind" value="${k}" id="fk_${k}">${v.short}</label>`).join('');
+$('#kindChips').innerHTML=['due','task','study','open','close','other'].map(k=>[k,KINDS[k]]).map(([k,v])=>`<label data-shift="${v.shift?1:0}"><input type="radio" name="fKind" value="${k}" id="fk_${k}">${v.short}</label>`).join('');
 $('#fDay').innerHTML=DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
 $('#fDays').innerHTML=DAYI.map((l,i)=>`<button type="button" data-d="${i}" aria-label="${DAYS[i]}" aria-pressed="false">${l}</button>`).join(''); // the week's days: a tap picks the day (dated: in the week of the picked date)
 $('#fDays').addEventListener('click',x=>{const b=x.target.closest('[data-d]');if(!b)return;const fd=$('#fDate');$('#fDay').value=b.dataset.d;if(isDated())fd.value=clampDay(addDays(isoOk(fd.value)?sunOf(fd.value):editSun,Number(b.dataset.d)));syncFields();hint()});
@@ -1542,7 +1549,7 @@ const mkPill=(id,box,pick,r)=>{let el=null,cur=null;const f=anim=>{ // same moti
   const L=Math.min(from.l,to.l),R=Math.max(from.l+from.w,to.l+to.w);
   el.animate([{...px(from),offset:0},{...px({l:L,t:to.t+to.h*.12,w:R-L,h:to.h*.76}),offset:.45},{...px({l:to.l+to.w*.08,t:to.t+to.h*.08,w:to.w*.84,h:to.h*.84}),offset:.8},{...px(to),offset:1}],{duration:600,easing:'cubic-bezier(.3,.7,.3,1)'})};f.reset=()=>{cur=null};new ResizeObserver(()=>f(0)).observe(box);return f};
 const kindPill0=mkPill('kindPill',$('#kindChips'),()=>$('#kindChips').querySelector('label:has(input:checked)'));
-const kindPill=anim=>{const kc={open:'open',close:'close',study:'study',due:'bad',other:'other'}[getKind()];if(kc)frm.style.setProperty('--kc',`var(--${kc}-bd)`);kindPill0(anim)}; // the pills are beige; only the dot in the title carries the kind's colour
+const kindPill=anim=>{const kc={open:'open',close:'close',study:'study',due:'bad',task:'other',other:'other'}[getKind()];if(kc)frm.style.setProperty('--kc',`var(--${kc}-bd)`);kindPill0(anim)}; // the pills are beige; only the dot in the title carries the kind's colour
 const prePill=mkPill('prePill',$('#fPre'),()=>$('#fPre').querySelector('button.on'));
 function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true;if(!worksOn()&&!(KINDS[k]&&KINDS[k].shift))$('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=true);else $('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=false);kindPill(0)} // a student who works no shifts does not see the shift types (an existing shift keeps its own)
 function setWeek(w){$('#fRec').checked=w==='A'||w==='B'||w==='both'} // A/B docs of the retired rotation open as weekly
@@ -1551,21 +1558,22 @@ $('#fCourse').innerHTML='<option value="">בלי מקצוע</option>'+COURSE_OPT
 $('#fStatus').innerHTML=Object.entries(STAT).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
 $('#fDate').min=SEM.start;$('#fDate').max=SEM.last;
 let dated=false; // true while the date field (not the weekday select) is the one in use: a deadline, or "only on this date"
-const isDated=()=>getKind()==='due'||getWeek()==='date';
+const isDated=()=>getKind()!=='task'&&(getKind()==='due'||getWeek()==='date'); // a task has no date at all
 let preKey='',endTouched=false,prevS='',prevE=''; // endTouched: the end was typed by hand, so changing the start no longer drags it along
 const PRE0={open:[['08:00','16:00'],['10:00','18:00'],['07:00','15:00']],close:[['16:00','22:00'],['14:00','22:00'],['17:00','23:00']],study:[['10:00','12:00'],['14:00','16:00'],['18:00','20:00']],other:[['10:00','12:00'],['14:00','16:00'],['18:00','20:00']]};
 const firstPre=()=>{renderPre();const b=$('#fPre').querySelector('button');return b&&{s:b.dataset.s,e:b.dataset.e}};
 function renderPre(){ // always three two-line buttons (range, then what it is), so the row never changes shape: the kind's own most used times first, then that kind's defaults; a deadline gets three hours
-  const k=getKind(),L=k==='due'?[{s:'23:59'},{s:'12:00'},{s:'08:00'}]:recentTimes(items,k,9).filter(x=>[x.s,x.e].every(t=>!t||/:(00|30)$/.test(t))).slice(0,3);
+  const k=getKind();if(k==='task'){preKey='';$('#fPre').hidden=true;return} // a task has no time
+  const L=k==='due'?[{s:'23:59'},{s:'12:00'},{s:'08:00'}]:recentTimes(items,k,9).filter(x=>[x.s,x.e].every(t=>!t||/:(00|30)$/.test(t))).slice(0,3);
   if(k!=='due')for(const[s,e]of PRE0[k]||PRE0.other){if(L.length>=3)break;if(!L.some(y=>y.s===s&&y.e===e))L.push({s,e})}
   const key=k+'|'+L.map(x=>x.s+(x.e||'')).join();if(key===preKey){preMark();return}preKey=key;
   const b=$('#fPre');b.hidden=false;b.innerHTML=L.map(x=>`<button type="button" data-s="${x.s}"${x.e?` data-e="${x.e}"`:''}><b>${ltr(x.e?x.s+'–'+x.e:x.s)}</b></button>`).join('');preMark()}
-function preMark(anim=1){const s=$('#fStart').value,e=$('#fEnd').value,due=getKind()==='due';for(const b of $('#fPre').children)b.classList.toggle('on',b.dataset.s===s&&(due||b.dataset.e===e));prePill(anim)} // the quick time that equals the fields is ringed
+function preMark(anim=1){if(getKind()==='task')return;const s=$('#fStart').value,e=$('#fEnd').value,due=getKind()==='due';for(const b of $('#fPre').children)b.classList.toggle('on',b.dataset.s===s&&(due||b.dataset.e===e));prePill(anim)} // the quick time that equals the fields is ringed
 function syncFields(){
-  const due=getKind()==='due',dt=isDated(),fd=$('#fDate'),fy=$('#fDay'),rp=()=>isoOk(fd.value)&&dow(fd.value)===Number(fy.value)?fd.value:clampDay(addDays(editSun,Number(fy.value))); // rp: the date "only on this date" takes from a recurring form (the picked date while its weekday still matches)
+  const task=getKind()==='task',due=getKind()==='due',dt=isDated(),fd=$('#fDate'),fy=$('#fDay'),rp=()=>isoOk(fd.value)&&dow(fd.value)===Number(fy.value)?fd.value:clampDay(addDays(editSun,Number(fy.value))); // rp: the date "only on this date" takes from a recurring form (the picked date while its weekday still matches)
   if(dt!==dated){dated=dt;if(dt)fd.value=rp();else if(isoOk(fd.value))fy.value=String(dow(fd.value))} // switching mode keeps the day and the date in step (a picked date survives a round trip)
-  renderPre();$('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due;$('#fCourseF').hidden=$('#fStatusF').hidden=!due;$('#fDayF').hidden=true;$('#fDateF').hidden=!dt;
-  $('#fTime').classList.toggle('due',due);$('#fTitle').placeholder=due?'שם המטלה':getKind()==='other'?'מה זה?':'כותרת (לא חובה)';daysSync();
+  frm.classList.toggle('task',task);renderPre();$('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due||task;$('#fCourseF').hidden=$('#fStatusF').hidden=!(due||task);for(const o of $('#fStatus').options)o.textContent=(task?TSTAT:STAT)[o.value];$('#fDayF').hidden=true;$('#fDateF').hidden=!dt;
+  $('#fTime').classList.toggle('due',due);$('#fTitle').placeholder=task?'מה לעשות?':due?'שם המטלה':getKind()==='other'?'מה זה?':'כותרת (לא חובה)';daysSync();
 }
 function openAdd(pre={}){
   const sun=pre.sun||viewSun; // the week to add to (month view passes its own)
@@ -1602,6 +1610,7 @@ function readForm(){
   return{kind,title:$('#fTitle').value.trim(),day:isoOk(date)?dow(date):Number($('#fDay').value),date,course:$('#fCourse').value,status:$('#fStatus').value,start:$('#fStart').value,end:$('#fEnd').value,week:getWeek(),note:$('#fNote').value.trim(),updated:Date.now()};
 }
 function validate(d){
+  if(d.kind==='task')return d.title?'':'כתוב מה לעשות';
   if((d.kind==='due'||d.week==='date')&&!(isoOk(d.date)&&d.date>=SEM.start&&d.date<=SEM.last))return`בחר תאריך בין ${dmy(SEM.start)} ל-${dmy(SEM.last)}`;
   if(d.kind==='due')return'';
   if(!okTime(d.start)||!okTime(d.end))return'צריך שעת התחלה ושעת סיום.';
@@ -1611,6 +1620,7 @@ function validate(d){
 }
 function hint(){preMark();
   const d=readForm(),h=$('#fHint');h.classList.remove('full');
+  if(d.kind==='task'){h.className='hint';h.textContent='בלי תאריך · תופיע ב"מה מתקרב"';return}
   if(isDated()&&!isoOk(d.date)){h.className='hint';h.textContent='בחר תאריך';return}
   if(d.kind==='due'){h.className='hint';h.textContent=`הגשה ב-${dm(d.date)} עד ${okTime(d.start)?d.start:'23:59'}`;return}
   if(!okTime(d.start)||!okTime(d.end)||d.start===d.end){h.className='hint';h.textContent='בחר שעת התחלה וסיום. סיום מוקדם מההתחלה נחשב עד אחרי חצות.';return}
@@ -1646,12 +1656,12 @@ frm.addEventListener('submit',async x=>{
   if(err){$('#fErr').textContent=err;$('#fErr').hidden=false;$('#fErr').scrollIntoView({block:'nearest'});shake($('#fErr'));return}
   const prev=editing&&items.find(it=>it.id===editing);
   $('#fSave').disabled=true;let ok;
-  if(prev&&isRec(prev)&&(d.week==='date'||d.kind==='due')){
+  if(prev&&isRec(prev)&&d.kind!=='task'&&(d.week==='date'||d.kind==='due')){
     const{one,series}=detach(prev,d,editSun,$('#fSkip').dataset.date);
     ok=await saveItem(null,one,dMsg(one.date,'נוסף ל-'+dm(one.date)))&&await saveItem(prev.id,series,dMsg(one.date,'הועבר ל-'+dm(one.date),' · הסדרה נשארה'));
   }else{
     const doc=toDoc({...d,skip:prev&&isRec(prev)?prev.skip:undefined},editSun);
-    const m=editing?'עודכן':doc.date?'נוסף ל-'+dm(doc.date):'נוסף ל'+WKN[doc.week];
+    const m=editing?'עודכן':doc.kind==='task'?'נוספה משימה':doc.date?'נוסף ל-'+dm(doc.date):'נוסף ל'+WKN[doc.week];
     ok=await saveItem(editing,doc,doc.date?dMsg(doc.date,m):m);
   }
   $('#fSave').disabled=false;if(ok)dlg.close();else{$('#fErr').textContent='השמירה לא הצליחה. בדוק את החיבור ונסה שוב.';$('#fErr').hidden=false;$('#fErr').scrollIntoView({block:'nearest'});shake($('#fErr'))}
@@ -2262,7 +2272,7 @@ $('#dayCard').addEventListener('touchend',x=>{if(!swipe0)return;const t=x.change
 PHQ.addEventListener('change',()=>{if(!PHQ.matches&&(view==='day'||view==='up'))view='week';render()}); // e.g. an iPhone turned sideways is wider than 600px: desktop layout
 $('#vWeek').addEventListener('click',()=>setView('week'));$('#vMonth').addEventListener('click',()=>setView('month'));
 $('#mLegend').innerHTML=$('#gridCard .legend').innerHTML;
-$('#addBtn').addEventListener('click',()=>{const t=todayIso(),d=clampDay(ymOf(t)===viewYm?t:viewYm+'-01');openAdd(view==='month'?{sun:sunOf(d),day:dow(d)}:view==='day'?{day:dow(viewDay)}:{})}); // month: today if it is in the shown month, else the 1st (its week and weekday). day: viewSun is the picked day's week
+$('#addBtn').addEventListener('click',()=>{const t=todayIso(),d=clampDay(ymOf(t)===viewYm?t:viewYm+'-01');openAdd(PHQ.matches&&view==='up'?{kind:'task'}:view==='month'?{sun:sunOf(d),day:dow(d)}:view==='day'?{day:dow(viewDay)}:{})}); // month: today if it is in the shown month, else the 1st (its week and weekday). day: viewSun is the picked day's week
 
 try{if(location.protocol==='https:'&&navigator.serviceWorker)navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){} // offline shell; https only (not localhost, not file)
 render();

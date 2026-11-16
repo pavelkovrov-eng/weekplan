@@ -597,3 +597,19 @@ test('recentTimes: the most used start-end pairs of a kind',()=>{
   assert.equal(core.recentTimes(L,'open',1).length,1);
   assert.deepEqual(core.recentTimes(L,'study'),[]);
 });
+
+test('tasks (dateless to-dos)',()=>{
+  const T=(id,o)=>({id,kind:'task',title:id,done:false,updated:1,...o});
+  const items=[T('a',{updated:1}),T('b',{updated:5,course:'micro'}),T('c',{done:true,updated:3}),T('d',{course:'zzz',updated:2}),
+    {id:'u',kind:'due',title:'x',date:'2026-11-20',done:false}];
+  assert.deepEqual(core.tasksOf(items,false).map(x=>x.id),['b','d','a']); // open, newest first, dues ignored
+  assert.deepEqual(core.tasksOf(items,true).map(x=>x.id),['c']);
+  assert.equal(core.tasksOf(items,false)[0].course,'micro');assert.equal(core.tasksOf(items,false)[1].course,undefined);
+  const d=core.toDoc({kind:'task',title:'t',note:'',updated:9,date:'2026-11-20',day:2,start:'10:00',end:'12:00',status:'done',course:'micro'},'2026-11-15');
+  assert.deepEqual(d,{kind:'task',title:'t',note:'',updated:9,done:true,course:'micro'}); // no date, no times
+  assert.equal(core.toDoc({kind:'task',title:'t',status:'todo'},'2026-11-15').done,false);
+  for(const sun of ['2026-11-15','2026-11-22'])assert.equal(core.evsForWeek(sun,items).filter(e=>e.src==='user').length,0); // never drawn
+  assert.equal(core.semEvents(items).length,core.semEvents(items.filter(x=>x.kind!=='task')).length);
+  assert.equal(core.shiftMonths(items).n,0);
+  assert.deepEqual(core.upcoming('2026-11-16',items,20),core.upcoming('2026-11-16',items.filter(x=>x.kind!=='task'),20)); // what's coming ignores tasks
+});
