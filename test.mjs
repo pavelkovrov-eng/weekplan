@@ -613,3 +613,12 @@ test('tasks (dateless to-dos)',()=>{
   assert.equal(core.shiftMonths(items).n,0);
   assert.deepEqual(core.upcoming('2026-11-16',items,20),core.upcoming('2026-11-16',items.filter(x=>x.kind!=='task'),20)); // what's coming ignores tasks
 });
+
+test('duesOfCourse (open deadlines in the class window)',()=>{
+  const D=(id,date,o)=>({id,kind:'due',title:id,date,start:'23:59',done:false,course:'micro',...o});
+  const items=[D('b','2026-11-25'),D('a','2026-11-10'),D('x','2026-11-20',{course:'stat'}),D('d','2026-11-18',{done:true}),D('n','2026-11-30',{course:undefined}),{id:'t',kind:'task',title:'t',course:'micro'}];
+  const L=core.duesOfCourse(items,'micro','2026-11-16');
+  assert.deepEqual(L.map(x=>x.id),['a','b']); // other course, submitted, no course and tasks left out; oldest first
+  assert.deepEqual([L[0].late,L[0].daysLeft,L[1].late,L[1].daysLeft],[1,-6,0,9]);
+  assert.deepEqual(core.duesOfCourse(items,'nope','2026-11-16'),[]);assert.deepEqual(core.duesOfCourse(items,undefined,'2026-11-16'),[]);
+});

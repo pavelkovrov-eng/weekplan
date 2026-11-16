@@ -173,6 +173,10 @@ button.blk.base{cursor:pointer;line-height:1.3;display:flex;flex-direction:colum
 @media (hover:hover){.upgo:hover{background:color-mix(in srgb,var(--cc,var(--text-faint)) 12%,var(--bg-card))}}
 .upgo .dl{display:grid;justify-items:center;line-height:1.1;color:var(--ink)}.upgo .dl b{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}.upgo .dl b.w{font-size:15px}.upgo .dl small{font-size:11px;font-weight:600;color:var(--text-muted)}
 #frm.task :is(#fTime,#fPre,.fwhen,#fWeekF){display:none}
+.cdues{margin-top:10px;display:grid;gap:6px;text-align:start}.cdues h4{margin:0;font-size:12px;font-weight:800;letter-spacing:.05em;color:var(--text-muted)}
+.cdr{display:flex;align-items:center;gap:8px}.cdr>button:first-child{flex:1 1 0;min-width:0;display:grid;gap:1px;text-align:start;border:0;background:var(--bg-sunk);border-radius:10px;padding:8px 10px;min-height:44px;font:inherit;color:inherit;cursor:pointer;border-inline-start:3px solid var(--cc,var(--border-dark))}
+.cdr b{font-size:14px;overflow-wrap:anywhere}.cdr span{font-size:12.5px;color:var(--text-muted)}.cdr.late>button:first-child{background:var(--bad-bg)}.cdr.late span{color:var(--bad-tx)}
+.cdmore{border:0;background:none;color:var(--accent-text);font:inherit;font-size:13px;font-weight:700;padding:4px;cursor:pointer;justify-self:start}
 .upgo.tk{grid-template-columns:minmax(0,1fr);background:none;padding-block:3px}.upgo.tk .tx>b{font-size:14px;font-weight:600}
 .upgo .tx{display:grid;gap:2px;min-width:0}.upgo .tx>b{font-size:15px;overflow-wrap:anywhere}
 .upgo .dt{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted)}
@@ -681,6 +685,7 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="dlg">
     <h3 id="cTitle"></h3>
     <div class="hint" id="cWhen"></div>
+    <div class="cdues" id="cDues" hidden></div>
     <div class="actions">
       <button type="button" class="btn pri" id="cGo"></button>
       <button type="button" class="btn" id="cClose" autofocus>סגירה</button>
@@ -1002,6 +1007,7 @@ function evsForWeek(sun,items,skipId){
 }
 const submitted=items=>items.filter(x=>x.kind==='due'&&isoOk(x.date)&&x.done).map(x=>({id:x.id,date:x.date,time:okTime(x.start)?x.start:'23:59',title:dueName(x)||'הגשה',st:'done',...(courseOk(x.course)&&{course:x.course})})).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0); // the submitted deadlines, newest first: the record under "what's coming"
 const tasksOf=(items,done)=>items.filter(x=>x.kind==='task'&&!!x.done===done).map(x=>({id:x.id,title:x.title||'משימה',st:done?'done':'todo',...(courseOk(x.course)&&{course:x.course}),u:x.updated||0})).sort((a,b)=>b.u-a.u); // dateless tasks, newest first: done=false the open ones (the "בלי תאריך" group of what's coming), true the finished ones
+const duesOfCourse=(items,course,today)=>courseOk(course)?items.filter(x=>x.kind==='due'&&x.course===course&&isoOk(x.date)&&dueSt(x)!=='done').map(x=>({id:x.id,title:x.title||'הגשה',date:x.date,time:okTime(x.start)?x.start:'23:59',st:'todo',late:dueLate(x,today)?1:0,daysLeft:dayDiff(today,x.date)})).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.time<b.time?-1:a.time>b.time?1:0):[]; // a course's open deadlines (late ones are simply the oldest dates), for the class window
 function recentTimes(items,kind,n=3){ // the most used start-end pairs of one kind (ties: the more recently saved), for the quick time buttons of the add dialog
   const m=new Map();for(const it of items)if(it.kind===kind&&okTime(it.start)&&okTime(it.end)){const k=it.start+'-'+it.end,o=m.get(k)||{s:it.start,e:it.end,n:0,u:0};o.n++;o.u=Math.max(o.u,it.updated||0);m.set(k,o)}
   return[...m.values()].sort((a,b)=>b.n-a.n||b.u-a.u).slice(0,n)
@@ -1222,7 +1228,7 @@ function setView(v,date){ // v: day|week|month|up (day and up only on a phone); 
 /* ---------- render ---------- */
 let agAuto=0,legAuto=0,agL={},wkSeen=''; // wkSeen: the week whose grid was last scrolled to the picked day
 let agAuto0; // agL: the phone agenda's lines by date|key, for taps
-function render(){const f=flipPrep();render0();flipRun(f)} // the lists animate only after the user's own change (flipArm)
+function render(){const f=flipPrep();render0();flipRun(f);if(cdlg.open)cDues()} // the lists animate only after the user's own change (flipArm)
 function render0(){
   const ph=PHQ.matches; if(ph&&!legAuto){legAuto=1;document.querySelectorAll('.mleg').forEach(m=>m.open=false)} // the long legend starts folded on a phone
   const day=ph&&view==='day', upv=ph&&view==='up', mon=view==='month', wkv=!mon&&!day&&!upv; // phone views: day, week, month, up (what's coming)
@@ -1515,9 +1521,16 @@ async function toggleCancel(date,i){
   if(!ok)render();return ok;
 }
 const cdlg=$('#cdlg');let cEv;
+function cDues(){ // the open deadlines of the clicked class's course, at most 3 rows
+  const c=cEv&&(cEv.course||COURSE[cEv.title]),L=cEv?duesOfCourse(items,c,todayIso()):[],box=$('#cDues'),edit=canEdit();box.hidden=!L.length;if(!L.length)return;
+  const dl=x=>x.late?Math.abs(x.daysLeft)+' ימי איחור':x.daysLeft===0?'היום':x.daysLeft===1?'מחר':'בעוד '+x.daysLeft+' ימים';
+  box.innerHTML='<h4>הגשות פתוחות בקורס</h4>'+L.slice(0,3).map(x=>`<div class="cdr c-${c}${x.late?' late':''}"><button type="button" data-ed="${esc(x.id)}"><b>${esc(x.title)}</b><span>${dm(x.date)} · ${dl(x)}</span></button>${stBtn(x,edit,x.title)}</div>`).join('')+(L.length>3?`<button type="button" class="cdmore" data-more="1">ועוד ${L.length-3}</button>`:'');
+}
+$('#cDues').addEventListener('click',x=>{const e=x.target.closest('[data-ed]');if(e&&canEdit()){cdlg.close();openEdit(e.dataset.ed);return}
+  if(x.target.closest('[data-more]')){cdlg.close();if(PHQ.matches)setView('up');else{$('#upCard').open=true;$('#upCard').scrollIntoView({behavior:'smooth'})}}});
 function openCancel(ev){ // confirm dialog for one grid class block
   cEv=ev;$('#cTitle').textContent=ev.title+' · '+(BKIND[ev.kind]||'אנגלית');$('#cWhen').textContent=`${DAYS[ev.d]} ${dm(ev.date)} · ${tr(ev.s,ev.e)} · ${ev.room}`;
-  const g=$('#cGo');g.disabled=false;g.textContent=ev.cancelled?'החזרת השיעור':'ביטול השיעור בתאריך זה';cdlg.showModal();
+  const g=$('#cGo');g.disabled=false;g.textContent=ev.cancelled?'החזרת השיעור':'ביטול השיעור בתאריך זה';cDues();cdlg.showModal();
 }
 $('#cGo').addEventListener('click',async x=>{const g=x.currentTarget;if(g.disabled)return;g.disabled=true;const p=toggleCancel(cEv.date,cEv.i);if(mode==='sb'){cdlg.close();return} // sb: already shown, the save finishes in the background
   if(await p)cdlg.close();else g.disabled=false});
