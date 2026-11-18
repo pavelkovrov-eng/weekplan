@@ -591,7 +591,7 @@ dialog{border-radius:24px}.btn{border-radius:14px}.upgo{border-radius:16px}.dstr
 .ph .ups{background:var(--bg-card);border-radius:24px;padding:16px 16px 12px;margin-top:14px;box-shadow:0 12px 30px -20px rgba(20,32,24,.35),0 1px 2px var(--shadow)}
 .ph .htop+.ups{margin-top:16px}
 .ph #dayHead{background:var(--accent-fill);color:var(--accent-ink);border-radius:28px;padding:20px 22px 62px;display:grid;gap:2px}
-.ph #dayHead h2{font-size:32px;line-height:1.15;color:inherit}.ph #dayHead small{color:inherit;opacity:.75;font-weight:500;font-size:14px}.ph #dayHead small.rel{opacity:.7;font-size:13px}
+.ph #dayHead h2{font-size:32px;line-height:1.15;color:inherit}.ph #dayHead small{color:inherit;opacity:.75;font-weight:500;font-size:14px}
 .ph #dstrip{position:relative;margin:-50px 10px 14px;gap:6px}
 .ph #dstrip button{background:var(--bg-card);border:0;box-shadow:0 8px 18px -12px rgba(0,0,0,.4)}
 .ph #dstrip button[aria-pressed=true]{background:var(--ink);transform:translateY(-4px);box-shadow:0 0 0 3px var(--bg-app),0 10px 20px -10px rgba(0,0,0,.5)}
@@ -609,6 +609,21 @@ dialog{border-radius:24px}.btn{border-radius:14px}.upgo{border-radius:16px}.dstr
 .ph #dayList .dli:not(:last-child)::after{content:'';position:absolute;inset-inline-start:11px;top:calc(50% + 14px);height:calc(100% - 18px);width:2px;background:var(--border-light)}
 .ph #dayList .dlb{background:var(--bg-card);border-color:transparent;box-shadow:0 6px 16px -12px rgba(20,32,24,.35)}
 .ph #dayList .dli.ex .dlb{background:color-mix(in srgb,var(--lc) 14%,var(--bg-card))}
+/* home rows (2026-11-18): a round check, the name over a grey line, a soft days box; thin lines between rows, one font */
+.uplist{gap:0}.uplist li{gap:12px;padding:10px 0}.uplist li+li{border-top:1px solid var(--border-light)}
+.uplist .upgo{display:flex;align-items:center;gap:12px;background:none;border:0;border-radius:0;padding:0;min-height:44px}
+.uplist .upgo .tx{flex:1 1 0}.uplist .upgo .tx>b{font-size:15.5px;font-weight:600;color:var(--ink)}
+.uplist .dt,.upsub .dt{font:400 13px var(--font-body);color:var(--text-muted)}
+.uplist .dl{flex:none;min-width:50px;padding:5px 6px;border-radius:14px;background:var(--accent-soft);display:grid;justify-items:center;line-height:1.1}
+.uplist .dl b{font:700 18px var(--font-serif);color:var(--ink)}.uplist .dl b.w{font:700 14px var(--font-body)}.uplist .dl small{font-size:11px;color:var(--text-muted)}
+.uplist .late .dl{background:var(--bad-bg)}.uplist .late :is(.dl b,.tx>b){color:var(--bad-tx)}
+.uplist li.past{opacity:.55}
+.ck{flex:none;position:relative;width:26px;height:26px;padding:0;border-radius:50%;border:2px solid var(--cc,var(--border-dark));background:none;cursor:pointer;display:grid;place-items:center;font:800 14px var(--font-body);color:var(--accent-ink);transition:background-color .2s,border-color .2s}
+.ck::before{content:'';position:absolute;inset:-9px}.ck:disabled{cursor:default}
+.ck.s-done{background:var(--accent-fill);border-color:var(--accent-fill)}.ck.s-done::after{content:'✓'}
+.xdot{flex:none;width:26px;display:grid;place-items:center}.xdot::before{content:'';width:10px;height:10px;border-radius:50%;background:var(--cc,var(--text-faint))}
+.upsub li{gap:12px}.upsub li b{flex:1 1 0}
+.vup header.top h1,.vup header.top .eyebrow{display:none}
 </style>
 
 <div class="wrap" dir="rtl" lang="he">
@@ -1292,7 +1307,7 @@ function render0(){
   $('#prev').setAttribute('aria-label',mon?'חודש קודם':day?'יום קודם':'שבוע קודם');$('#next').setAttribute('aria-label',mon?'חודש הבא':day?'יום הבא':'שבוע הבא');
   $('#vWeek').setAttribute('aria-pressed',String(!mon));$('#vMonth').setAttribute('aria-pressed',String(mon));
   $('.nav').hidden=upv;
-  $('#upCard').hidden=ph&&!upv;if(upv)$('#upCard').open=true;$('#upCard h2').textContent=ph?'בית':'מה מתקרב';$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;document.querySelectorAll('.lg-sh').forEach(l=>l.hidden=!worksOn());$('#shCard').hidden=!worksOn();
+  $('#upCard').hidden=ph&&!upv;if(upv)$('#upCard').open=true;$('#upCard h2').textContent=ph?'בית':'מה מתקרב';document.documentElement.classList.toggle('vup',ph&&upv);$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;document.querySelectorAll('.lg-sh').forEach(l=>l.hidden=!worksOn());$('#shCard').hidden=!worksOn();
   $('#gridCard').hidden=!wkv;$('#agCard').hidden=!wkv;$('#wkBar').hidden=true; // the phone week tab shows the two-day grid, the agenda is a closed card below it
   $('#addLbl').textContent=mon?'הוספה':day?'הוספה ליום זה':'הוספה לשבוע';$('#addBtn').hidden=upv;
   document.querySelectorAll('#tabs [data-v]').forEach(b=>b.setAttribute('aria-current',b.dataset.v===view?'page':'false'));tabPill(1);
@@ -1350,6 +1365,10 @@ function dayDue(date){ // a day's deadlines as quiet chips for the foot of its g
   const L=items.filter(x=>x.kind==='due'&&x.date===date),open=dueMore.has(date),shown=open?L:L.slice(0,2),t=todayIso();
   return shown.map(x=>`<span class="dchip${x.done?' done':''}${dueLate(x,t)?' late':''} ${dueCls(x)}" title="${esc(dueLbl(x))}${x.done?' · הוגש':''}"><i></i><span>${x.done?'✓ ':''}${esc(dueName(x)||'הגשה')}</span></span>`).join('')
     +(L.length>2?`<button type="button" class="dmore" data-more="${date}">${open?'פחות':'+'+(L.length-2)+' עוד'}</button>`:'');
+}
+function stCk(x,edit,name){ // the home's round check: the same [data-st] flip as stBtn, drawn as an empty circle or ✓
+  const s=x.st||dueSt(x),ST=x.task?TSTAT:STAT;
+  return`<button type="button" class="ck s-${s}" data-st="${esc(x.id)}" data-s="${s}"${edit?` aria-pressed="${s==='done'}"`:' disabled'} aria-label="${esc((name||'הגשה')+' · '+ST[s]+(edit?' · לחיצה להחלפה':''))}"></button>`;
 }
 function stBtn(x,edit,name){ // the status pill of a deadline: its state in words; one tap flips it (לא התחלתי / הוגש)
   const s=x.st||dueSt(x),ST=x.task?TSTAT:STAT;
@@ -1462,10 +1481,10 @@ function renderDay(evs,an){ // phone day view: the week strip, the day's notes, 
   const date=viewDay,today=todayIso(),c=CAL[date],off=offDoc(date,items),edit=canEdit();
   $('#dstrip').innerHTML=DAYI.map((l,k)=>{const d=addDays(viewSun,k);return`<button type="button" data-day="${d}" aria-pressed="${d===date}" aria-label="${DAYS[k]} ${dm(d)}"${d===today?' class="today"':''}><small>${l}</small><b>${Number(d.slice(8))}</b></button>`}).join('');
   dayL=dayLines(date,items,evs);
-  const L=dayL.filter(l=>!l.cancelled),nm=nowMin(),rel=date===today?'היום':date===addDays(today,1)?'מחר':date===addDays(today,-1)?'אתמול':'',cnt=(n,one,many)=>n?n===1?one:n+' '+many:'';
+  const L=dayL.filter(l=>!l.cancelled),nm=nowMin(),cnt=(n,one,many)=>n?n===1?one:n+' '+many:'';
   const sh=L.filter(l=>l.src==='user'&&KINDS[l.kind]&&KINDS[l.kind].shift).length,own=L.filter(l=>l.src==='user').length-sh;
   const what=[cnt(L.filter(l=>l.src==='base').length,'שיעור אחד','שיעורים'),cnt(L.filter(l=>l.src==='exam').length,'מבחן','מבחנים'),cnt(sh,'משמרת','משמרות'),cnt(L.filter(l=>l.src==='due').length,'הגשה','הגשות'),cnt(own,'עוד פריט','פריטים נוספים')].filter(Boolean).join(' · ');
-  $('#dayHead').innerHTML=(rel?`<small class="rel">${rel}</small>`:'')+`<h2>יום ${DAYS[dow(date)]}</h2><small>${dmy(date)}${what?' · '+what:''}</small>`+(c?`<small>${esc(c.label)}</small>`:'')+(off?'<small>לימודים בוטלו</small>':''); // the dark header: when, the day, what is in it
+  $('#dayHead').innerHTML=`<h2>יום ${DAYS[dow(date)]}</h2><small>${dmy(date)}${what?' · '+what:''}</small>`+(c?`<small>${esc(c.label)}</small>`:'')+(off?'<small>לימודים בוטלו</small>':''); // the dark header: when, the day, what is in it
   const dn=L.filter(l=>l.src==='due'?l.st==='done':l.date<today||l.date===today&&l.e<=nm).length,pc=L.length?Math.round(dn*100/L.length):0,dp=$('#dayPlan');
   dp.hidden=!L.length||!PHQ.matches;dp.innerHTML=`<h3>${date===today?'התוכנית להיום':'התוכנית ליום הזה'}</h3><small>${dn} מתוך ${L.length} הושלמו</small><div class="bar"><i style="--p:${pc}%"></i><b>${pc}%</b></div>`; // what is over (or submitted) out of the day's lines
   $('#dayList').innerHTML=dayL.length?dayL.map(l=>dayLi(l,an.clash,edit,today)).join(''):emptyDay(date,edit);
@@ -1561,12 +1580,11 @@ function renderUp(){
   $('#upSum').innerHTML=[late?`<b class="lt">${late} באיחור</b>`:'',nx?'הבא: '+dm(nx.date)+' · '+esc(nx.title):'',TK.length?(TK.length===1?'משימה אחת':TK.length+' משימות'):''].filter(Boolean).join(' · ')||'אין הגשות קרובות'; // the line next to the title while the card is closed
   const Xc=X.filter(x=>!x.past),dl0=D.filter(x=>x.late).length;
   $('#upTN').textContent=TK.length||'';$('#upDN').textContent=D.length?D.length+(dl0?` · ${dl0} באיחור`:''):'';$('#upDN').classList.toggle('lt',!!dl0);$('#upXN').textContent=Xc.length||'';
-  const grp=x=>x.past?'עברו':x.late?'באיחור':x.daysLeft<=7?'השבוע':x.daysLeft<=30?'החודש':'אחר כך',gc=x=>x.past?'g-far past':x.late||x.daysLeft<=7?'g-near':x.daysLeft<=30?'g-mid':'g-far'; // urgency decides the size
   const cc=x=>x.exam&&COURSE[x.title]?'cd c-'+COURSE[x.title]:dueCls(x),dl=x=>x.past?'<small>עבר</small>':x.daysLeft===0?'<b class="w">היום</b>':x.daysLeft===1?'<b class="w">מחר</b>':`<b>${Math.abs(x.daysLeft)}</b><small>${x.late?'ימי איחור':'ימים'}</small>`;
-  const row=x=>`<li><button type="button" class="upgo ${gc(x)}${x.late?' late':''} ${cc(x)}" data-go="${x.date}"><span class="dl">${dl(x)}</span><span class="tx"><b>${esc(x.title)}</b><span class="dt">${dm(x.date)} · ${esc(x.time)} · ${esc(x.tag)}</span></span></button>${x.id?stBtn(x,edit,x.title):''}</li>`;
-  const grouped=A=>{let g='';return A.map(x=>(grp(x)!==g?`<li class="uph">${g=grp(x)}</li>`:'')+row(x)).join('')};
-  const doneL=A=>A.map(x=>`<li>${x.date?`<span class="dt">${dm(x.date)}</span>`:''}<b>${esc(x.title)}</b>${stBtn(x,edit,x.title)}</li>`).join('');
-  $('#upT').innerHTML=TK.length?TK.map(x=>`<li><button type="button" class="upgo tk ${dueCls(x)}" data-edit="${esc(x.id)}"><span class="tx"><b>${esc(x.title)}</b></span></button>${stBtn(x,edit,x.title)}</li>`).join(''):'<li class="none">אין משימות פתוחות.</li>';
+  const row=x=>`<li class="${cc(x)}${x.late?' late':''}${x.past?' past':''}">${x.id?stCk(x,edit,x.title):'<i class="xdot"></i>'}<button type="button" class="upgo" data-go="${x.date}"><span class="tx"><b>${esc(x.title)}</b><span class="dt">${dm(x.date)} · ${esc(x.time)}${x.exam?' · '+esc(x.tag):''}</span></span><span class="dl">${dl(x)}</span></button></li>`; // one quiet row: check (or a course dot for an exam), name over date, the days box
+  const grouped=A=>A.map(row).join('');
+  const doneL=A=>A.map(x=>`<li class="${dueCls(x)}">${stCk(x,edit,x.title)}<b>${esc(x.title)}</b>${x.date?`<span class="dt">${dm(x.date)}</span>`:''}</li>`).join('');
+  $('#upT').innerHTML=TK.length?TK.map(x=>`<li class="${dueCls(x)}">${stCk(x,edit,x.title)}<button type="button" class="upgo" data-edit="${esc(x.id)}"><span class="tx"><b>${esc(x.title)}</b></span></button></li>`).join(''):'<li class="none">אין משימות פתוחות.</li>';
   $('#upTD').hidden=!TD.length;$('#upTDN').textContent='הושלמו ('+TD.length+')';$('#upTDL').innerHTML=doneL(TD);
   $('#up').innerHTML=D.length?grouped(D):'<li class="none">אין מטלות פתוחות.</li>';
   $('#upDone').hidden=!S.length;$('#upDoneN').textContent='הוגשו ('+S.length+')';$('#upDoneL').innerHTML=doneL(S);
