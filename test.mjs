@@ -622,3 +622,30 @@ test('duesOfCourse (open deadlines in the class window)',()=>{
   assert.deepEqual([L[0].late,L[0].daysLeft,L[1].late,L[1].daysLeft],[1,-6,0,9]);
   assert.deepEqual(core.duesOfCourse(items,'nope','2026-11-16'),[]);assert.deepEqual(core.duesOfCourse(items,undefined,'2026-11-16'),[]);
 });
+
+test('home lists: all deadlines, all exams',()=>{
+  const items=[{id:'l',kind:'due',title:'l',date:'2026-11-10',done:false},{id:'f',kind:'due',title:'f',date:'2027-02-20',done:false},{id:'d',kind:'due',title:'d',date:'2026-11-20',done:true},{id:'t',kind:'task',title:'t'}];
+  const D=core.duesAll('2026-11-16',items);
+  assert.deepEqual(D.map(x=>x.id),['l','f']);assert.ok(D[0].late);assert.ok(D.every(x=>!x.exam)); // no cap, no exams, no tasks
+  const X=core.examsAll('2027-02-01');
+  assert.equal(X.length,core.EXAMS.length);
+  const fi=X.findIndex(x=>x.past);assert.ok(fi>0&&X.slice(fi).every(x=>x.past)&&X.slice(0,fi).every(x=>!x.past)); // coming first, then the past ones
+  assert.ok(X.slice(0,fi).every((x,i,a)=>!i||a[i-1].date<=x.date));
+  assert.equal(core.examsAll('2026-11-16').filter(x=>x.past).length,0);
+});
+
+test('greet and nowNext (home)',()=>{
+  assert.deepEqual([299,300,719,720,899,900,1079,1080,1319,1320,0].map(core.greet),['לילה טוב','בוקר טוב','בוקר טוב','צהריים טובים','צהריים טובים','אחר צהריים טובים','אחר צהריים טובים','ערב טוב','ערב טוב','לילה טוב','לילה טוב']);
+  const M=t=>core.toMin(t);
+  // Monday 16.11.26, track ב': prob 08:30-10:00, micro 10:30-12:00, math 14:00-15:30
+  let r=core.nowNext('2026-11-16',M('10:45'),[]);
+  assert.equal(r.now.title,'מבוא למיקרו');assert.equal(r.now.minsLeft,75);
+  assert.equal(r.next.title,"מתמטיקה א'");assert.equal(r.next.daysAhead,0);assert.equal(r.next.minsTo,195);
+  r=core.nowNext('2026-11-16',M('10:15'),[]);assert.equal(r.now,null);assert.equal(r.next.title,'מבוא למיקרו');assert.equal(r.next.minsTo,15);
+  r=core.nowNext('2026-11-16',M('20:00'),[]);assert.equal(r.now,null);assert.equal(r.next.date,'2026-11-17');assert.equal(r.next.daysAhead,1);assert.equal(r.next.minsTo,undefined);
+  r=core.nowNext('2026-11-19',M('12:00'),[]);assert.equal(r.next.date,'2026-11-22'); // Thursday is free: next is Sunday
+  const i=core.BASE.findIndex(b=>b.d===1&&b.t==='מבוא למיקרו');
+  r=core.nowNext('2026-11-16',M('10:45'),[{id:'c',kind:'cancel',date:'2026-11-16',base:i}]);assert.equal(r.now,null); // a cancelled class is not "now"
+  r=core.nowNext('2027-02-01',M('08:00'),[]);assert.equal(r.next.src,'exam');
+  assert.deepEqual(core.nowNext('2027-04-01',600,[]),{now:null,next:null});
+});

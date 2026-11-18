@@ -177,6 +177,11 @@ button.blk.base{cursor:pointer;line-height:1.3;display:flex;flex-direction:colum
 .cdr{display:flex;align-items:center;gap:8px}.cdr>button:first-child{flex:1 1 0;min-width:0;display:grid;gap:1px;text-align:start;border:0;background:var(--bg-sunk);border-radius:10px;padding:8px 10px;min-height:44px;font:inherit;color:inherit;cursor:pointer;border-inline-start:3px solid var(--cc,var(--border-dark))}
 .cdr b{font-size:14px;overflow-wrap:anywhere}.cdr span{font-size:12.5px;color:var(--text-muted)}.cdr.late>button:first-child{background:var(--bad-bg)}.cdr.late span{color:var(--bad-tx)}
 .cdmore{border:0;background:none;color:var(--accent-text);font:inherit;font-size:13px;font-weight:700;padding:4px;cursor:pointer;justify-self:start}
+.ups{margin-top:22px}.ups>h3{margin:0 0 8px;font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:baseline;gap:6px}.ups>h3 small{font-size:12.5px;font-weight:700;color:var(--text-muted)}.ups>h3 small.lt{color:var(--bad-tx)}
+.htop{display:grid;gap:8px;margin:2px 0 6px}.hello{margin:0 0 2px;font-size:22px;font-weight:800;color:var(--ink)}
+.hrow{display:grid;gap:2px;text-align:start;border:0;border-inline-start:4px solid var(--cc,var(--accent));background:color-mix(in srgb,var(--cc,var(--accent)) 12%,var(--bg-card));border-radius:12px;padding:10px 12px;min-height:44px;font:inherit;color:inherit;cursor:pointer}
+.hrow.nx{background:var(--bg-sunk)}.hrow small{font-size:11.5px;font-weight:800;letter-spacing:.05em;color:var(--text-muted)}.hrow b{font-size:16px}.hrow span{font-size:13px;color:var(--text-muted)}
+.upgo.past{opacity:.55}
 .upgo.tk{grid-template-columns:minmax(0,1fr);background:none;padding-block:3px}.upgo.tk .tx>b{font-size:14px;font-weight:600}
 .upgo .tx{display:grid;gap:2px;min-width:0}.upgo .tx>b{font-size:15px;overflow-wrap:anywhere}
 .upgo .dt{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted)}
@@ -208,6 +213,7 @@ details.card>summary::-webkit-details-marker{display:none}
 details.card>summary h2{margin:0;flex:none}
 details.card>summary::after{content:"▾";margin-inline-start:auto;flex:none;color:var(--text-muted);transition:transform .15s}
 details.card[open]>summary::after{transform:rotate(180deg)}
+.ph #upCard>summary{display:none} /* home: the greeting is the title, and the card never folds */.ph .htop+.ups{margin-top:18px}
 details.card[open]>summary{margin-bottom:8px}
 details.card>summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
 .upsum{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px;color:var(--text-muted)}
@@ -643,9 +649,10 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <details class="card" id="upCard">
   <summary><h2>מה מתקרב</h2><span class="upsum" id="upSum"></span></summary>
-  <ol class="uplist" id="up"></ol>
-  <details class="upsub" id="upDone" hidden><summary id="upDoneN"></summary><ol id="upDoneL"></ol></details>
-  <button type="button" class="btn pastebtn" id="pasteBtn" hidden>הדבקה מהמודל</button>
+  <div class="htop" id="homeTop" hidden><p class="hello" id="hello"></p><button type="button" class="hrow" id="nowRow" hidden></button><button type="button" class="hrow nx" id="nextRow" hidden></button></div>
+  <section class="ups"><h3>משימות <small id="upTN"></small></h3><ol class="uplist" id="upT"></ol><details class="upsub" id="upTD" hidden><summary id="upTDN"></summary><ol id="upTDL"></ol></details></section>
+  <section class="ups"><h3>מטלות <small id="upDN"></small></h3><ol class="uplist" id="up"></ol><details class="upsub" id="upDone" hidden><summary id="upDoneN"></summary><ol id="upDoneL"></ol></details><button type="button" class="btn pastebtn" id="pasteBtn" hidden>הדבקה מהמודל</button></section>
+  <section class="ups"><h3>מבחנים <small id="upXN"></small></h3><ol class="uplist" id="upX"></ol><button type="button" class="cdmore" id="upXAll" hidden></button></section>
 </details>
 
 <details class="card" id="agCard">
@@ -663,11 +670,11 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <div id="miniTop" aria-hidden="true"><b></b><span></span></div>
 <nav class="tabs" id="tabs" aria-label="תצוגות">
+  <button type="button" data-v="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="bd" d="M4.5 10.5 12 4.5l7.5 6V19a1 1 0 0 1-1 1H15v-5.5H9V20H5.5a1 1 0 0 1-1-1Z"/></svg><span>בית</span></button>
   <button type="button" data-v="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect class="bd" x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/><rect x="9" y="13" width="6" height="4" rx="1" fill="currentColor"/></svg><span>יום</span></button>
-  <button type="button" data-v="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect class="bd" x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4M8 13.5h8M8 17h8"/></svg><span>שבוע</span></button>
   <button type="button" id="tabAdd" aria-label="הוספה" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg></button>
+  <button type="button" data-v="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect class="bd" x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4M8 13.5h8M8 17h8"/></svg><span>שבוע</span></button>
   <button type="button" data-v="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect class="bd" x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01M16 17.5h.01" stroke-width="2.6"/></svg><span>חודש</span></button>
-  <button type="button" data-v="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle class="bd" cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>מה מתקרב</span></button>
 </nav>
 
 <dialog id="mvDlg" autofocus aria-labelledby="mvT">
@@ -1008,6 +1015,18 @@ function evsForWeek(sun,items,skipId){
 const submitted=items=>items.filter(x=>x.kind==='due'&&isoOk(x.date)&&x.done).map(x=>({id:x.id,date:x.date,time:okTime(x.start)?x.start:'23:59',title:dueName(x)||'הגשה',st:'done',...(courseOk(x.course)&&{course:x.course})})).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0); // the submitted deadlines, newest first: the record under "what's coming"
 const tasksOf=(items,done)=>items.filter(x=>x.kind==='task'&&!!x.done===done).map(x=>({id:x.id,title:x.title||'משימה',st:done?'done':'todo',...(courseOk(x.course)&&{course:x.course}),u:x.updated||0})).sort((a,b)=>b.u-a.u); // dateless tasks, newest first: done=false the open ones (the "בלי תאריך" group of what's coming), true the finished ones
 const duesOfCourse=(items,course,today)=>courseOk(course)?items.filter(x=>x.kind==='due'&&x.course===course&&isoOk(x.date)&&dueSt(x)!=='done').map(x=>({id:x.id,title:x.title||'הגשה',date:x.date,time:okTime(x.start)?x.start:'23:59',st:'todo',late:dueLate(x,today)?1:0,daysLeft:dayDiff(today,x.date)})).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.time<b.time?-1:a.time>b.time?1:0):[]; // a course's open deadlines (late ones are simply the oldest dates), for the class window
+const greet=m=>m>=300&&m<720?'בוקר טוב':m>=720&&m<900?'צהריים טובים':m>=900&&m<1080?'אחר צהריים טובים':m>=1080&&m<1320?'ערב טוב':'לילה טוב'; // m = minutes since midnight
+function nowNext(today,min,items){ // the class or exam going on now, and the next one (up to the end of the exams): {now,next}; cancelled classes and own items are left out
+  let now=null,next=null;
+  for(let sun=sunOf(today);sun<=sunOf(SEM.last)&&!next;sun=addDays(sun,7)){
+    const E=evsForWeek(sun,items).filter(e=>(e.src==='base'||e.src==='exam')&&!e.cancelled&&e.date>=today).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.s-b.s);
+    for(const e of E){if(e.date===today&&e.s<=min&&min<e.e){if(!now)now={...e,minsLeft:e.e-min};continue}
+      if(e.date>today||e.s>min){next={...e,daysAhead:dayDiff(today,e.date),...(e.date===today&&{minsTo:e.s-min})};break}}
+  }
+  return{now,next};
+}
+const duesAll=(today,items)=>upcoming(today,items,1e9).filter(x=>!x.exam); // every open deadline: late ones first, then by date (the מטלות tab)
+const examsAll=today=>EXAMS.map((x,i)=>({key:'x'+i,date:x.date,time:x.s,title:x.c,tag:'מועד '+x.m+"'",exam:1,daysLeft:dayDiff(today,x.date),...(x.date<today&&{past:1})})).sort((a,b)=>(a.past||0)-(b.past||0)||(a.date<b.date?-1:a.date>b.date?1:a.time<b.time?-1:a.time>b.time?1:0)); // every exam, the coming ones first, then the ones that are over (the מבחנים tab)
 function recentTimes(items,kind,n=3){ // the most used start-end pairs of one kind (ties: the more recently saved), for the quick time buttons of the add dialog
   const m=new Map();for(const it of items)if(it.kind===kind&&okTime(it.start)&&okTime(it.end)){const k=it.start+'-'+it.end,o=m.get(k)||{s:it.start,e:it.end,n:0,u:0};o.n++;o.u=Math.max(o.u,it.updated||0);m.set(k,o)}
   return[...m.values()].sort((a,b)=>b.n-a.n||b.u-a.u).slice(0,n)
@@ -1196,7 +1215,7 @@ const tabPill=(()=>{let el=null,cur=null;return anim=>{ // the pill leaves the o
   el.animate([{...px(from),offset:0},{...px({l:L,t:to.t+to.h*.12,w:R-L,h:to.h*.76}),offset:.45},{...px({l:to.l+to.w*.08,t:to.t+to.h*.08,w:to.w*.84,h:to.h*.84}),offset:.8},{...px(to),offset:1}],{duration:600,easing:'cubic-bezier(.3,.7,.3,1)'})}})();
 /* list motion (FLIP): after the user's own change, the rows of the day/month-day/what's-coming lists slide to their new places, a new row springs in and a removed one fades out where it was */
 let flipArm=0,flipCtx=''; // flipArm: set by saveItem/removeItem/fast; flipCtx: what was on screen, so a move to another day never animates as a change
-const FLIPL=['#dayList','#mDay .dlist','#up','#upDoneL'],flipKey=e=>e.querySelector('[data-key]')?.dataset.key||e.querySelector('[data-st]')?.dataset.st||e.textContent;
+const FLIPL=['#dayList','#mDay .dlist','#up','#upDoneL','#upT','#upTDL'],flipKey=e=>e.querySelector('[data-key]')?.dataset.key||e.querySelector('[data-st]')?.dataset.st||e.textContent;
 function flipPrep(){const ctx=view+viewDay+monthSel+viewSun,on=flipArm&&Date.now()-flipArm<8000&&ctx===flipCtx&&!still();flipCtx=ctx;if(!on)return null;flipArm=0;
   return FLIPL.map(sel=>{const u=$(sel),m=new Map();if(!u||!u.getBoundingClientRect().height)return null;const ur=u.getBoundingClientRect();for(const li of u.children){const r=li.getBoundingClientRect();if(r.height)m.set(flipKey(li),{r,li})}return{sel,ur,m}}).filter(Boolean)}
 function flipRun(P){if(!P)return;
@@ -1208,7 +1227,7 @@ function flipRun(P){if(!P)return;
       Object.assign(c.style,{position:'absolute',top:(o.r.top-ur.top-u.clientTop)+'px',left:(o.r.left-ur.left-u.clientLeft)+'px',width:o.r.width+'px',margin:'0',pointerEvents:'none'});u.appendChild(c);
       c.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.92)'}],{duration:260,easing:EZ.out,fill:'forwards'}).onfinish=()=>c.remove()}}}
 const PHQ=matchMedia('(max-width:600px)'); // phone width: day view + tab bar (class ph on <html>)
-let items=[], viewSun=clampSun(sunOf(todayIso())), viewDay=clampDay(todayIso()), viewYm=clampYm(ymOf(todayIso())), wkGrid=false, dayL=[], view=(()=>{try{const v=localStorage.getItem('wp.view');return v==='month'?v:PHQ.matches&&v!=='week'?'day':'week'}catch(e){return PHQ.matches?'day':'week'}})(), editSun=null, mode='loading', db=null, editing=null, timesTouched=false, delArmed=0, addTimes=null;
+let items=[], viewSun=clampSun(sunOf(todayIso())), viewDay=clampDay(todayIso()), viewYm=clampYm(ymOf(todayIso())), wkGrid=false, dayL=[], view=(()=>{try{const v=localStorage.getItem('wp.view');return PHQ.matches?'up':v==='month'?v:'week'}catch(e){return PHQ.matches?'up':'week'}})(), editSun=null, mode='loading', db=null, editing=null, timesTouched=false, delArmed=0, addTimes=null;
 const canEdit=()=>mode==='db'||mode==='local'||mode==='srv'||mode==='gh'||mode==='sb'; // srv = the local server (python3 server.py), gh = GitHub contents API
 function go(sun){viewSun=clampSun(sun);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goMonth(ym){viewYm=clampYm(ym);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
@@ -1240,7 +1259,7 @@ function render0(){
   $('#prev').setAttribute('aria-label',mon?'חודש קודם':day?'יום קודם':'שבוע קודם');$('#next').setAttribute('aria-label',mon?'חודש הבא':day?'יום הבא':'שבוע הבא');
   $('#vWeek').setAttribute('aria-pressed',String(!mon));$('#vMonth').setAttribute('aria-pressed',String(mon));
   $('.nav').hidden=upv;
-  $('#upCard').hidden=ph&&!upv;$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;document.querySelectorAll('.lg-sh').forEach(l=>l.hidden=!worksOn());$('#shCard').hidden=!worksOn();
+  $('#upCard').hidden=ph&&!upv;if(upv)$('#upCard').open=true;$('#upCard h2').textContent=ph?'בית':'מה מתקרב';$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;document.querySelectorAll('.lg-sh').forEach(l=>l.hidden=!worksOn());$('#shCard').hidden=!worksOn();
   $('#gridCard').hidden=!wkv;$('#agCard').hidden=!wkv;$('#wkBar').hidden=true; // the phone week tab shows the two-day grid, the agenda is a closed card below it
   $('#addLbl').textContent=mon?'הוספה':day?'הוספה ליום זה':'הוספה לשבוע';$('#addBtn').hidden=upv;
   document.querySelectorAll('#tabs [data-v]').forEach(b=>b.setAttribute('aria-current',b.dataset.v===view?'page':'false'));tabPill(1);
@@ -1258,7 +1277,7 @@ function render0(){
       if(ph&&wkSeen!==viewSun){wkSeen=viewSun;gridTo(viewDay>=viewSun&&viewDay<=addDays(viewSun,6)?viewDay:todayIso()>=viewSun&&todayIso()<=addDays(viewSun,6)?todayIso():viewSun)} // only on entering the tab or a new week, never on a data refresh
     }
   }
-  $('#addBtn').disabled=!edit;$('#tabAdd').disabled=!edit;$('#pasteBtn').hidden=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
+  $('#addBtn').disabled=!edit;$('#tabAdd').disabled=!edit;$('#expCsv').disabled=$('#expIcs').disabled=$('#printBtn').disabled=$('#printFile').disabled=mode==='loading';
 }
 function renderStore(){
   const m={loading:['ld','מתחבר…'],db:['db','נשמר בחשבון שלך'],srv:['db','נשמר במחשב'],gh:['db','נשמר ב-GitHub'],sb:['db','נשמר בחשבון Google'],local:['local','נשמר בדפדפן הזה בלבד'],ro:['ro','צפייה בלבד']}[mode];
@@ -1371,7 +1390,7 @@ function nowLine(){ // a line at the current time in today's column, when the sh
   document.querySelectorAll('#grid .nowl').forEach(e=>e.remove());
   const t=todayIso();if(viewSun!==sunOf(t))return;const n=nowMin(),[lo,hi]=gridRange;if(n<lo||n>hi)return;
   const c=$('#grid .col[data-day="'+dow(t)+'"]');if(!c)return;const l=document.createElement('div');l.className='nowl';l.style.top=((n-lo)*PPM)+'px';c.appendChild(l)}
-function nowTick(){if(document.hidden||document.querySelector('dialog[open]'))return;if(PHQ.matches&&view==='day'&&viewDay===todayIso())render();else if(view==='week'&&!gDrag&&!gPend)render()} // the week: the now line and the dimmed past // once a minute and on return: refresh only what shows the time
+function nowTick(){if(document.hidden||document.querySelector('dialog[open]'))return;if(PHQ.matches&&view==='up')renderHome();if(PHQ.matches&&view==='day'&&viewDay===todayIso())render();else if(view==='week'&&!gDrag&&!gPend)render()} // the week: the now line and the dimmed past // once a minute and on return: refresh only what shows the time
 setInterval(nowTick,60000);document.addEventListener('visibilitychange',nowTick);
 function gridTo(d){ // phone week grid: scroll so the column of day d is the first one (works in RTL: scrollLeft is the view position)
   const sc=$('#gridCard .scroller'),c=sc&&sc.querySelector('.col[data-day="'+dow(d)+'"]');if(c)sc.scrollLeft+=c.getBoundingClientRect().right-sc.getBoundingClientRect().right}
@@ -1485,18 +1504,39 @@ function renderShifts(){
     +S.rows.map(r=>`<tr><td>${MONTHS[Number(r.ym.slice(5))-1]} ${r.ym.slice(0,4)}</td>${r.n?`<td>${hrs(r.min)}</td><td>${r.n}</td>`:'<td class="z">—</td><td class="z">0</td>'}</tr>`).join('')
     +`</tbody><tfoot><tr><td>סה"כ בסמסטר</td><td>${hrs(S.min)}</td><td>${S.n}</td></tr></tfoot>`;
 }
+let exAll=false,homeEv={}; // exAll: every exam shown; homeEv: the now/next events, for taps
+const inMin=m=>{if(m<60)return m+" דק'";const h=Math.floor(m/60),r=m%60;return(h===1?'שעה':h===2?'שעתיים':h+' שעות')+(r?` ו-${r} דק'`:'')}; // 75 -> שעה ו-15 דק'
+function renderHome(){ // greeting, the class now and the next one (phone home only)
+  const on=PHQ.matches&&view==='up';$('#homeTop').hidden=!on;if(!on)return;
+  const t=todayIso(),m=nowMin(),nm=(profileOf(items)||{}).name,{now,next}=nowNext(t,m,items),cc=e=>e.course?'c-'+e.course:'';homeEv={now,next};
+  $('#hello').textContent=greet(m)+(nm?' '+nm:'');
+  const what=e=>esc(e.title)+(e.src==='exam'?' · מבחן':'')+(e.room?' · '+esc(e.room):'');
+  const n=$('#nowRow');n.hidden=!now;if(now){n.className='hrow '+cc(now);n.innerHTML=`<small>עכשיו</small><b>${what(now)}</b><span>עד ${ltr(fm(now.e))} · עוד ${inMin(now.minsLeft)}</span>`}
+  const x=$('#nextRow');x.hidden=!next;if(next){const d=next.daysAhead,h=ltr(fm(next.s));x.className='hrow nx '+cc(next);
+    x.innerHTML=`<small>הבא</small><b>${what(next)}</b><span>${d===0?`היום ${h} · בעוד ${inMin(next.minsTo)}`:d===1?'מחר '+h:d<7?`ביום ${DAYS[next.d]} ${h}`:`ב-${dm(next.date)} ${h}`}</span>`}
+}
+['#nowRow','#nextRow'].forEach((q,k)=>$(q).addEventListener('click',()=>{const e=k?homeEv.next:homeEv.now;if(!e)return;if(e.src==='base'&&canEdit())openCancel(e);else setView('day',e.date)}));
 function renderUp(){
-  const L=upcoming(todayIso(),items,PHQ.matches?30:6),edit=canEdit(),S=submitted(items),TK=tasksOf(items,false).map(x=>({...x,task:1})),TD=tasksOf(items,true).map(x=>({...x,task:1}));
+  renderHome();
+  const t=todayIso(),edit=canEdit(),L=upcoming(t,items,6),D=duesAll(t,items),X=examsAll(t),S=submitted(items),TK=tasksOf(items,false).map(x=>({...x,task:1})),TD=tasksOf(items,true).map(x=>({...x,task:1}));
   const late=L.filter(x=>x.late).length,nx=L.find(x=>!x.late);
   $('#upSum').innerHTML=[late?`<b class="lt">${late} באיחור</b>`:'',nx?'הבא: '+dm(nx.date)+' · '+esc(nx.title):'',TK.length?(TK.length===1?'משימה אחת':TK.length+' משימות'):''].filter(Boolean).join(' · ')||'אין הגשות קרובות'; // the line next to the title while the card is closed
-  $('#upDone').hidden=!S.length&&!TD.length;$('#upDoneN').textContent=(TD.length?'הושלמו (':'הוגשו (')+(S.length+TD.length)+')';
-  $('#upDoneL').innerHTML=S.map(x=>`<li><span class="dt">${dm(x.date)}</span><b>${esc(x.title)}</b>${stBtn(x,edit,x.title)}</li>`).join('')+TD.map(x=>`<li><b>${esc(x.title)}</b>${stBtn(x,edit,x.title)}</li>`).join('');
-  const grp=x=>x.late?'באיחור':x.daysLeft<=7?'השבוע':x.daysLeft<=30?'החודש':'אחר כך',gc=x=>x.late||x.daysLeft<=7?'g-near':x.daysLeft<=30?'g-mid':'g-far'; // urgency decides the size
-  const cc=x=>x.exam&&COURSE[x.title]?'cd c-'+COURSE[x.title]:dueCls(x),dl=x=>x.daysLeft===0?'<b class="w">היום</b>':x.daysLeft===1?'<b class="w">מחר</b>':`<b>${Math.abs(x.daysLeft)}</b><small>${x.late?'ימי איחור':'ימים'}</small>`;
-  const tk=TK.length?'<li class="uph">בלי תאריך</li>'+TK.map(x=>`<li><button type="button" class="upgo tk ${dueCls(x)}" data-edit="${esc(x.id)}"><span class="tx"><b>${esc(x.title)}</b></span></button>${stBtn(x,edit,x.title)}</li>`).join(''):'';
-  let g='';$('#up').innerHTML=(L.length?L.map(x=>{const h=grp(x)!==g?`<li class="uph">${g=grp(x)}</li>`:'';
-    return h+`<li><button type="button" class="upgo ${gc(x)}${x.late?' late':''} ${cc(x)}" data-go="${x.date}"><span class="dl">${dl(x)}</span><span class="tx"><b>${esc(x.title)}</b><span class="dt">${dm(x.date)} · ${esc(x.time)} · ${esc(x.tag)}</span></span></button>${x.id?stBtn(x,edit,x.title):''}</li>`}).join(''):TK.length?'':'<li class="none">אין מבחנים או הגשות קרובים.</li>')+tk;
+  const Xc=X.filter(x=>!x.past),dl0=D.filter(x=>x.late).length;
+  $('#upTN').textContent=TK.length||'';$('#upDN').textContent=D.length?D.length+(dl0?` · ${dl0} באיחור`:''):'';$('#upDN').classList.toggle('lt',!!dl0);$('#upXN').textContent=Xc.length||'';
+  const grp=x=>x.past?'עברו':x.late?'באיחור':x.daysLeft<=7?'השבוע':x.daysLeft<=30?'החודש':'אחר כך',gc=x=>x.past?'g-far past':x.late||x.daysLeft<=7?'g-near':x.daysLeft<=30?'g-mid':'g-far'; // urgency decides the size
+  const cc=x=>x.exam&&COURSE[x.title]?'cd c-'+COURSE[x.title]:dueCls(x),dl=x=>x.past?'<small>עבר</small>':x.daysLeft===0?'<b class="w">היום</b>':x.daysLeft===1?'<b class="w">מחר</b>':`<b>${Math.abs(x.daysLeft)}</b><small>${x.late?'ימי איחור':'ימים'}</small>`;
+  const row=x=>`<li><button type="button" class="upgo ${gc(x)}${x.late?' late':''} ${cc(x)}" data-go="${x.date}"><span class="dl">${dl(x)}</span><span class="tx"><b>${esc(x.title)}</b><span class="dt">${dm(x.date)} · ${esc(x.time)} · ${esc(x.tag)}</span></span></button>${x.id?stBtn(x,edit,x.title):''}</li>`;
+  const grouped=A=>{let g='';return A.map(x=>(grp(x)!==g?`<li class="uph">${g=grp(x)}</li>`:'')+row(x)).join('')};
+  const doneL=A=>A.map(x=>`<li>${x.date?`<span class="dt">${dm(x.date)}</span>`:''}<b>${esc(x.title)}</b>${stBtn(x,edit,x.title)}</li>`).join('');
+  $('#upT').innerHTML=TK.length?TK.map(x=>`<li><button type="button" class="upgo tk ${dueCls(x)}" data-edit="${esc(x.id)}"><span class="tx"><b>${esc(x.title)}</b></span></button>${stBtn(x,edit,x.title)}</li>`).join(''):'<li class="none">אין משימות פתוחות.</li>';
+  $('#upTD').hidden=!TD.length;$('#upTDN').textContent='הושלמו ('+TD.length+')';$('#upTDL').innerHTML=doneL(TD);
+  $('#up').innerHTML=D.length?grouped(D):'<li class="none">אין מטלות פתוחות.</li>';
+  $('#upDone').hidden=!S.length;$('#upDoneN').textContent='הוגשו ('+S.length+')';$('#upDoneL').innerHTML=doneL(S);
+  $('#pasteBtn').hidden=!edit;
+  const XS=exAll?X:Xc.slice(0,3);$('#upX').innerHTML=XS.length?grouped(XS):'<li class="none">אין מבחנים קרובים.</li>';
+  const xa=$('#upXAll');xa.hidden=X.length<=XS.length&&!exAll;xa.textContent=exAll?'רק הקרובים':`כל המבחנים (${X.length})`;
 }
+$('#upXAll').addEventListener('click',()=>{exAll=!exAll;renderUp()});
 const stBusy=new Set(); // deadlines whose status save is still running
 async function setSt(id,s){
   const it=items.find(x=>x.id===id);if(!it||stBusy.has(id)||dueSt(it)===s)return;
@@ -1507,7 +1547,7 @@ async function setSt(id,s){
   }finally{stBusy.delete(id)}
   const b=document.querySelector(`[data-st="${id}"]`);if(b)b.focus(); // the lists are redrawn: keep the keyboard on the same button
 }
-$('#up').addEventListener('click',x=>{const t=x.target.closest('[data-edit]');if(t){openEdit(t.dataset.edit);return}const b=x.target.closest('[data-go]');if(!b)return;if(PHQ.matches){setView('day',b.dataset.go);scrollTo(0,0);return}if(view==='month')viewYm=clampYm(ymOf(b.dataset.go));go(sunOf(b.dataset.go))});
+$('#upCard').addEventListener('click',x=>{const t=x.target.closest('[data-edit]');if(t){openEdit(t.dataset.edit);return}const b=x.target.closest('[data-go]');if(!b)return;if(PHQ.matches){setView('day',b.dataset.go);scrollTo(0,0);return}if(view==='month')viewYm=clampYm(ymOf(b.dataset.go));go(sunOf(b.dataset.go))});
 document.addEventListener('click',x=>{const b=x.target.closest('[data-st]');if(b&&!b.disabled){const id=b.dataset.st;setSt(id,b.dataset.s==='done'?'todo':'done');pop(document.querySelector(`[data-st="${id}"]`))}}); // sb redraws at once, so the pop lands on the new pill // one tap flips the status (there are only two)
 $('#agenda').addEventListener('click',x=>{
   const k=x.target.closest('[data-key]'),kl=k&&agL[k.dataset.date+'|'+k.dataset.key];
@@ -1603,7 +1643,7 @@ function openAdd(pre={}){
   $('#dlgTitle').textContent='הוספה';$('#fDel').hidden=true;$('#fSkip').hidden=true;resetDel();$('#fErr').hidden=true;
   syncFields();hint();dlg.showModal();lockH();
 }
-const lockH=()=>{dlg.style.height='';if(PHQ.matches)dlg.style.height=dlg.getBoundingClientRect().height+'px'}; // the window keeps the height it opened with: an opened note or an error scrolls inside
+const lockH=()=>{dlg.style.height='';if(PHQ.matches)dlg.style.height=dlg.offsetHeight+'px'}; // the window keeps the height it opened with: an opened note or an error scrolls inside. offsetHeight, not the rect: the open animation may already scale the window (no button to grow from, e.g. a tap on the grid), and a scaled rect locked it at 30%
 function openEdit(id,sun=viewSun){ // sun: the week of the clicked occurrence
   const it=items.find(x=>x.id===id);if(!it)return;
   if(!canEdit()){toast('הדף פתוח לצפייה בלבד');return}
@@ -1633,7 +1673,7 @@ function validate(d){
 }
 function hint(){preMark();
   const d=readForm(),h=$('#fHint');h.classList.remove('full');
-  if(d.kind==='task'){h.className='hint';h.textContent='בלי תאריך · תופיע ב"מה מתקרב"';return}
+  if(d.kind==='task'){h.className='hint';h.textContent='בלי תאריך · ברשימת המשימות';return}
   if(isDated()&&!isoOk(d.date)){h.className='hint';h.textContent='בחר תאריך';return}
   if(d.kind==='due'){h.className='hint';h.textContent=`הגשה ב-${dm(d.date)} עד ${okTime(d.start)?d.start:'23:59'}`;return}
   if(!okTime(d.start)||!okTime(d.end)||d.start===d.end){h.className='hint';h.textContent='בחר שעת התחלה וסיום. סיום מוקדם מההתחלה נחשב עד אחרי חצות.';return}
