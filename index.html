@@ -5,20 +5,20 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="השבוע">
-<meta name="theme-color" content="#f1ebe3" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#15110d" media="(prefers-color-scheme: dark)">
-<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#f1ebe3;color:#141413}@media (prefers-color-scheme:dark){html:not([data-theme=light]) body{background:#15110d}}html[data-theme=dark] body{background:#15110d}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>try{var t=localStorage.getItem("wp.theme");document.documentElement.dataset.theme=t==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}</script></head><body>
+<meta name="theme-color" content="#f1eee6" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#101411" media="(prefers-color-scheme: dark)">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#f1eee6;color:#141413}@media (prefers-color-scheme:dark){html:not([data-theme=light]) body{background:#101411}}html[data-theme=dark] body{background:#101411}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>try{var t=localStorage.getItem("wp.theme");document.documentElement.dataset.theme=t==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}</script></head><body>
 <title>תכנון השבוע בסמסטר א'</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 /* Layout: header, a dated week bar (prev · range · next · today · add), an upcoming exams/deadlines card, one summary strip, an attention list, the 7-day grid (Sun→Sat, right to left, past midnight when needed), a day-by-day agenda, then the calendar-export card. The course base is locked; personal blocks layer on top, weekly or on one date. */
 :root{
   --ez-out:cubic-bezier(.32,.72,0,1); --ez-spring:cubic-bezier(.34,1.56,.64,1); --ez-snap:cubic-bezier(.2,.8,.2,1); /* motion curves (iOS-like), the same in every theme; JS copies them in EZ */
-  --bg-app:#f1ebe3; --bg-card:#fcfaf6; --bg-sunk:#f6f1ea;
-  --ink:#2a1d12; --text-main:#3b2a1c; --text-muted:#76624e; --text-faint:#a39080;
-  --border-light:#e4dacd; --border-dark:#d2c4b2;
-  --accent:#9a7650; --accent-fill:#e3d2bf; --accent-ink:#4a3320; --accent-soft:#eadccb; --accent-text:#6b4a2b; /* beige coffee: fill = bubbles and the +, soft = quiet tint, accent = lines and rings, text on light */
+  --bg-app:#f1eee6; --bg-card:#fcfbf7; --bg-sunk:#f5f3ec;
+  --ink:#1c2620; --text-main:#28332c; --text-muted:#6f7a71; --text-faint:#a0a79f;
+  --border-light:#e4e1d7; --border-dark:#cfccbf;
+  --accent:#3c5c48; --accent-fill:#2f4a3a; --accent-ink:#f3f0e8; --accent-soft:#dfe5d9; --accent-text:#2f4a3a; /* forest (default since 2026-11-18): fill = the dark green of the + and the home card, soft = sage tint, accent = lines and rings */
   --c-stat:#1d4ed8; --c-math:#15803d; --c-acc:#be123c; --c-micro:#7e22ce; --c-data:#c2410c; --c-ob:#a21caf; --c-eng:#4d7c0f; --on-course:#ffffff;
   --open-bg:#fffbeb; --open-bd:#f59e0b; --open-tx:#92400e;
   --close-bg:#eef2ff; --close-bd:#6366f1; --close-tx:#3730a3;
@@ -30,13 +30,14 @@
   --night:#e0e7ff;
   --shadow:rgba(15,23,42,.06); --scrim:rgba(15,23,42,.45);
   --font-body:'Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  --font-serif:'Frank Ruhl Libre','David Libre',Georgia,serif;
   --font-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg-app:#15110d; --bg-card:#1d1814; --bg-sunk:#18130f;
-  --ink:#f5efe8; --text-main:#e8e0d6; --text-muted:#a8998a; --text-faint:#7a6c5e;
-  --border-light:#2e2720; --border-dark:#43382d;
-  --accent:#c9ab88; --accent-fill:#e3d2bf; --accent-ink:#2b1d0e; --accent-soft:#3a2e22; --accent-text:#ecdcc8;
+  --bg-app:#101411; --bg-card:#181e1a; --bg-sunk:#141915;
+  --ink:#eef1ea; --text-main:#dde3da; --text-muted:#9aa59b; --text-faint:#6b756c;
+  --border-light:#252d27; --border-dark:#36403a;
+  --accent:#9cc0a5; --accent-fill:#33503f; --accent-ink:#eef1ea; --accent-soft:#25302a; --accent-text:#bcd6c2;
   --c-stat:#60a5fa; --c-math:#4ade80; --c-acc:#fb7185; --c-micro:#c084fc; --c-data:#fb923c; --c-ob:#e879f9; --c-eng:#a3e635; --on-course:#0b111c;
   --open-bg:#2a1d06; --open-bd:#fbbf24; --open-tx:#fde68a;
   --close-bg:#1b1d3f; --close-bd:#818cf8; --close-tx:#c7d2fe;
@@ -50,10 +51,10 @@
   color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg-app:#15110d; --bg-card:#1d1814; --bg-sunk:#18130f;
-  --ink:#f5efe8; --text-main:#e8e0d6; --text-muted:#a8998a; --text-faint:#7a6c5e;
-  --border-light:#2e2720; --border-dark:#43382d;
-  --accent:#c9ab88; --accent-fill:#e3d2bf; --accent-ink:#2b1d0e; --accent-soft:#3a2e22; --accent-text:#ecdcc8;
+  --bg-app:#101411; --bg-card:#181e1a; --bg-sunk:#141915;
+  --ink:#eef1ea; --text-main:#dde3da; --text-muted:#9aa59b; --text-faint:#6b756c;
+  --border-light:#252d27; --border-dark:#36403a;
+  --accent:#9cc0a5; --accent-fill:#33503f; --accent-ink:#eef1ea; --accent-soft:#25302a; --accent-text:#bcd6c2;
   --c-stat:#60a5fa; --c-math:#4ade80; --c-acc:#fb7185; --c-micro:#c084fc; --c-data:#fb923c; --c-ob:#e879f9; --c-eng:#a3e635; --on-course:#0b111c;
   --open-bg:#2a1d06; --open-bd:#fbbf24; --open-tx:#fde68a;
   --close-bg:#1b1d3f; --close-bd:#818cf8; --close-tx:#c7d2fe;
@@ -577,6 +578,37 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .tabs button{transition:color .2s ease-out}.tabs svg{transition:transform .4s var(--ez-spring)}.tabs button:active:not(:disabled) svg{transform:scale(.85);transition-duration:.1s}
 .tabs button[aria-current=page],.tabs button[aria-current=page] .bd{transition-delay:.3s} /* the picked icon lights up when the pill reaches it */
 .tabs .bd{fill:currentColor;fill-opacity:0;transition:fill-opacity .15s ease-out}.tabs button[aria-current=page] .bd{fill-opacity:.25}
+/* forest look (2026-11-18, mockup docs/mockups/forest.html): serif headings, rounder cards with a soft shadow, on a phone the home and the day are cards on the page */
+h1,.card h2,.hello,.ups>h3,.dayhead h2,#monthTitle{font-family:var(--font-serif);font-weight:700;letter-spacing:0}
+.card{border-radius:24px;border-color:transparent;box-shadow:0 12px 30px -20px rgba(20,32,24,.35),0 1px 2px var(--shadow)}
+dialog{border-radius:24px}.btn{border-radius:14px}.upgo{border-radius:16px}.dstrip button{border-radius:16px}.dlb{border-radius:16px}
+.ups>h3{font-size:20px}.ups>h3 small{font-family:var(--font-body)}
+.ph #upCard,.ph #dayCard{background:none;border:0;box-shadow:none;padding:0}
+.ph .hello{font-size:32px;line-height:1.15;margin:6px 4px 10px}
+.ph .hrow{border:0;border-radius:26px;padding:18px 20px;gap:4px;background:var(--accent-fill);color:var(--accent-ink);box-shadow:0 16px 30px -20px rgba(20,32,24,.6)}
+.ph .hrow b{font:700 25px/1.2 var(--font-serif)}.ph .hrow :is(small,span){color:inherit;opacity:.78}
+.ph #nowRow:not([hidden])+#nextRow{background:var(--accent-soft);color:var(--ink);box-shadow:none;padding:14px 20px}.ph #nowRow:not([hidden])+#nextRow b{font-size:19px}
+.ph .ups{background:var(--bg-card);border-radius:24px;padding:16px 16px 12px;margin-top:14px;box-shadow:0 12px 30px -20px rgba(20,32,24,.35),0 1px 2px var(--shadow)}
+.ph .htop+.ups{margin-top:16px}
+.ph #dayHead{background:var(--accent-fill);color:var(--accent-ink);border-radius:28px;padding:20px 22px 62px;display:grid;gap:2px}
+.ph #dayHead h2{font-size:32px;line-height:1.15;color:inherit}.ph #dayHead small{color:inherit;opacity:.75;font-weight:500;font-size:14px}.ph #dayHead small.rel{opacity:.7;font-size:13px}
+.ph #dstrip{position:relative;margin:-50px 10px 14px;gap:6px}
+.ph #dstrip button{background:var(--bg-card);border:0;box-shadow:0 8px 18px -12px rgba(0,0,0,.4)}
+.ph #dstrip button[aria-pressed=true]{background:var(--ink);transform:translateY(-4px);box-shadow:0 0 0 3px var(--bg-app),0 10px 20px -10px rgba(0,0,0,.5)}
+.ph #dstrip b{font:700 20px var(--font-serif)}
+.dplan{background:var(--bg-card);border-radius:24px;padding:16px 18px;margin-bottom:6px;box-shadow:0 12px 30px -20px rgba(20,32,24,.35),0 1px 2px var(--shadow)}
+.dplan h3{margin:0;font:700 21px var(--font-serif);color:var(--ink)}.dplan small{color:var(--text-muted);font-size:13px}
+.dplan .bar{display:flex;align-items:center;gap:12px;margin-top:10px}.dplan .bar i{flex:1;height:9px;border-radius:9px;background:var(--accent-soft);overflow:hidden}.dplan .bar i::before{content:'';display:block;height:100%;width:var(--p);border-radius:9px;background:var(--accent-fill);transition:width .5s var(--ez-out)}.dplan .bar b{font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+.ph #dayList{gap:10px}
+.ph #dayList .dli{position:relative;padding-inline-start:36px}
+.ph #dayList .dli::before{content:'';position:absolute;inset-inline-start:0;top:50%;width:24px;height:24px;margin-top:-12px;border-radius:50%;border:1.8px solid var(--border-dark);background:var(--bg-app);box-sizing:border-box;display:grid;place-items:center;font-size:13px;font-weight:800;color:var(--accent-ink)}
+.ph #dayList .dli:is(.past,.done)::before{content:'✓';background:var(--accent-fill);border-color:var(--accent-fill)}
+.ph #dayList .dli.now::before{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.ph #dayList .dli.late::before{border-color:var(--bad-bd)}
+.ph #dayList .dli.cancelled::before{border-style:dashed}
+.ph #dayList .dli:not(:last-child)::after{content:'';position:absolute;inset-inline-start:11px;top:calc(50% + 14px);height:calc(100% - 18px);width:2px;background:var(--border-light)}
+.ph #dayList .dlb{background:var(--bg-card);border-color:transparent;box-shadow:0 6px 16px -12px rgba(20,32,24,.35)}
+.ph #dayList .dli.ex .dlb{background:color-mix(in srgb,var(--lc) 14%,var(--bg-card))}
 </style>
 
 <div class="wrap" dir="rtl" lang="he">
@@ -607,8 +639,9 @@ html{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <div class="wkbar" id="wkBar" hidden></div>
 
 <section class="card" id="dayCard" hidden>
-  <div class="dstrip" id="dstrip" role="group" aria-label="ימי השבוע"></div>
   <div class="dayhead" id="dayHead"></div>
+  <div class="dstrip" id="dstrip" role="group" aria-label="ימי השבוע"></div>
+  <div class="dplan" id="dayPlan" hidden></div>
   <ul class="dlist" id="dayList"></ul>
 </section>
 <section class="card" id="monthCard" hidden>
@@ -1428,13 +1461,18 @@ function renderAgenda(evs,clash){
 function renderDay(evs,an){ // phone day view: the week strip, the day's notes, then its lines by time
   const date=viewDay,today=todayIso(),c=CAL[date],off=offDoc(date,items),edit=canEdit();
   $('#dstrip').innerHTML=DAYI.map((l,k)=>{const d=addDays(viewSun,k);return`<button type="button" data-day="${d}" aria-pressed="${d===date}" aria-label="${DAYS[k]} ${dm(d)}"${d===today?' class="today"':''}><small>${l}</small><b>${Number(d.slice(8))}</b></button>`}).join('');
-  $('#dayHead').innerHTML=`<h2>${DAYS[dow(date)]} ${dm(date)}</h2>`+(c?`<small>${esc(c.label)}</small>`:'')+(off?'<small>לימודים בוטלו</small>':'');
   dayL=dayLines(date,items,evs);
+  const L=dayL.filter(l=>!l.cancelled),nm=nowMin(),rel=date===today?'היום':date===addDays(today,1)?'מחר':date===addDays(today,-1)?'אתמול':'',cnt=(n,one,many)=>n?n===1?one:n+' '+many:'';
+  const sh=L.filter(l=>l.src==='user'&&KINDS[l.kind]&&KINDS[l.kind].shift).length,own=L.filter(l=>l.src==='user').length-sh;
+  const what=[cnt(L.filter(l=>l.src==='base').length,'שיעור אחד','שיעורים'),cnt(L.filter(l=>l.src==='exam').length,'מבחן','מבחנים'),cnt(sh,'משמרת','משמרות'),cnt(L.filter(l=>l.src==='due').length,'הגשה','הגשות'),cnt(own,'עוד פריט','פריטים נוספים')].filter(Boolean).join(' · ');
+  $('#dayHead').innerHTML=(rel?`<small class="rel">${rel}</small>`:'')+`<h2>יום ${DAYS[dow(date)]}</h2><small>${dmy(date)}${what?' · '+what:''}</small>`+(c?`<small>${esc(c.label)}</small>`:'')+(off?'<small>לימודים בוטלו</small>':''); // the dark header: when, the day, what is in it
+  const dn=L.filter(l=>l.src==='due'?l.st==='done':l.date<today||l.date===today&&l.e<=nm).length,pc=L.length?Math.round(dn*100/L.length):0,dp=$('#dayPlan');
+  dp.hidden=!L.length||!PHQ.matches;dp.innerHTML=`<h3>${date===today?'התוכנית להיום':'התוכנית ליום הזה'}</h3><small>${dn} מתוך ${L.length} הושלמו</small><div class="bar"><i style="--p:${pc}%"></i><b>${pc}%</b></div>`; // what is over (or submitted) out of the day's lines
   $('#dayList').innerHTML=dayL.length?dayL.map(l=>dayLi(l,an.clash,edit,today)).join(''):emptyDay(date,edit);
 }
 function dayLi(l,clash,edit,today){ // one line of a day, as a tappable row: time column, course colour bar, title and room (the phone day view and the phone week agenda)
   {
-    const now=l.date===today?nowMin():-1,cur=now>=0&&l.src!=='due'&&!l.cancelled&&l.s<=now&&now<l.e,past=now>=0&&l.src!=='due'&&!l.cancelled&&l.e<=now; // today's row: dimmed when over, ringed while on
+    const now=l.date===today?nowMin():-1,cur=now>=0&&l.src!=='due'&&!l.cancelled&&l.s<=now&&now<l.e,past=l.src!=='due'&&!l.cancelled&&(now>=0&&l.e<=now||l.date<today); // today's row: dimmed when over, ringed while on
     const t=lineTxt(l),due=l.src==='due',tap=l.src!=='exam'&&(l.src!=='base'||edit),hit=clash.has(l.key),meta=[cur?'עכשיו':'',l.cancelled?'בוטל':'',due&&l.st!=='done'&&l.date<today?'באיחור':'',l.e>1440?'עד '+fm(l.e)+' (למחרת)':'',t.meta].filter(Boolean).join(' · ');
     const when=due?'עד '+fm(l.s):tr(l.s,l.e),act=l.src==='base'?l.cancelled?'החזרה':'ביטול':'עריכה';
     return`<li class="dli${cur?' now':''}${past?' past':''}${l.src==='exam'?' ex':''}${l.cancelled?' cancelled':''}${due&&l.done?' done':''}${due&&l.st!=='done'&&l.date<today?' late':''}">`
@@ -1510,10 +1548,10 @@ function renderHome(){ // greeting, the class now and the next one (phone home o
   const on=PHQ.matches&&view==='up';$('#homeTop').hidden=!on;if(!on)return;
   const t=todayIso(),m=nowMin(),nm=(profileOf(items)||{}).name,{now,next}=nowNext(t,m,items),cc=e=>e.course?'c-'+e.course:'';homeEv={now,next};
   $('#hello').textContent=greet(m)+(nm?' '+nm:'');
-  const what=e=>esc(e.title)+(e.src==='exam'?' · מבחן':'')+(e.room?' · '+esc(e.room):'');
-  const n=$('#nowRow');n.hidden=!now;if(now){n.className='hrow '+cc(now);n.innerHTML=`<small>עכשיו</small><b>${what(now)}</b><span>עד ${ltr(fm(now.e))} · עוד ${inMin(now.minsLeft)}</span>`}
+  const what=e=>esc(e.title)+(e.src==='exam'?' · מבחן':''),rm=e=>e.room?esc(e.room)+' · ':''; // the name big, the room in the small line
+  const n=$('#nowRow');n.hidden=!now;if(now){n.className='hrow '+cc(now);n.innerHTML=`<small>עכשיו</small><b>${what(now)}</b><span>${rm(now)}עד ${ltr(fm(now.e))} · עוד ${inMin(now.minsLeft)}</span>`}
   const x=$('#nextRow');x.hidden=!next;if(next){const d=next.daysAhead,h=ltr(fm(next.s));x.className='hrow nx '+cc(next);
-    x.innerHTML=`<small>הבא</small><b>${what(next)}</b><span>${d===0?`היום ${h} · בעוד ${inMin(next.minsTo)}`:d===1?'מחר '+h:d<7?`ביום ${DAYS[next.d]} ${h}`:`ב-${dm(next.date)} ${h}`}</span>`}
+    x.innerHTML=`<small>הבא</small><b>${what(next)}</b><span>${rm(next)}${d===0?`היום ${h} · בעוד ${inMin(next.minsTo)}`:d===1?'מחר '+h:d<7?`ביום ${DAYS[next.d]} ${h}`:`ב-${dm(next.date)} ${h}`}</span>`}
 }
 ['#nowRow','#nextRow'].forEach((q,k)=>$(q).addEventListener('click',()=>{const e=k?homeEv.next:homeEv.now;if(!e)return;if(e.src==='base'&&canEdit())openCancel(e);else setView('day',e.date)}));
 function renderUp(){
@@ -2037,20 +2075,20 @@ $('#setWipe').addEventListener('click',async()=>{ // two clicks: the first arms 
     toast('הנתונים נמחקו');setDlg.close();
   }catch(e){toast('המחיקה לא הצליחה. נסה שוב.');b.disabled=false;b.classList.remove('armed');b.textContent='מחיקת כל הנתונים שלי'}
 });
-const PAL_LS='wp.pal',PALS={beige:{n:'בז׳ קפה',f:'#e3d2bf',l:'#9a7650'},lilac:{n:'לילך',tn:'#a855f7',f:'#e6d7f5',i:'#4a2a73',l:'#8b6fb8',t:'#5b3a8a'},lavender:{n:'לבנדר',tn:'#7c6ad6',f:'#b9a7ee',i:'#241552',l:'#7a64c9',t:'#3b2a7a'},pea:{n:'ירוק אפונה',tn:'#84cc16',f:'#b7e36a',i:'#233a0a',l:'#6a9a1f',t:'#3f6212'},blue:{n:'תכלת',tn:'#4f86d6',f:'#bcd7f0',i:'#12304d',l:'#5b8fc4',t:'#1f4a7a'},peach:{n:'אפרסק',tn:'#f97316',f:'#ffd9bf',i:'#7a2e0a',l:'#d9803f',t:'#9a3f10'}};
+const PAL_LS='wp.pal',PALS={forest:{n:'יער',f:'#2f4a3a',l:'#3c5c48'},beige:{n:'בז׳ קפה',f:'#e3d2bf',l:'#9a7650',x:{'--bg-app':'#f1ebe3','--bg-card':'#fcfaf6','--bg-sunk':'#f6f1ea','--ink':'#2a1d12','--text-main':'#3b2a1c','--text-muted':'#76624e','--text-faint':'#a39080','--border-light':'#e4dacd','--border-dark':'#d2c4b2','--accent':'#9a7650','--accent-fill':'#e3d2bf','--accent-ink':'#4a3320','--accent-soft':'#eadccb','--accent-text':'#6b4a2b'},xd:{'--bg-app':'#15110d','--bg-card':'#1d1814','--bg-sunk':'#18130f','--ink':'#f5efe8','--text-main':'#e8e0d6','--text-muted':'#a8998a','--text-faint':'#7a6c5e','--border-light':'#2e2720','--border-dark':'#43382d','--accent':'#c9ab88','--accent-fill':'#e3d2bf','--accent-ink':'#2b1d0e','--accent-soft':'#3a2e22','--accent-text':'#ecdcc8'}},lilac:{n:'לילך',tn:'#a855f7',f:'#e6d7f5',i:'#4a2a73',l:'#8b6fb8',t:'#5b3a8a'},lavender:{n:'לבנדר',tn:'#7c6ad6',f:'#b9a7ee',i:'#241552',l:'#7a64c9',t:'#3b2a7a'},pea:{n:'ירוק אפונה',tn:'#84cc16',f:'#b7e36a',i:'#233a0a',l:'#6a9a1f',t:'#3f6212'},blue:{n:'תכלת',tn:'#4f86d6',f:'#bcd7f0',i:'#12304d',l:'#5b8fc4',t:'#1f4a7a'},peach:{n:'אפרסק',tn:'#f97316',f:'#ffd9bf',i:'#7a2e0a',l:'#d9803f',t:'#9a3f10'}};
 const hexMix=(a,b,t)=>{const A=[1,3,5].map(i=>parseInt(a.slice(i,i+2),16)),B=[1,3,5].map(i=>parseInt(b.slice(i,i+2),16));return'#'+B.map((v,i)=>Math.round(v*(1-t)+A[i]*t).toString(16).padStart(2,'0')).join('')};
 const palKeys=['--accent','--accent-fill','--accent-ink','--accent-soft','--accent-text','--bg-app','--bg-card','--bg-sunk','--border-light','--border-dark','--ink','--text-main','--text-muted','--text-faint'];
 function palVars(P,dark){const m=(b,t)=>hexMix(P.tn,b,t);return dark?{'--accent':P.f,'--accent-fill':P.f,'--accent-ink':P.i,'--accent-soft':m('#1c1c1c',.22),'--accent-text':hexMix(P.f,'#ffffff',.5),'--bg-app':m('#111111',.08),'--bg-card':m('#1a1a1a',.07),'--bg-sunk':m('#151515',.07),'--border-light':m('#2a2a2a',.15),'--border-dark':m('#3d3d3d',.15),'--ink':m('#f4f4f4',.06),'--text-main':m('#e6e6e6',.06),'--text-muted':m('#a5a5a5',.1),'--text-faint':m('#777777',.1)}:{'--accent':P.l,'--accent-fill':P.f,'--accent-ink':P.i,'--accent-soft':hexMix(P.f,'#ffffff',.5),'--accent-text':P.t,'--bg-app':m('#f3f2f2',.12),'--bg-card':m('#ffffff',.04),'--bg-sunk':m('#f8f8f8',.08),'--border-light':m('#e5e5e5',.18),'--border-dark':m('#cfcfcf',.2),'--ink':m('#161616',.12),'--text-main':m('#262626',.14),'--text-muted':m('#6b6b6b',.2),'--text-faint':m('#9c9c9c',.2)}}
-const palNow=()=>{try{const k=localStorage.getItem(PAL_LS);return PALS[k]?k:'beige'}catch(e){return'beige'}};
-function palApply(){const k=palNow(),st=document.documentElement.style;for(const v of palKeys)st.removeProperty(v);if(k!=='beige'){const d=themeNow()==='dark';for(const[v,c]of Object.entries(palVars(PALS[k],d)))st.setProperty(v,c)}
+const palNow=()=>{try{const k=localStorage.getItem(PAL_LS);return PALS[k]?k:'forest'}catch(e){return'forest'}};
+function palApply(){const k=palNow(),st=document.documentElement.style;for(const v of palKeys)st.removeProperty(v);if(k!=='forest'){const d=themeNow()==='dark',P=PALS[k];for(const[v,c]of Object.entries(P.x?d?P.xd:P.x:palVars(P,d)))st.setProperty(v,c)}
   for(const m of document.querySelectorAll('meta[name=theme-color]'))m.content=getComputedStyle(document.documentElement).getPropertyValue('--bg-app').trim()||m.content;
-  for(const b of $('#pals').children)b.setAttribute('aria-checked',String(b.dataset.p===k))} // beige = the stylesheet's own tokens; another palette sets them inline for the shown theme (re-applied when the theme flips)
+  for(const b of $('#pals').children)b.setAttribute('aria-checked',String(b.dataset.p===k))} // forest = the stylesheet's own tokens, beige = its fixed sets x/xd; another palette sets them inline for the shown theme (re-applied when the theme flips)
 $('#pals').innerHTML=Object.entries(PALS).map(([k,P])=>`<button type="button" role="radio" data-p="${k}" style="--pf:${P.f};--pl:${P.l}"><i></i>${P.n}</button>`).join('');
 $('#pals').addEventListener('click',x=>{const b=x.target.closest('[data-p]');if(!b)return;try{localStorage.setItem(PAL_LS,b.dataset.p)}catch(e){}palApply();if(!still())$('#pals [aria-checked=true] i').animate([{transform:'scale(.7)'},{transform:'none'}],{duration:420,easing:EZ.spring})});
 const THEME_LS='wp.theme';
 function themeNow(){return document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}
 const TH_SV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',TH_MOON=TH_SV+'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',TH_SUN=TH_SV+'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>'; // line icons in the tab bar's style
-function themeShow(){const d=themeNow()==='dark',b=$('#themeBtn');for(const m of document.querySelectorAll('meta[name=theme-color]'))m.content=d?'#15110d':'#f1ebe3';b.innerHTML=d?TH_SUN:TH_MOON;b.title=b.dataset.t=d?'מעבר למצב בהיר':'מעבר למצב כהה';b.setAttribute('aria-label',b.title);palApply()}
+function themeShow(){const d=themeNow()==='dark',b=$('#themeBtn');for(const m of document.querySelectorAll('meta[name=theme-color]'))m.content=d?'#101411':'#f1eee6';b.innerHTML=d?TH_SUN:TH_MOON;b.title=b.dataset.t=d?'מעבר למצב בהיר':'מעבר למצב כהה';b.setAttribute('aria-label',b.title);palApply()}
 try{const t=localStorage.getItem(THEME_LS);document.documentElement.dataset.theme=t==='dark'?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'} // light unless the user chose dark (2026-11-15)
 $('#themeBtn').addEventListener('click',()=>{const n=themeNow()==='dark'?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem(THEME_LS,n)}catch(e){}themeShow();if(!still())$('#themeBtn svg').animate([{transform:'rotate(-180deg) scale(.4)',opacity:0},{transform:'none',opacity:1}],{duration:520,easing:EZ.spring})}); // the new icon turns in
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',themeShow);

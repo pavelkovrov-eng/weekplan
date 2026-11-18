@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>דוגמה: יער</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9e6de;--app:#f3f0e8;--card:#fcfbf7;--ink:#1e2a22;--mut:#7d867e;--line:#e3e0d6;--g:#2f4a3a;--g2:#3c5c48;--sage:#dfe5d9;--sage2:#c9d3c2;
+--micro:#5b7fa6;--stat:#b0795a;--math:#8a6aa8;--shift:#c49a3a;--due:#b5524a}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);font:15px/1.4 Heebo,system-ui,sans-serif;color:var(--ink);padding:28px 16px;display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+.ph{width:375px;height:812px;background:var(--app);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 30px 60px -20px #0004,0 0 0 1px #0000000d}
+.scr{height:100%;overflow:auto;padding-bottom:110px}
+.sb{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-weight:600;font-size:14px;direction:ltr}
+.serif{font-family:'Frank Ruhl Libre',serif}
+/* home */
+.hd{padding:10px 22px 18px}
+.hd small{color:var(--mut);font-size:14px}
+.hd h1{font:700 34px/1.1 'Frank Ruhl Libre',serif;margin-top:4px}
+.hero{margin:0 16px;border-radius:28px;background:linear-gradient(160deg,var(--g2),var(--g));color:#f3f0e8;padding:20px;position:relative;overflow:hidden}
+.hero svg{position:absolute;inset-inline-start:-10px;bottom:-6px;opacity:.18}
+.hero .lb{font-size:12px;letter-spacing:.04em;opacity:.7}
+.hero .t{font:700 26px/1.15 'Frank Ruhl Libre',serif;margin:6px 0 4px}
+.hero .m{opacity:.8;font-size:14px}
+.hero .nx{margin-top:16px;padding-top:14px;border-top:1px solid #ffffff22;display:flex;justify-content:space-between;align-items:center;font-size:14px}
+.hero .nx b{font-weight:500}
+.pill{background:#f3f0e8;color:var(--g);border-radius:99px;padding:8px 14px;font-weight:700;font-size:13px}
+.sec{margin:16px 16px 0;background:var(--card);border-radius:24px;padding:16px 16px 6px;box-shadow:0 6px 20px -12px #2f4a3a40}
+.sec h2{font:700 20px 'Frank Ruhl Libre',serif;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.sec h2 small{font:500 13px Heebo;color:var(--mut)}
+.sec h2 small.lt{color:var(--due)}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.ck{width:24px;height:24px;border-radius:50%;border:1.8px solid var(--sage2);flex:none;display:grid;place-items:center}
+.ck.on{background:var(--g);border-color:var(--g)}
+.ck.on::after{content:'';width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.row .tx{flex:1;min-width:0}
+.row .tx b{font-weight:500;display:block}
+.row .tx span{font-size:13px;color:var(--mut)}
+.days{min-width:46px;text-align:center;border-radius:14px;background:var(--sage);padding:5px 0;line-height:1.05}
+.days b{font:700 18px 'Frank Ruhl Libre',serif;display:block}
+.days small{font-size:11px;color:var(--mut)}
+.days.lt{background:#f3dcd8}.days.lt b{color:var(--due)}
+.cc{width:4px;align-self:stretch;border-radius:4px;flex:none}
+/* tab bar */
+.tabs{position:absolute;bottom:14px;inset-inline:14px;height:70px;border-radius:26px;background:#fcfbf7e6;backdrop-filter:blur(14px);display:grid;grid-template-columns:repeat(5,1fr);align-items:center;box-shadow:0 10px 30px -12px #0003}
+.tabs div{display:grid;justify-items:center;gap:3px;font-size:11px;color:var(--mut)}
+.tabs div.on{color:var(--g);font-weight:700}
+.tabs i{width:24px;height:24px;border-radius:7px;border:2px solid currentColor;opacity:.85}
+.tabs div.on i{background:var(--sage);border-color:var(--g)}
+.tabs .add{width:52px;height:52px;border-radius:18px;background:var(--g);color:#fff;font-size:30px;line-height:52px;text-align:center;justify-self:center}
+/* day */
+.top{background:linear-gradient(170deg,var(--g2),var(--g));color:#f3f0e8;padding:0 0 70px;position:relative;overflow:hidden}
+.top .sb{color:#f3f0e8}
+.top .in{padding:14px 22px 0}
+.top small{opacity:.7;font-size:14px}
+.top h1{font:700 36px/1.08 'Frank Ruhl Libre',serif;margin:4px 0 6px}
+.top .d{opacity:.7;font-size:14px}
+.top svg{position:absolute;inset-inline-start:-14px;top:40px;opacity:.22}
+.strip{display:flex;gap:8px;padding:0 16px;margin-top:-52px;position:relative}
+.strip div{flex:1;background:var(--card);border-radius:18px;text-align:center;padding:9px 0 8px;box-shadow:0 8px 18px -12px #0005}
+.strip small{font-size:12px;color:var(--mut);display:block}
+.strip b{font:700 22px 'Frank Ruhl Libre',serif}
+.strip .on{background:#17221b;color:#fff;transform:translateY(-6px);box-shadow:0 0 0 3px var(--app),0 10px 20px -8px #0008}
+.strip .on small{color:#ffffffaa}
+.plan{margin:14px 16px 0;background:var(--card);border-radius:24px;padding:16px;box-shadow:0 6px 20px -12px #2f4a3a40}
+.plan .h{display:flex;justify-content:space-between;align-items:center}
+.plan h2{font:700 21px 'Frank Ruhl Libre',serif}
+.plan .h small{color:var(--mut);font-size:13px}
+.plus{width:34px;height:34px;border-radius:50%;background:var(--sage);display:grid;place-items:center;font-size:20px;color:var(--g)}
+.bar{display:flex;align-items:center;gap:12px;margin-top:12px}
+.bar div{flex:1;height:9px;border-radius:9px;background:var(--sage)}
+.bar div i{display:block;height:100%;width:40%;border-radius:9px;background:var(--g)}
+.bar b{font-size:14px}
+.tl{margin:6px 16px 0;padding:6px 6px 0}
+.ti{display:flex;gap:14px;padding:12px 0;position:relative}
+.ti::before{content:'';position:absolute;inset-inline-start:11px;top:38px;bottom:-12px;width:2px;background:var(--line)}
+.ti:last-child::before{display:none}
+.ti .tx{flex:1}
+.ti .tx b{font-weight:500;display:block}
+.ti .tx span{font-size:13px;color:var(--mut)}
+.ti time{font-size:13px;color:var(--mut);direction:ltr}
+.ti.past .tx{opacity:.55}
+.ti.now .ck{border-color:var(--g);box-shadow:0 0 0 4px var(--sage)}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:99px;padding:1px 8px;margin-inline-start:6px;vertical-align:1px}
+.quote{margin:12px 16px 0;background:var(--sage);border-radius:22px;padding:16px 18px;font:500 17px/1.4 'Frank Ruhl Libre',serif;color:#33443a}
+.quote small{display:block;font:400 13px Heebo;color:var(--mut);margin-bottom:4px}
+.cap{width:100%;text-align:center;color:var(--mut);font-size:13px;margin-top:-6px}
+</style>
+</head>
+<body>
+<p class="cap">דוגמה בלבד · שמות ושעות לדוגמה · צבעי הקורסים לא משתנים</p>
+
+<!-- HOME -->
+<div class="ph"><div class="scr">
+  <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+  <div class="hd"><small>יום רביעי, 18 בנובמבר</small><h1>ערב טוב, פבל</h1></div>
+  <div class="hero">
+    <svg width="220" height="120" viewBox="0 0 220 120"><path d="M0 120 60 40l30 34 40-58 90 104z" fill="#fff"/><circle cx="170" cy="30" r="16" fill="#fff"/></svg>
+    <div class="lb">הבא</div>
+    <div class="t">מבוא למיקרו</div>
+    <div class="m">מחר 08:30 · כלכלה 107</div>
+    <div class="nx"><span>אין שיעור עכשיו</span><span class="pill">פתיחת היום ←</span></div>
+  </div>
+  <div class="sec"><h2>משימות <small>2</small></h2>
+    <div class="row"><span class="ck"></span><div class="tx"><b>לקרוא פרק 3 בסטטיסטיקה</b></div></div>
+    <div class="row"><span class="ck"></span><div class="tx"><b>לשלוח מייל למתרגל</b></div></div>
+  </div>
+  <div class="sec"><h2>מטלות <small class="lt">3 · 1 באיחור</small></h2>
+    <div class="row"><span class="cc" style="background:var(--micro)"></span><div class="tx"><b>מיקרו · תרגיל 4</b><span>17.11 · 23:59</span></div><div class="days lt"><b>1</b><small>יום איחור</small></div></div>
+    <div class="row"><span class="cc" style="background:var(--stat)"></span><div class="tx"><b>הסתברות · עבודה 2</b><span>20.11 · 23:59</span></div><div class="days"><b>2</b><small>ימים</small></div></div>
+    <div class="row"><span class="cc" style="background:var(--math)"></span><div class="tx"><b>מתמטיקה · גיליון 5</b><span>26.11 · 12:00</span></div><div class="days"><b>8</b><small>ימים</small></div></div>
+  </div>
+  <div class="sec"><h2>מבחנים <small>הבאים</small></h2>
+    <div class="row"><span class="cc" style="background:var(--math)"></span><div class="tx"><b>מתמטיקה א'</b><span>18.01 · 09:00 · מועד א'</span></div><div class="days"><b>61</b><small>ימים</small></div></div>
+  </div>
+</div>
+<div class="tabs"><div class="on"><i></i>בית</div><div><i></i>יום</div><div class="add">+</div><div><i></i>שבוע</div><div><i></i>חודש</div></div>
+</div>
+
+<!-- DAY -->
+<div class="ph"><div class="scr">
+  <div class="top">
+    <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+    <svg width="200" height="160" viewBox="0 0 200 160"><path d="M100 150C40 120 20 60 60 10c10 50 40 80 40 140zM110 150c10-60 50-90 90-100-10 50-40 90-90 100z" fill="#cfe0c8"/></svg>
+    <div class="in"><small>היום</small><h1>מה שחשוב,<br>צעד אחד בכל פעם.</h1><div class="d">רביעי · 18.11.26</div></div>
+  </div>
+  <div class="strip"><div><small>א'</small><b>15</b></div><div><small>ב'</small><b>16</b></div><div><small>ג'</small><b>17</b></div><div class="on"><small>ד'</small><b>18</b></div><div><small>ה'</small><b>19</b></div></div>
+  <div class="plan">
+    <div class="h"><div><h2>התוכנית להיום</h2><small>2 מתוך 5 הושלמו</small></div><span class="plus">+</span></div>
+    <div class="bar"><div><i></i></div><b>40%</b></div>
+  </div>
+  <div class="tl">
+    <div class="ti past"><span class="ck on"></span><div class="tx"><b>הסתברות וסטטיסטיקה</b><span>הרצאה · כלכלה 109</span></div><time>08:30</time></div>
+    <div class="ti past"><span class="ck on"></span><div class="tx"><b>מבוא למיקרו</b><span>תרגול · כלכלה 101</span></div><time>10:15</time></div>
+    <div class="ti now"><span class="ck"></span><div class="tx"><b>מתמטיקה א' <span class="tag" style="background:var(--sage);color:var(--g)">עכשיו</span></b><span>הרצאה · עד 15:30</span></div><time>14:00</time></div>
+    <div class="ti"><span class="ck"></span><div class="tx"><b>משמרת סגירה</b><span>16:00–22:00 · 6 שעות</span></div><time>16:00</time></div>
+    <div class="ti"><span class="ck"></span><div class="tx"><b>מיקרו · תרגיל 5 <span class="tag" style="background:#f3dcd8;color:var(--due)">הגשה</span></b><span>לא התחלתי</span></div><time>23:59</time></div>
+  </div>
+  <div class="quote"><small>מחר</small>מבוא למיקרו 08:30 · ועוד 2 שיעורים</div>
+</div>
+<div class="tabs"><div><i></i>בית</div><div class="on"><i></i>יום</div><div class="add">+</div><div><i></i>שבוע</div><div><i></i>חודש</div></div>
+</div>
+</body>
+</html>
