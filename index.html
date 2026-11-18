@@ -2291,9 +2291,9 @@ addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('b
     const K=[{clipPath:`inset(${f(cy-bh/2)} ${f(W-cx-bw/2)} ${f(H-cy-bh/2)} ${f(cx-bw/2)} round ${R0}px)`,transform:`translate(${f(bx-cx)},${f(by-cy)})`},{clipPath:`inset(0px 0px 0px 0px round ${R1}px)`,transform:'none'}];
     let bg=cs.backgroundColor;if(!bg||/^(transparent|rgba\(0, 0, 0, 0\))$/.test(bg))bg=getComputedStyle(d).backgroundColor;
     const o=document.createElement('div');o.className='mph';Object.assign(o.style,{top:d.scrollTop+'px',height:d.clientHeight+'px',background:bg});d.appendChild(o); // the button's colour over the window, fading off
-    d.style.transformOrigin='';const D=out?380:560,O=[{opacity:1},{opacity:0}];
+    d.style.transformOrigin='';const D=out?420:560,O=[{opacity:1},{opacity:0}];
     const a=d.animate(out?K.reverse():K,{duration:D,easing:out?'cubic-bezier(.4,0,.2,1)':'cubic-bezier(.3,1.18,.4,1)',fill:out?'forwards':'none'}); // open: a small spring at the end
-    o.animate(out?O.reverse():O,{duration:D*.45,delay:out?D*.5:0,easing:'ease-out',fill:'both'});
+    o.animate(out?O.reverse():O,{duration:D*.45,delay:out?D*.05:0,easing:'ease-out',fill:'both'});if(out)d._fo=d.animate(O,{duration:D*.4,delay:D*.6,easing:'ease-in',fill:'forwards'}); // close: the content hides early, then the small box dissolves on the button (no patch left over the icon)
     if(!out)a.addEventListener('finish',()=>o.remove());
     return{a,o}};
   const origin=(d,el)=>{const r=d.getBoundingClientRect(),b=el&&el.isConnected?el.getBoundingClientRect():null;d.style.transformOrigin=(b?b.left+b.width/2-r.left:r.width/2)+'px '+(b?b.top+b.height/2-r.top:r.height/2)+'px'};
@@ -2309,7 +2309,7 @@ addEventListener('pointerdown',x=>{lastBtn=x.target.closest&&x.target.closest('b
     this.dataset.closing='1';let a;
     let o;try{const m=morph(this,this._from,1);if(m){a=m.a;o=m.o}
       else{origin(this,this._from);a=this.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.3)'}],{duration:300,easing:'cubic-bezier(.5,0,.75,0)',fill:'forwards'})}}catch(e){} // fill forwards: the last frame stays until close(), so the full dialog never flashes for a frame
-    let fin=0;const done=()=>{if(fin++)return;delete this.dataset.closing;cl.call(this,v);ghost(null,0);if(o)o.remove();if(a)try{a.cancel()}catch(e){}};if(a){a.onfinish=done;setTimeout(done,560)}else done(); // the timer: a paused page (background tab) never finishes the animation
+    let fin=0;const done=()=>{if(fin++)return;delete this.dataset.closing;cl.call(this,v);ghost(null,0);if(o)o.remove();if(a)try{a.cancel()}catch(e){}if(this._fo){this._fo.cancel();this._fo=null}};if(a){a.onfinish=done;setTimeout(done,600)}else done(); // the timer: a paused page (background tab) never finishes the animation
   };
 })();
 /* week grid: hold an own block (touch 0.4 s; mouse: just drag) to lift it and drag it in 15-minute steps, also to another shown day; a picked block (.sel) drags at once and its handle (.rsz) drags its end. A weekly item asks: this week only (detach) or every week. The toast offers undo. */
