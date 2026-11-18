@@ -241,7 +241,7 @@ details.card[open] .upsum{display:none}
 .sethead{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .sethead h3{margin:0}
 #setDlg .setsec{margin-top:12px;box-shadow:none}#palCard{padding:14px 16px}.palh{font-size:15px;margin:0 0 10px}.pals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px}.pals button{display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:none;padding:4px;min-height:64px;cursor:pointer;font:600 11.5px var(--font-body);color:var(--text-muted)}.pals button i{width:36px;height:36px;border-radius:50%;background:var(--pf);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--pl) 55%,transparent);transition:transform .4s var(--ez-spring)}.pals button[aria-checked=true]{color:var(--ink);font-weight:800}.pals button[aria-checked=true] i{box-shadow:0 0 0 2px var(--bg-card),0 0 0 4px var(--accent)}.pals button:active i{transform:scale(.9)}
-.setrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.setrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}#mdNew input{flex:1 1 220px;min-width:0}
 .btn.del.armed{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad-tx)}
 html:not(.ph) #setDlg{width:min(620px,calc(100% - 32px))} /* on a phone it is the full-width bottom sheet like every dialog */
 .mhandle{display:flex;justify-content:center;padding:16px 0 10px;cursor:grab;touch-action:none}
@@ -838,6 +838,12 @@ dialog{border-radius:24px}.btn{border-radius:14px}.upgo{border-radius:16px}.dstr
       <p class="lead">המקבץ, השם והאם אתה עובד במשמרות.</p>
       <button type="button" class="btn" id="obLink" hidden>עריכה</button>
     </details>
+    <details class="card setsec" id="setMoodle" hidden><summary><h2>המודל</h2><span class="upsum" id="mdSum"></span></summary>
+      <p class="lead">מטלות ובחנים מלוח השנה של המודל נכנסים לבד כהגשות. במודל: לוח השנה המלא ← ייצוא לוח שנה ← "כל האירועים" ו"אירועים אחרונים וקרובים" ← קבלת כתובת לוח השנה. מדביקים את הכתובת כאן בלבד: יש בה מפתח אישי, אל תשלח אותה לאף אחד.</p>
+      <div class="setrow" id="mdNew"><input type="url" id="mdUrl" dir="ltr" autocomplete="off" spellcheck="false" placeholder="https://mama.mta.ac.il/calendar/export_execute.php?…" aria-label="כתובת לוח השנה של המודל"><button type="button" class="btn pri" id="mdSave">שמירה</button></div>
+      <div class="setrow" id="mdOn" hidden><button type="button" class="btn pri" id="mdNow">סנכרון עכשיו</button><button type="button" class="btn" id="mdOff">ניתוק</button></div>
+      <p class="lead" id="mdMsg" aria-live="polite"></p>
+    </details>
     <details class="card" id="shCard">
   <summary><h2>סיכום משמרות</h2><span class="upsum" id="shSum"></span></summary>
   <p class="lead">שעות המשמרות שלך בכל חודש, לפי המשמרות הקבועות והחד-פעמיות. מ-1.10.26 עד 13.03.27 (משמרות חד-פעמיות מתחילת אוקטובר, משמרות קבועות מ-18.10); משמרת שמסתיימת אחרי חצות נספרת בחודש שבו היא מתחילה.</p>
@@ -979,7 +985,7 @@ const EXAMS=[ // mtamn.mta.ac.il exam search, תשפ"ז. Live system: dates can 
  {c:'יסודות התנהגות ארגונית',m:'א',date:'2027-02-14',s:'14:00'},{c:'יסודות התנהגות ארגונית',m:'ב',date:'2027-03-08',s:'14:00'},
 ];
 const EXAM_MIN=180; // ponytail: assumed 3h; the listing gives start time only
-const SPECIAL={due:1,task:1,off:1,anchor:1,cancel:1,profile:1};
+const SPECIAL={due:1,task:1,off:1,anchor:1,cancel:1,profile:1,moodle:1};
 const profileOf=items=>items.filter(x=>x.kind==='profile').sort((p,q)=>(q.updated||0)-(p.updated||0))[0]||null; // the newest profile doc: {track,name,works}
 const trackOf=items=>{const p=profileOf(items);return p&&TRACKS[p.track]?p.track:'b'}; // the timetable of the signed-in student; track ב' is the default (the owner's data has no profile)
 const baseOf=items=>TRACKS[trackOf(items)].base;
@@ -1009,11 +1015,36 @@ const guessCourse=t=>{const g=GUESS.find(([r])=>r.test(t||''));return g?g[1]:''}
 function parseMoodle(txt){ // text of the Moodle month calendar -> [{date,title}]: a date line ("אירוע אחד, 15/11/2026") then "יש להגיש את '<name>'" lines (markdown link or plain)
   const out=[],seen=new Set();let date='';
   String(txt||'').split(/\r?\n/).forEach(l=>{
-    const t=l.match(/יש להגיש את\s+['"׳״‘’“”]?(.+?)['"׳״‘’“”]?\s*(?:\]\(|\]|$)/),d=(t?l.replace(t[0],''):l).replace(/https?:\/\/\S+/g,'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); // a date inside a title or a link URL is not the day block's date
+    const t=l.match(/יש להגיש את\s+['"׳״‘’“”]?(.+?)['"׳״‘’“”]?\s*(?:\]\(|\]|$)/)||l.match(/^\s*תאריך הגשה\s+(.+?)\s*$/),d=(t?l.replace(t[0],''):l).replace(/https?:\/\/\S+/g,'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); // a date inside a title or a link URL is not the day block's date
     if(d){const iso=d[3]+'-'+pad(Number(d[2]))+'-'+pad(Number(d[1]));date=isoOk(iso)?iso:''} // a day number glued to the year ("20261") is ignored: only 4 digits are read
     if(t&&date&&t[1].trim()&&!seen.has(date+'|'+t[1].trim())){seen.add(date+'|'+t[1].trim());out.push({date,title:t[1].trim()})}
   });
   return out;
+}
+function parseIcs(txt){ // an iCalendar file (the Moodle calendar export) -> [{uid,summary,cat,date,time}] in Israel time; folded lines, escapes, UTC or TZID or date-only
+  const L=String(txt||'').replace(/\r?\n[ \t]/g,'').split(/\r?\n/),out=[],un=v=>v.replace(/\\([\\;,])/g,'$1').replace(/\\n/gi,' ').trim();let e=null;
+  const jlm=ms=>{const p={};new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(ms)).forEach(x=>p[x.type]=x.value);return{date:p.year+'-'+p.month+'-'+p.day,time:p.hour+':'+p.minute}};
+  for(const l of L){
+    if(/^BEGIN:VEVENT/i.test(l)){e={};continue}if(/^END:VEVENT/i.test(l)){if(e&&e.uid&&e.date)out.push(e);e=null;continue}if(!e)continue;
+    const i=l.indexOf(':');if(i<0)continue;const k=l.slice(0,i).split(';')[0].toUpperCase(),v=l.slice(i+1);
+    if(k==='UID')e.uid=v.trim();else if(k==='SUMMARY')e.summary=un(v);else if(k==='CATEGORIES')e.cat=un(v);
+    else if(k==='DTSTART'){const m=v.trim().match(/^(\d{4})(\d\d)(\d\d)(?:T(\d\d)(\d\d)\d\d(Z?))?$/);if(!m)continue;
+      if(!m[4]){e.date=m[1]+'-'+m[2]+'-'+m[3];e.time='23:59'}else if(m[6])Object.assign(e,jlm(Date.UTC(+m[1],m[2]-1,+m[3],+m[4],+m[5])));else{e.date=m[1]+'-'+m[2]+'-'+m[3];e.time=m[4]+':'+m[5]}}
+  }
+  return out.filter(x=>isoOk(x.date));
+}
+const MDUE=[/^יש להגיש את\s+['"׳״‘’“”]?(.+?)['"׳״‘’“”]?$/,/^תאריך הגשה\s+(.+)$/,/^(.+?)\s+is due$/i,/^(.+?)\s+closes$/i,/^(.+?)\s+\((?:תאריך הגשה|סגירה|closes)\)$/i]; // the names Moodle gives a deadline (assignment due, quiz close); opening and other events are not deadlines
+const moodleTitle=s=>{for(const r of MDUE){const m=String(s||'').trim().match(r);if(m)return m[1].trim()}return''};
+function moodleMerge(evs,items,today){ // Moodle calendar events -> what to change: add new deadlines, move ones whose date moved (not submitted), tag a deadline added by hand with its uid; seen = every uid ever taken (a deleted one never comes back)
+  const sd=items.find(x=>x.kind==='moodle'),seen=new Set(sd&&Array.isArray(sd.seen)?sd.seen:[]),n0=seen.size,dues=items.filter(x=>x.kind==='due'),nt=t=>String(t||'').trim().toLowerCase(),add=[],move=[],tag=[];
+  for(const e of evs){const title=moodleTitle(e.summary);if(!title||!isoOk(e.date)||e.date<today||e.date<SEM.start||e.date>SEM.last)continue;
+    const m=dues.find(x=>x.mid===e.uid);
+    if(m){if(dueSt(m)!=='done'&&(m.date!==e.date||m.start!==e.time))move.push({id:m.id,date:e.date,start:e.time});seen.add(e.uid);continue}
+    if(seen.has(e.uid))continue;seen.add(e.uid);
+    const h=dues.find(x=>!x.mid&&x.date===e.date&&nt(x.title)===nt(title));if(h){tag.push({id:h.id,mid:e.uid});continue}
+    const c=COURSE[e.cat]||guessCourse(e.cat)||guessCourse(title);
+    add.push({kind:'due',title,note:'',date:e.date,start:e.time,done:false,mid:e.uid,...(c&&{course:c})})}
+  return{add,move,tag,seen:seen.size>n0?[...seen]:null};
 }
 const ltr=t=>'\u2066'+t+'\u2069'; // isolate a range ("10:15–11:45", "15.11–21.11") so Hebrew text around it does not flip it
 const dmy=iso=>dm(iso)+'.'+iso.slice(2,4);
@@ -1147,7 +1178,7 @@ function stats(evs){
 function toDoc(f,sun){
   const b={kind:f.kind,title:f.title,note:f.note,updated:f.updated},date=()=>isoOk(f.date)?f.date:addDays(sun,f.day); // f.date = the picked date; without one, the weekday in the dialog's week
   if(f.kind==='task')return{...b,done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course})}; // no date, no times
-  if(f.kind==='due')return{...b,date:date(),start:okTime(f.start)?f.start:'23:59',done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course})}; // f.status (the dialog's select) wins over f.done
+  if(f.kind==='due')return{...b,date:date(),start:okTime(f.start)?f.start:'23:59',done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course}),...(f.mid&&{mid:f.mid})}; // f.status (the dialog's select) wins over f.done; mid = the Moodle uid of a synced deadline
   if(f.week==='date')return{...b,date:date(),start:f.start,end:f.end};
   return{...b,day:f.day,start:f.start,end:f.end,week:f.week,skip:f.skip||[]};
 }
@@ -1769,7 +1800,7 @@ frm.addEventListener('submit',async x=>{
     const{one,series}=detach(prev,d,editSun,$('#fSkip').dataset.date);
     ok=await saveItem(null,one,dMsg(one.date,'נוסף ל-'+dm(one.date)))&&await saveItem(prev.id,series,dMsg(one.date,'הועבר ל-'+dm(one.date),' · הסדרה נשארה'));
   }else{
-    const doc=toDoc({...d,skip:prev&&isRec(prev)?prev.skip:undefined},editSun);
+    const doc=toDoc({...d,skip:prev&&isRec(prev)?prev.skip:undefined,mid:prev&&prev.mid},editSun);
     const m=editing?'עודכן':doc.kind==='task'?'נוספה משימה':doc.date?'נוסף ל-'+dm(doc.date):'נוסף ל'+WKN[doc.week];
     ok=await saveItem(editing,doc,doc.date?dMsg(doc.date,m):m);
   }
@@ -2018,7 +2049,7 @@ async function sbLoad(){
   try{
     const rows=[];for(let i=0;;i+=1000){const r=await sbFetch('/rest/v1/items?select=id,doc&order=id',{headers:{'Range-Unit':'items',Range:i+'-'+(i+999)}}),pg=await r.json();rows.push(...pg);if(pg.length<1000)break} // PostgREST returns at most 1000 rows per request
     if(q!==sbSeq)return;
-    items=sbItems(rows);mode='sb';sbCacheSave();render();maybeOnboard();
+    items=sbItems(rows);mode='sb';sbCacheSave();render();maybeOnboard();mdSync(false);
     if(sbNew){sbNew=false;toast('מחובר עם Google · '+(items.length===1?'פריט אחד':items.length+' פריטים'))}
   }catch(e){if(q===sbSeq)sbFail(e,mode==='sb'||mode==='ro')}
 }
@@ -2070,7 +2101,43 @@ async function sbSignOut(){
 $('#sbOut').addEventListener('click',sbSignOut);
 /* ---------- settings dialog: profile, shifts summary, calendar export, my data, account ---------- */
 const setDlg=$('#setDlg');
-function setFill(){
+/* Moodle sync (2026-11-18, plan docs/superpowers/plans/2026-11-18-moodle-sync.md): the Edge Function "moodle" returns the user's Moodle calendar (ICS); core parseIcs + moodleMerge decide what is new; one batch upsert. sb mode only. The link itself lives only in the table moodle_link. */
+const MD_RE=/^https:\/\/mama\.mta\.ac\.il\/calendar\/export_execute\.php\?\S*authtoken=\w+/,MD_EVERY=3*3600e3,mdDoc=()=>items.find(x=>x.kind==='moodle');let mdBusy=false;
+const strip=({id,...d})=>d;
+async function sbPutMany(ops){ // several docs in one upsert (the sync), then one render
+  await sbFetch('/rest/v1/items?on_conflict=user_id,id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(ops.map(o=>({id:o.id,doc:o.doc,updated_at:new Date().toISOString()})))});
+  sbSeq++;let st=itemsToStore(items);for(const o of ops)st=applyOp(st,o);items=storeToItems(st);sbCacheSave();flipArm=Date.now();render();
+}
+const mdWhy=e=>e&&e.status===404?'אין קישור שמור.':e&&e.status===422?'הקישור של המודל כבר לא עובד (המפתח אופס או שגוי). צור קישור חדש והדבק אותו.':e&&e.status?'המודל לא ענה. נסה שוב מאוחר יותר.':'אין חיבור לאינטרנט.';
+async function mdSync(manual){ // manual: the button (says what happened); auto: on load, at most every 3 hours, silent on failure
+  const d0=mdDoc();if(mode!=='sb'||mdBusy||!manual&&(!d0||!d0.on||Date.now()-(d0.at||0)<MD_EVERY))return;mdBusy=true;if(manual)mdMsg('מסנכרן…');
+  try{
+    const ics=await(await sbFetch('/functions/v1/moodle',{method:'POST',body:'{}'})).text(),r=moodleMerge(parseIcs(ics),items,todayIso()),u=Date.now(),by=id=>items.find(x=>x.id===id),ops=[];
+    for(const a of r.add)ops.push({id:newId(),doc:{...a,updated:u}});
+    for(const m of r.move)ops.push({id:m.id,doc:{...strip(by(m.id)),date:m.date,start:m.start,updated:u}});
+    for(const t of r.tag)ops.push({id:t.id,doc:{...strip(by(t.id)),mid:t.mid}});
+    const d=mdDoc();ops.push({id:d?d.id:newId(),doc:{...(d?strip(d):{kind:'moodle'}),on:true,seen:r.seen||(d&&d.seen)||[],at:u,err:''}});
+    await sbPutMany(ops);
+    const msg=[r.add.length?r.add.length===1?'נוספה מטלה מהמודל: '+r.add[0].title:'נוספו '+r.add.length+' מטלות מהמודל':'',r.move.length?(r.move.length===1?'עודכן תאריך: '+by(r.move[0].id).title+' ← '+dm(r.move[0].date):'עודכנו '+r.move.length+' תאריכים מהמודל'):''].filter(Boolean).join(' · ');
+    if(msg)toast(msg);else if(manual)toast('אין מטלות חדשות במודל');mdMsg('');
+  }catch(e){if(manual){mdMsg(mdWhy(e));toast(mdWhy(e))}const d=mdDoc();if(d&&e&&e.status===422&&!d.err)await sbSave({id:d.id,doc:{...strip(d),err:'key'}})} // a dead key is remembered, so the settings card says so
+  finally{mdBusy=false;mdCard()}
+}
+const mdMsg=t=>{$('#mdMsg').textContent=t};
+function mdCard(){ // the settings card: hidden outside sb mode; paste field until a link is saved, then sync / disconnect and the last sync time
+  const on=mode==='sb',d=mdDoc(),ln=!!(d&&d.on);$('#setMoodle').hidden=!on;if(!on)return;
+  $('#mdNew').hidden=ln;$('#mdOn').hidden=!ln;
+  $('#mdSum').textContent=!ln?'לא מחובר':d.err?'הקישור לא עובד':d.at?'סונכרן '+((m=>m<1?'עכשיו':m<60?'לפני '+m+' דק\'':m<1440?'לפני '+Math.round(m/60)+' שע\'':'לפני '+Math.round(m/1440)+' ימים')(Math.floor((Date.now()-d.at)/6e4))):'מחובר';
+  if(ln&&d.err==='key'&&!$('#mdMsg').textContent)mdMsg(mdWhy({status:422}));
+}
+$('#mdSave').addEventListener('click',async()=>{const u=$('#mdUrl').value.trim();
+  if(!MD_RE.test(u)){mdMsg('זו לא כתובת ייצוא של לוח השנה של המודל (צריכה להתחיל ב-https://mama.mta.ac.il/calendar/export_execute.php).');shake($('#mdUrl'));return}
+  try{$('#mdSave').disabled=true;await sbFetch('/rest/v1/moodle_link?on_conflict=user_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({url:u,updated_at:new Date().toISOString()})});
+    $('#mdUrl').value='';const d=mdDoc();await sbPutMany([{id:d?d.id:newId(),doc:{...(d?strip(d):{kind:'moodle',seen:[]}),on:true,err:''}}]);await mdSync(true)}
+  catch(e){mdMsg(e&&e.status?'השמירה לא הצליחה ('+e.status+'). אם זו הפעם הראשונה, צריך להריץ את supabase/moodle_link.sql.':'אין חיבור לאינטרנט.')}finally{$('#mdSave').disabled=false}});
+$('#mdNow').addEventListener('click',()=>mdSync(true));
+$('#mdOff').addEventListener('click',async()=>{try{await sbFetch('/rest/v1/moodle_link?user_id=eq.'+encodeURIComponent(sbSub()),{method:'DELETE',headers:{Prefer:'return=minimal'}});const d=mdDoc();if(d)await sbPutMany([{id:d.id,doc:{...strip(d),on:false,err:''}}]);mdMsg('');toast('המודל נותק · ההגשות שנוספו נשארות')}catch(e){mdMsg('הניתוק לא הצליח. נסה שוב.')}mdCard()});
+function setFill(){mdCard();
   const pf=profileOf(items),email=(()=>{try{const t=JSON.parse(localStorage.getItem(SB_LS));const p=t&&sbPayload(t.access);return p&&p.email||''}catch(e){return''}})();
   $('#setProfSum').textContent=pf?[TRACKS[trackOf(items)].label,pf.name||'',pf.works===false?'בלי משמרות':'עם משמרות'].filter(Boolean).join(' · '):'מקבץ ב\'';
   $('#setAcctTxt').textContent=email?'מחובר כ-'+email:mode==='sb'?'מחובר':'לא מחובר לחשבון Google';

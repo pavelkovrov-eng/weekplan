@@ -649,3 +649,34 @@ test('greet and nowNext (home)',()=>{
   r=core.nowNext('2027-02-01',M('08:00'),[]);assert.equal(r.next.src,'exam');
   assert.deepEqual(core.nowNext('2027-04-01',600,[]),{now:null,next:null});
 });
+test('Moodle: paste reads quiz close lines',()=>{
+  const r=core.parseMoodle("3 אירועים, 23/11/202623\n  תאריך הגשה בוחן תרגיל 2\n  יש להגיש את 'מטלה 2'\nאירוע אחד, 17/11/202617\n  נפתח ב בוחן תרגיל 2");
+  assert.deepEqual(r,[{date:'2026-11-23',title:'בוחן תרגיל 2'},{date:'2026-11-23',title:'מטלה 2'}]);
+});
+test('Moodle: parseIcs and moodleTitle',()=>{
+  const ics=['BEGIN:VCALENDAR','BEGIN:VEVENT','UID:11@mama.mta.ac.il','SUMMARY:יש להגיש את \'מטלה 4- המשך גורמי ייצור משלימים\\, שיפור טכנולו',' גי\'','CATEGORIES:מבוא למיקרו כלכלה','DTSTART:20261119T215900Z','END:VEVENT',
+    'BEGIN:VEVENT','UID:12@mama.mta.ac.il','SUMMARY:נפתח ב בוחן תרגיל 2','DTSTART:20261117T080000Z','END:VEVENT',
+    'BEGIN:VEVENT','UID:13@x','SUMMARY:Quiz 3 closes','DTSTART;TZID=Asia/Jerusalem:20261201T120000','END:VEVENT',
+    'BEGIN:VEVENT','UID:14@x','SUMMARY:תאריך הגשה בוחן תרגיל 2','DTSTART;VALUE=DATE:20261123','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const e=core.parseIcs(ics);
+  assert.equal(e.length,4);
+  assert.deepEqual(e[0],{uid:'11@mama.mta.ac.il',summary:"יש להגיש את 'מטלה 4- המשך גורמי ייצור משלימים, שיפור טכנולוגי'",cat:'מבוא למיקרו כלכלה',date:'2026-11-19',time:'23:59'}); // 21:59 UTC = 23:59 Israel (winter)
+  assert.equal(e[2].time,'12:00');assert.equal(e[3].date,'2026-11-23');assert.equal(e[3].time,'23:59');
+  assert.equal(core.moodleTitle(e[0].summary),'מטלה 4- המשך גורמי ייצור משלימים, שיפור טכנולוגי');
+  assert.equal(core.moodleTitle(e[1].summary),'');assert.equal(core.moodleTitle('Quiz 3 closes'),'Quiz 3');assert.equal(core.moodleTitle(e[3].summary),'בוחן תרגיל 2');
+});
+test('Moodle: moodleMerge adds, moves, tags, never re-adds',()=>{
+  const ev=(uid,summary,date,time='23:59',cat='')=>({uid,summary,date,time,cat});
+  const evs=[ev('a',"יש להגיש את 'מטלה 2'",'2026-11-23'),ev('b',"יש להגיש את 'תרגיל 5'",'2026-11-25','23:59','מבוא למיקרו כלכלה'),ev('c','נפתח ב בוחן','2026-11-20'),ev('d',"יש להגיש את 'ישן'",'2026-11-01'),ev('e',"יש להגיש את 'מחוקה'",'2026-11-26'),ev('f',"יש להגיש את 'זזה'",'2026-11-28','12:00')];
+  const items=[{id:'1',kind:'due',title:'מטלה 2',date:'2026-11-23',start:'23:59',done:false},{id:'2',kind:'due',title:'זזה',date:'2026-11-27',start:'23:59',done:false,mid:'f'},{id:'3',kind:'moodle',seen:['e','f']}];
+  const r=core.moodleMerge(evs,items,'2026-11-18');
+  assert.deepEqual(r.tag,[{id:'1',mid:'a'}]);
+  assert.deepEqual(r.add.map(x=>[x.title,x.mid,x.course]),[['תרגיל 5','b','micro']]);
+  assert.deepEqual(r.move,[{id:'2',date:'2026-11-28',start:'12:00'}]);
+  assert.deepEqual(r.seen.sort(),['a','b','e','f']);
+  const done=core.moodleMerge(evs,[{...items[1],done:true},items[2]],'2026-11-18');assert.deepEqual(done.move,[]); // a submitted one is not moved
+  const again=core.moodleMerge(evs,[...items,{id:'4',kind:'due',title:'תרגיל 5',date:'2026-11-25',start:'23:59',mid:'b'},{id:'3',kind:'moodle',seen:['a','b','e','f']}].filter((x,i,A)=>x.kind!=='moodle'||x.seen.length===4),'2026-11-18');
+  assert.deepEqual(again.add,[]);assert.equal(again.seen,null);
+  assert.equal(core.toDoc({kind:'due',title:'x',note:'',updated:1,date:'2026-11-23',start:'23:59',status:'todo',mid:'b'},'2026-11-22').mid,'b');
+  assert.equal(core.evsForWeek('2026-11-22',[{kind:'moodle',seen:[]}]).filter(e=>e.src==='user').length,0);
+});
