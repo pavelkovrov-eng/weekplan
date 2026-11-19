@@ -34,8 +34,8 @@ test('the week-A/B rotation is gone',()=>{
   assert.equal(core.WKN.A,'כל שבוע');assert.equal(core.WKN.both,'כל שבוע');
 });
 test('clampSun',()=>{
-  assert.equal(core.clampSun('2026-10-04'),'2026-10-18');
-  assert.equal(core.clampSun('2027-05-02'),'2027-03-07');
+  assert.equal(core.clampSun('2026-10-04'),'2026-10-04'); // no semester bounds any more (2026-11-19)
+  assert.equal(core.clampSun('2027-05-02'),'2027-05-02');assert.equal(core.clampSun('2010-01-03'),core.sunOf(core.ERA.start));assert.equal(core.clampSun('2050-01-02'),core.lastSun);
   assert.equal(core.clampSun('2026-11-08'),'2026-11-08');
 });
 test('baseDay',()=>{
@@ -169,8 +169,8 @@ test('late-night rule looks at the next Sunday',()=>{
 });
 test('every course maps to a color class',()=>{
   const ids=new Set(Object.values(core.COURSE));
-  assert.equal(ids.size,7);
-  [...core.BASE.map(b=>b.t),...core.EXAMS.map(x=>x.c)].forEach(t=>assert.ok(core.COURSE[t],'no COURSE entry for '+t));
+  assert.equal(ids.size,12);
+  [...core.TERMS.flatMap(t=>[...t.tracks.a,...t.tracks.b]).map(b=>b.t),...core.EXAMS.map(x=>x.c)].forEach(t=>assert.ok(core.COURSE[t],'no COURSE entry for '+t));
   const evs=core.evsForWeek('2027-01-17',[]);
   assert.ok(evs.filter(e=>e.src==='base'||e.src==='exam').every(e=>e.course===core.COURSE[e.title]));
   assert.equal(evs.find(e=>e.src==='exam'&&e.date==='2027-01-22').course,'micro');
@@ -239,7 +239,7 @@ test('month helpers',()=>{
   assert.deepEqual(core.monthSuns('2027-03').slice(-1),['2027-03-28']);
 });
 test('clampYm',()=>{
-  assert.equal(core.clampYm('2026-09'),'2026-10');assert.equal(core.clampYm('2027-05'),'2027-03');
+  assert.equal(core.clampYm('2026-09'),'2026-09');assert.equal(core.clampYm('2027-05'),'2027-05');assert.equal(core.clampYm('2019-01'),'2020-01');
   assert.equal(core.clampYm('2026-10'),'2026-10');assert.equal(core.clampYm('2027-03'),'2027-03');assert.equal(core.clampYm('2026-12'),'2026-12');
 });
 test('every course has a short month-view name',()=>{
@@ -273,15 +273,15 @@ test('applyOp: set / replace / delete, never mutates',()=>{
   assert.deepEqual(core.applyOp(null,{id:'a',doc:{kind:'x'}}),{v:1,items:{a:{kind:'x'}}});
   assert.equal(JSON.stringify(st),snap);
 });
-test('clampDay / pickDay: the navigable days are SEM.start..SEM.last',()=>{
-  assert.equal(core.clampDay('2026-10-11'),'2026-10-18');assert.equal(core.clampDay('2027-05-01'),'2027-03-13');
+test('clampDay / pickDay: the navigable days are only the wide ERA window',()=>{
+  assert.equal(core.clampDay('2026-10-11'),'2026-10-11');assert.equal(core.clampDay('2027-05-01'),'2027-05-01');assert.equal(core.clampDay('2045-05-01'),core.ERA.last);
   assert.equal(core.clampDay('2026-11-04'),'2026-11-04');assert.equal(core.clampDay('2027-03-13'),'2027-03-13');
-  assert.equal(core.sunOf(core.clampDay('2027-05-01')),core.lastSun);
+  assert.equal(core.sunOf(core.clampDay('2045-05-01')),core.lastSun);
   const wk=['2026-11-01','2026-11-07'];
   assert.equal(core.pickDay('2026-11-03',...wk,'2026-11-05'),'2026-11-03'); // the pick is inside the period: keep it
   assert.equal(core.pickDay('2026-11-10',...wk,'2026-11-05'),'2026-11-05'); // else today, if inside
   assert.equal(core.pickDay('2026-11-10',...wk,'2026-12-05'),'2026-11-01'); // else the first day
-  assert.equal(core.pickDay('2026-10-14','2026-10-11','2026-10-17','2026-10-12'),'2026-10-18'); // always clamped
+  assert.equal(core.pickDay('2026-10-14','2026-10-11','2026-10-17','2026-10-12'),'2026-10-14'); // no semester clamp any more
 });
 test('swipeDir: >=50px, mostly horizontal; Hebrew/RTL, a swipe to the right is the next day',()=>{
   assert.equal(core.swipeDir(60,5),1);assert.equal(core.swipeDir(-60,-5),-1);
@@ -415,33 +415,27 @@ test('export: the course short name goes into the deadline title',()=>{
   assert.ok(core.buildCsv(items).split('\r\n').includes('"הגשה: מיקרו · מטלה, 1","11/05/2026","11:29 PM","11/05/2026","11:59 PM","",""'));
 });
 
-test('shiftMonths: monthly shift hours over the semester',()=>{
-  const A={id:'a',kind:'anchor',date:'2026-10-18',updated:1};
-  const sh=(id,o)=>({id,kind:'open',title:'',start:'08:00',end:'16:00',note:'',updated:1,...o});
-  const none=core.shiftMonths([]);
-  assert.deepEqual(none.rows.map(r=>r.ym),['2026-10','2026-11','2026-12','2027-01','2027-02','2027-03']);
-  assert.equal(none.min,0);assert.equal(none.n,0);assert.ok(none.rows.every(r=>r.min===0&&r.n===0));
-  // a "both" shift on Mondays: Mondays from 19.10.26 to 08.03.27
-  const mon=core.shiftMonths([sh('m',{day:1,week:'both'})]);
-  assert.equal(mon.rows.find(r=>r.ym==='2026-10').n,2);   // 19.10, 26.10
-  assert.equal(mon.rows.find(r=>r.ym==='2026-11').n,5);   // 2,9,16,23,30
-  assert.equal(mon.n,mon.rows.reduce((a,r)=>a+r.n,0));assert.equal(mon.min,mon.n*480);
-  // A/B docs of the retired rotation count every week, anchor or not
-  assert.equal(core.shiftMonths([sh('x',{day:1,week:'A'})]).n,mon.n);
-  const ab=core.shiftMonths([A,sh('x',{day:1,week:'A'}),sh('y',{day:2,week:'B'})]);
-  let want=0;for(let sun='2026-10-18';sun<='2027-03-13';sun=core.addDays(sun,7))want+=1;
-  assert.equal(ab.n,2*want);                               // Monday and Tuesday, every week
-  assert.ok(ab.rows.find(r=>r.ym==='2026-10').n===4);      // 19, 20, 26, 27.10
-  // skipped, one-off, non-shift kinds, overnight
-  const sk=core.shiftMonths([sh('m',{day:1,week:'both',skip:['2026-10-19']})]);
-  assert.equal(sk.rows.find(r=>r.ym==='2026-10').n,1);
-  const one=core.shiftMonths([sh('o',{date:'2026-12-31',end:'02:00',kind:'close',start:'18:00'})]);
-  assert.equal(one.rows.find(r=>r.ym==='2026-12').n,1);assert.equal(one.rows.find(r=>r.ym==='2026-12').min,480);assert.equal(one.rows.find(r=>r.ym==='2027-01').n,0); // counted in the month it starts
-  assert.equal(core.shiftMonths([sh('s',{day:1,week:'both',kind:'study'}),sh('d',{day:1,week:'both',kind:'other'})]).n,0);
-  assert.equal(core.shiftMonths([sh('late',{date:'2027-03-20'}),sh('early',{date:'2026-09-30'})]).n,0); // outside the counted range
-  const pre=core.shiftMonths([sh('p1',{date:'2026-10-01',start:'20:18',end:'03:23'}),sh('p2',{date:'2026-10-17'}),sh('r',{day:1,week:'both'})]);
-  assert.equal(pre.rows[0].n,2+2);assert.equal(pre.rows[0].min,(425+480)+480*2); // one-offs from 1.10 (20:18-03:23 = 7h05); the recurring Monday series only from 19.10, so 19.10 + 26.10
+test('shiftMonths: monthly shift hours, from the first shift to the month after today',()=>{
+  const sh=(id,o)=>({id,kind:'open',title:'',start:'08:00',end:'16:00',note:'',updated:1,...o}),T='2026-11-19';
+  const none=core.shiftMonths([],T);
+  assert.deepEqual(none.rows.map(r=>r.ym),['2026-11','2026-12']);assert.equal(none.n,0);
+  // an old weekly doc (no from) starts 18.10.26: Mondays 19.10 .. 28.12 (the month after today)
+  const mon=core.shiftMonths([sh('m',{day:1,week:'both'})],T);
+  assert.deepEqual(mon.rows.map(r=>r.ym),['2026-10','2026-11','2026-12']);
+  assert.equal(mon.rows[0].n,2);assert.equal(mon.rows[1].n,5);assert.equal(mon.rows[2].n,4);assert.equal(mon.min,mon.n*480);
+  assert.equal(core.shiftMonths([sh('x',{day:1,week:'A'})],T).n,mon.n); // A/B docs of the retired rotation count every week
+  // a new weekly doc with from: only from that date
+  const fr=core.shiftMonths([sh('f',{day:1,week:'both',from:'2026-11-23'})],T);
+  assert.deepEqual(fr.rows.map(r=>[r.ym,r.n]),[['2026-11',2],['2026-12',4]]);
+  // skipped, one-off, non-shift kinds, overnight, far one-offs stretch the range
+  assert.equal(core.shiftMonths([sh('m',{day:1,week:'both',skip:['2026-10-19']})],T).rows[0].n,1);
+  const one=core.shiftMonths([sh('o',{date:'2026-12-31',end:'02:00',kind:'close',start:'18:00'})],T);
+  assert.equal(one.rows.find(r=>r.ym==='2026-12').min,480);assert.equal(one.n,1);
+  assert.equal(core.shiftMonths([sh('s',{day:1,week:'both',kind:'study'}),sh('d',{day:1,week:'both',kind:'other'})],T).n,0);
+  const far=core.shiftMonths([sh('late',{date:'2027-08-20'}),sh('early',{date:'2026-09-30'})],T);
+  assert.equal(far.rows[0].ym,'2026-09');assert.equal(far.rows[far.rows.length-1].ym,'2027-08');assert.equal(far.n,2);
 });
+
 
 const MOODLE=`נובמבר 2026דצמבר   ◀︎
 אירוע אחד, 1/11/20261
@@ -647,7 +641,9 @@ test('greet and nowNext (home)',()=>{
   const i=core.BASE.findIndex(b=>b.d===1&&b.t==='מבוא למיקרו');
   r=core.nowNext('2026-11-16',M('10:45'),[{id:'c',kind:'cancel',date:'2026-11-16',base:i}]);assert.equal(r.now,null); // a cancelled class is not "now"
   r=core.nowNext('2027-02-01',M('08:00'),[]);assert.equal(r.next.src,'exam');
-  assert.deepEqual(core.nowNext('2027-04-01',600,[]),{now:null,next:null});
+  assert.deepEqual(core.nowNext('2027-07-20',600,[]),{now:null,next:null}); // after the last semester
+  r=core.nowNext('2027-02-10',M('12:00'),[]);assert.equal(r.next.src,'exam'); // the break between semesters: the next exam
+  r=core.nowNext('2027-03-17',M('20:00'),[]);assert.equal(r.next.date,'2027-03-18');assert.equal(r.next.title,'מבוא למקרו'); // semester ב': Wednesday evening, next is Thursday 10:15 (no Python tutorial that week)
 });
 test('Moodle: paste reads quiz close lines',()=>{
   const r=core.parseMoodle("3 אירועים, 23/11/202623\n  תאריך הגשה בוחן תרגיל 2\n  יש להגיש את 'מטלה 2'\nאירוע אחד, 17/11/202617\n  נפתח ב בוחן תרגיל 2");
@@ -679,4 +675,33 @@ test('Moodle: moodleMerge adds, moves, tags, never re-adds',()=>{
   assert.deepEqual(again.add,[]);assert.equal(again.seen,null);
   assert.equal(core.toDoc({kind:'due',title:'x',note:'',updated:1,date:'2026-11-23',start:'23:59',status:'todo',mid:'b'},'2026-11-22').mid,'b');
   assert.equal(core.evsForWeek('2026-11-22',[{kind:'moodle',seen:[]}]).filter(e=>e.src==='user').length,0);
+});
+test('Moodle: real export shape (tab folds, blank fold lines, course code in CATEGORIES)',()=>{
+  const ics="BEGIN:VCALENDAR\nBEGIN:VEVENT\nUID:2185@mama.mta.ac.il\nSUMMARY:יש להגיש את 'הגשת תעודת סיום קורס אקסל למתחילים קמפוס IL - הגשת חוב\n\tה'\n\t\nDESCRIPTION:x\n\t y\nDTSTART:20261209T215500Z\nCATEGORIES:כלי ניתוח נתונים וAI - 21116500-20271 - מאוחד\nEND:VEVENT\nBEGIN:VEVENT\nUID:3995@mama.mta.ac.il\nSUMMARY:יש להגיש את 'תרגיל 4 - פקודות יומן'\nDTSTART:20261215T100000Z\nCATEGORIES:חשבונאות א' - 21115803-20271\nEND:VEVENT\nBEGIN:VEVENT\nUID:3984@mama.mta.ac.il\nSUMMARY:ההרשמה מתחילה: פגישות אישיות\nDTSTART:20261207T220000Z\nCATEGORIES:מיומנויות למידה - פגישות אישיות - 81238901-20271\nEND:VEVENT\nEND:VCALENDAR\n";
+  const r=core.moodleMerge(core.parseIcs(ics),[],'2026-11-18');
+  assert.deepEqual(r.add.map(x=>[x.title,x.date,x.start,x.course]),[['הגשת תעודת סיום קורס אקסל למתחילים קמפוס IL - הגשת חובה','2026-12-09','23:55','data'],['תרגיל 4 - פקודות יומן','2026-12-15','12:00','acc']]);
+});
+test('semesters: terms, semester B timetable, holidays, biweekly tutorial, weekly items from',()=>{
+  assert.equal(core.termOf('2026-11-19').id,'A');assert.equal(core.termOf('2027-01-17').id,'A');assert.equal(core.termOf('2027-02-01'),null);assert.equal(core.termOf('2027-03-01').id,'B');assert.equal(core.termOf('2027-08-01'),null);
+  const B=(sun,it=[])=>core.evsForWeek(sun,it).filter(e=>e.src==='base');
+  const w1=B('2027-02-21');assert.equal(w1.length,12); // first week of semester ב' (track ב'), Python tutorial on 25.02
+  assert.ok(w1.every(e=>e.key.startsWith('c')&&core.COURSE[e.title]));
+  assert.ok(w1.some(e=>e.date==='2027-02-25'&&e.title==='פייתון לכלכלנים'&&e.kind==='tut'));
+  assert.ok(!B('2027-02-28').some(e=>e.title==='פייתון לכלכלנים'&&e.kind==='tut')); // every two weeks
+  assert.ok(B('2027-03-07').some(e=>e.title==='פייתון לכלכלנים'&&e.kind==='tut'));
+  assert.ok(B('2027-02-21').some(e=>e.date==='2027-02-24'&&e.title==='פייתון לכלכלנים'&&e.kind==='lec')); // track ב': the lecture is on Wednesday
+  assert.ok(B('2027-02-21',[{id:'p',kind:'profile',track:'a',updated:1}]).some(e=>e.date==='2027-02-23'&&e.title==='פייתון לכלכלנים')); // track א' keeps Tuesday
+  const pes=B('2027-04-18');assert.ok(pes.every(e=>e.date==='2027-04-18'));assert.ok(pes.some(e=>e.title==='מבוא לארגון וניהול')); // 18.04 runs Tuesday, 19–24.04 off
+  assert.equal(B('2027-04-25').length,0);
+  assert.equal(B('2027-01-24').length,0);assert.equal(B('2027-08-01').length,0); // the break and the summer: a plain calendar
+  // weekly items: a new one shows from its first week, an old one (no from) from 18.10.26
+  const wk=f=>core.evsForWeek('2026-11-15',[{id:'w',kind:'open',day:1,start:'08:00',end:'16:00',week:'both',...f}]).filter(e=>e.src==='user').length;
+  assert.equal(wk({}),1);assert.equal(wk({from:'2026-11-22'}),0);assert.equal(wk({from:'2026-11-16'}),1);
+  assert.equal(core.toDoc({kind:'open',title:'',note:'',updated:1,day:1,start:'08:00',end:'16:00',week:'both'},'2026-11-22').from,'2026-11-23');
+  assert.equal(core.toDoc({kind:'open',title:'',note:'',updated:1,day:1,start:'08:00',end:'16:00',week:'both',from:'2026-10-18'},'2026-11-22').from,'2026-10-18');
+  // export per semester: semester ב' has only its own classes
+  const sb=core.semEvents([],core.TERMS[1]);assert.ok(sb.length>100);assert.ok(sb.every(x=>x.date>='2027-02-21'&&x.date<='2027-07-16'));assert.ok(!sb.some(x=>x.summary.startsWith('מבוא למיקרו')));
+  assert.ok(core.buildIcs([],'20261119T000000Z',core.TERMS[1]).includes("X-WR-CALNAME:סמסטר ב' תשפ\"ז"));
+  assert.equal(core.termLine('2026-11-19'),"סמסטר א' תשפ\"ז · 18.10.26–15.01.27");assert.equal(core.termLine('2027-02-01'),"תקופת מבחנים · סמסטר א' תשפ\"ז");assert.equal(core.termLine('2027-08-01'),'חופשה · 2027');
+  assert.equal(core.guessCourse('מטלה 2 במאקרו'),'macro');assert.equal(core.guessCourse('תרגיל הסקה סטטיסטית'),'infer');assert.equal(core.guessCourse('מטלה במיקרו'),'micro');
 });

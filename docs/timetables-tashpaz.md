@@ -1,6 +1,6 @@
 # Timetables תשפ"ז, Economics & Management year A (as sent by the owner, 2026-11-14)
 
-Source: the owner's notes. Semester A is built into `index.html` (`BASE` = track ב', `BASE_A` = track א', `TRACKS`). Semester B is NOT built yet. English is not part of either track (each student adds theirs).
+Source: the owner's notes. Semester A is built into `index.html` (`BASE` = track ב', `BASE_A` = track א', `TRACKS`). Semester B is built since 2026-11-19 (`BASE_B` = track ב', `BASE_BA` = track א', in `TERMS`), without rooms or exams (not published). English is not part of either track (each student adds theirs).
 
 ## Semester א' (18.10.26–15.01.27)
 
@@ -18,7 +18,7 @@ Source: the owner's notes. Semester A is built into `index.html` (`BASE` = track
 - Wed: same as track א', except the Math A lecture room is 101 (changed 2026-11-16)
 - Thu free
 
-## Semester ב' (starts 21.02.27) — not built
+## Semester ב' (starts 21.02.27)
 
 ### Track א'
 - Sun 08:30–15:00: 08:30–10:00 Price Theory A tutorial · 10:30–12:00 Intro Macro tutorial · 12:30–15:00 Math B lecture
@@ -27,12 +27,12 @@ Source: the owner's notes. Semester A is built into `index.html` (`BASE` = track
 - Wed 11:30–17:00: 11:30–13:00 Statistical Inference tutorial (Mr. Kens Arie) · 13:30–15:00 Accounting B tutorial · 15:30–17:00 Accounting B lecture
 - Thu 08:30–15:30: 08:30–10:00 Python tutorial (every two weeks) · 10:15–12:45 Intro Macro lecture · 13:00–15:30 Statistical Inference lecture
 
-### Track ב'
-- Sun 08:30–15:00: 08:30–10:00 Intro Macro tutorial · 10:30–12:00 Price Theory A tutorial · 12:30–15:00 Math B lecture
+### Track ב' (updated by the owner 2026-11-19: the Python lecture moved from Tuesday to Wednesday)
+- Sun 08:30–15:00: 08:30–10:00 Intro Macro tutorial · 10:30–12:00 Price Theory A tutorial · 12:30–15:00 Math B lecture (not in the 2026-11-19 update, which started at Tuesday; unchanged until confirmed)
 - Mon free
-- Tue: same as track א'
-- Wed 11:30–17:00: 11:30–13:00 Accounting B tutorial · 13:30–15:00 Statistical Inference tutorial (Ms. Lalo Efrat) · 15:30–17:00 Accounting B lecture
-- Thu: same as track א'
+- Tue 08:30–13:00: 08:30–10:00 Intro Organization & Management lecture · 10:30–13:00 Price Theory A lecture
+- Wed 08:30–17:00: 08:30–11:00 Python for Economists lecture (moved here from Tuesday) · 11:30–13:00 Accounting B tutorial · 13:30–15:00 Statistical Inference tutorial (Ms. Lalo Efrat) · 15:30–17:00 Accounting B lecture
+- Thu 08:30–15:30: 08:30–10:00 Python tutorial (every two weeks; in the other weeks the day starts 10:15) · 10:15–12:45 Intro Macro lecture · 13:00–15:30 Statistical Inference lecture
 - Rooms for semester B are not assigned yet. In semester B the two tracks occupy the same slots; only tutorials swap.
 
 ## Academic calendar, semester ב' (mta.ac.il/academic_calendar, read 2026-11-14)
@@ -40,7 +40,7 @@ Source: the owner's notes. Semester A is built into `index.html` (`BASE` = track
 - No classes: Purim 23.03; Pesach 18.04–30.04 ("for students who do not study on Tuesday"; 18.04 is a make-up day for Tuesday students); Memorial Day 11.05; Independence Day 12.05; graduation 08–09.06; Shavuot 10–11.06.
 - Classes end 18:00: 03.05 and 10.05. Hackathon 12.04 is a normal day. Make-up days: 18.04 and 06.06 (Tuesday students), 07.06 (Wednesday students).
 
-## Open questions (owner chose to postpone semester B)
+## Open questions (built with the owner's picks on 2026-11-19: Python tutorial from 25.02.27; 18.04 runs Tuesday, 19–30.04 off; follow-up courses keep their colour)
 1. First week of the biweekly Python tutorial (Thursday 08:30): 25.02.27 or 04.03.27?
 2. Semester B exam dates and rooms: not published.
 3. Pesach 18–30.04 for Tuesday students (both tracks study on Tuesday in semester B).

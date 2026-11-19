@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-title" content="השבוע">
 <meta name="theme-color" content="#f1eee6" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#101411" media="(prefers-color-scheme: dark)">
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#f1eee6;color:#141413}@media (prefers-color-scheme:dark){html:not([data-theme=light]) body{background:#101411}}html[data-theme=dark] body{background:#101411}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>try{var t=localStorage.getItem("wp.theme");document.documentElement.dataset.theme=t==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}</script></head><body>
-<title>תכנון השבוע בסמסטר א'</title>
+<title>תכנון השבוע</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -19,7 +19,8 @@
   --ink:#1c2620; --text-main:#28332c; --text-muted:#6f7a71; --text-faint:#a0a79f;
   --border-light:#e4e1d7; --border-dark:#cfccbf;
   --accent:#3c5c48; --accent-fill:#2f4a3a; --accent-ink:#f3f0e8; --accent-soft:#dfe5d9; --accent-text:#2f4a3a; /* forest (default since 2026-11-18): fill = the dark green of the + and the home card, soft = sage tint, accent = lines and rings */
-  --c-stat:#1d4ed8; --c-math:#15803d; --c-acc:#be123c; --c-micro:#7e22ce; --c-data:#c2410c; --c-ob:#a21caf; --c-eng:#4d7c0f; --on-course:#ffffff;
+  --c-stat:#1d4ed8; --c-math:#15803d; --c-acc:#be123c; --c-micro:#7e22ce; --c-data:#c2410c; --c-ob:#a21caf; --c-eng:#4d7c0f; --c-macro:#0f766e; --on-course:#ffffff;
+  --c-infer:var(--c-stat); --c-price:var(--c-micro); --c-org:var(--c-ob); --c-py:var(--c-data); /* semester ב': a follow-up course borrows its first part's colour (resolves per theme) */
   --open-bg:#fffbeb; --open-bd:#f59e0b; --open-tx:#92400e;
   --close-bg:#eef2ff; --close-bd:#6366f1; --close-tx:#3730a3;
   --study-bg:#ecfeff; --study-bd:#06b6d4; --study-tx:#155e75;
@@ -38,7 +39,7 @@
   --ink:#eef1ea; --text-main:#dde3da; --text-muted:#9aa59b; --text-faint:#6b756c;
   --border-light:#252d27; --border-dark:#36403a;
   --accent:#9cc0a5; --accent-fill:#33503f; --accent-ink:#eef1ea; --accent-soft:#25302a; --accent-text:#bcd6c2;
-  --c-stat:#60a5fa; --c-math:#4ade80; --c-acc:#fb7185; --c-micro:#c084fc; --c-data:#fb923c; --c-ob:#e879f9; --c-eng:#a3e635; --on-course:#0b111c;
+  --c-stat:#60a5fa; --c-math:#4ade80; --c-acc:#fb7185; --c-micro:#c084fc; --c-data:#fb923c; --c-ob:#e879f9; --c-eng:#a3e635; --c-macro:#2dd4bf; --on-course:#0b111c;
   --open-bg:#2a1d06; --open-bd:#fbbf24; --open-tx:#fde68a;
   --close-bg:#1b1d3f; --close-bd:#818cf8; --close-tx:#c7d2fe;
   --study-bg:#082a30; --study-bd:#22d3ee; --study-tx:#a5f3fc;
@@ -55,7 +56,7 @@
   --ink:#eef1ea; --text-main:#dde3da; --text-muted:#9aa59b; --text-faint:#6b756c;
   --border-light:#252d27; --border-dark:#36403a;
   --accent:#9cc0a5; --accent-fill:#33503f; --accent-ink:#eef1ea; --accent-soft:#25302a; --accent-text:#bcd6c2;
-  --c-stat:#60a5fa; --c-math:#4ade80; --c-acc:#fb7185; --c-micro:#c084fc; --c-data:#fb923c; --c-ob:#e879f9; --c-eng:#a3e635; --on-course:#0b111c;
+  --c-stat:#60a5fa; --c-math:#4ade80; --c-acc:#fb7185; --c-micro:#c084fc; --c-data:#fb923c; --c-ob:#e879f9; --c-eng:#a3e635; --c-macro:#2dd4bf; --on-course:#0b111c;
   --open-bg:#2a1d06; --open-bd:#fbbf24; --open-tx:#fde68a;
   --close-bg:#1b1d3f; --close-bd:#818cf8; --close-tx:#c7d2fe;
   --study-bg:#082a30; --study-bd:#22d3ee; --study-tx:#a5f3fc;
@@ -147,7 +148,7 @@ h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;line-height:1.12;margin:0 0 
 .blk .tm{direction:ltr;unicode-bidi:isolate;text-align:right;font-family:var(--font-mono);font-size:10.5px;opacity:.85;margin-top:2px}
 .blk .rm{font-size:10.5px;opacity:.8;margin-top:1px}
 .blk.tight .rm{display:none}
-.c-stat{--cc:var(--c-stat)} .c-math{--cc:var(--c-math)} .c-acc{--cc:var(--c-acc)} .c-micro{--cc:var(--c-micro)} .c-data{--cc:var(--c-data)} .c-ob{--cc:var(--c-ob)} .c-eng{--cc:var(--c-eng)}
+.c-stat{--cc:var(--c-stat)} .c-math{--cc:var(--c-math)} .c-acc{--cc:var(--c-acc)} .c-micro{--cc:var(--c-micro)} .c-data{--cc:var(--c-data)} .c-ob{--cc:var(--c-ob)} .c-eng{--cc:var(--c-eng)} .c-infer{--cc:var(--c-infer)} .c-price{--cc:var(--c-price)} .c-org{--cc:var(--c-org)} .c-py{--cc:var(--c-py)} .c-macro{--cc:var(--c-macro)}
 .blk.base{cursor:default;background:color-mix(in srgb,var(--cc) 8%,var(--bg-card));border-color:color-mix(in srgb,var(--cc) 16%,var(--bg-card));border-left-color:var(--cc);color:color-mix(in srgb,var(--cc) 35%,var(--ink))} /* quiet: the timetable is a soft tint with a course-colour edge, the user's own blocks and the exams stand out */
 .blk.base .nm{color:var(--ink)}
 .blk.k-tut{background:color-mix(in srgb,var(--cc) 6%,var(--bg-card));border-style:dashed;border-color:color-mix(in srgb,var(--cc) 55%,var(--bg-card));border-left-style:solid}
@@ -630,7 +631,7 @@ dialog{border-radius:24px}.btn{border-radius:14px}.upgo{border-radius:16px}.dstr
 
 <header class="top">
   <div>
-    <div class="eyebrow">סמסטר א' · תשפ"ז · 18.10.26–15.01.27</div>
+    <div class="eyebrow" id="eyebrow">סמסטר א' תשפ"ז · 18.10.26–15.01.27</div>
     <h1>השבוע שלי</h1>
   </div>
   <div class="who"><button type="button" class="btn ib" id="setBtn" title="הגדרות" aria-label="הגדרות"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button><button type="button" class="btn ib" id="themeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button><span class="store" id="store" role="img"><i></i><span>⏳</span></span><button type="button" class="btn ib out" id="outBtn" title="התנתקות" aria-label="התנתקות" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="flip" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button></div>
@@ -846,15 +847,15 @@ dialog{border-radius:24px}.btn{border-radius:14px}.upgo{border-radius:16px}.dstr
     </details>
     <details class="card" id="shCard">
   <summary><h2>סיכום משמרות</h2><span class="upsum" id="shSum"></span></summary>
-  <p class="lead">שעות המשמרות שלך בכל חודש, לפי המשמרות הקבועות והחד-פעמיות. מ-1.10.26 עד 13.03.27 (משמרות חד-פעמיות מתחילת אוקטובר, משמרות קבועות מ-18.10); משמרת שמסתיימת אחרי חצות נספרת בחודש שבו היא מתחילה.</p>
+  <p class="lead">שעות המשמרות שלך בכל חודש, לפי המשמרות הקבועות והחד-פעמיות, מהחודש של המשמרת הראשונה ועד החודש הבא. משמרת שמסתיימת אחרי חצות נספרת בחודש שבו היא מתחילה.</p>
   <table class="shm" id="shTbl"></table>
   </details>
     <details class="card" id="expCard">
   <summary><h2>ייצוא ליומן</h2><span class="upsum">Google Calendar · Apple</span></summary>
-  <p class="lead">כל הסמסטר עד סוף המבחנים: שיעורים, משמרות קבועות, פריטים חד-פעמיים, מבחנים והגשות. ייבוא חוזר יוצר כפילויות, אז כדאי לייבא ליומן נפרד ולמחוק אותו לפני ייבוא מחדש.</p>
+  <p class="lead">סמסטר אחד, מהשיעור הראשון עד המבחן האחרון: שיעורים, משמרות, פריטים חד-פעמיים, מבחנים והגשות. ייבוא חוזר יוצר כפילויות, אז כדאי לייבא ליומן נפרד ולמחוק אותו לפני ייבוא מחדש.</p><p class="setrow"><select id="expTerm" aria-label="איזה סמסטר"></select></p>
   <div class="exp">
     <div><button type="button" class="btn pri" id="expCsv">Google Calendar · CSV</button><p>ב-Google Calendar: הגדרות ← ייבוא וייצוא ← ייבוא. בוחרים את הקובץ ואת היומן.</p></div>
-    <div><button type="button" class="btn pri" id="expIcs">Apple ויומנים אחרים · ics בתוך zip</button><p>פותחים את ה-zip ולוחצים פעמיים על weekplan-semA.ics.</p></div>
+    <div><button type="button" class="btn pri" id="expIcs">Apple ויומנים אחרים · ics בתוך zip</button><p>פותחים את ה-zip ולוחצים פעמיים על קובץ ה-ics.</p></div>
   </div>
 </details>
     <details class="card setsec" id="setData"><summary><h2>הנתונים שלי</h2><span class="upsum">גיבוי ומחיקה</span></summary>
@@ -935,7 +936,40 @@ const BASE_A=[ // track א', semester א'
  {d:3,s:'12:30',e:'15:00',t:"מתמטיקה א'",k:'lec',r:'כלכלה 107'}
 ];
 const TRACKS={a:{label:"מקבץ א'",base:BASE_A},b:{label:"מקבץ ב'",base:BASE}};
-const COURSE={'הסתברות וסטטיסטיקה':'stat',"מתמטיקה א'":'math',"חשבונאות א'":'acc','מבוא למיקרו':'micro','כלי ניתוח נתונים ו-AI':'data','יסודות התנהגות ארגונית':'ob',"אנגלית מתקדמים א'":'eng'};
+const BASE_B=[ // track ב', semester ב' (the owner's notes, 2026-11-19: the Python lecture moved to Wednesday); rooms not assigned yet
+ {d:0,s:'08:30',e:'10:00',t:'מבוא למקרו',k:'tut',r:''},
+ {d:0,s:'10:30',e:'12:00',t:"תורת המחירים א'",k:'tut',r:''},
+ {d:0,s:'12:30',e:'15:00',t:"מתמטיקה ב'",k:'lec',r:''},
+ {d:2,s:'08:30',e:'10:00',t:'מבוא לארגון וניהול',k:'lec',r:''},
+ {d:2,s:'10:30',e:'13:00',t:"תורת המחירים א'",k:'lec',r:''},
+ {d:3,s:'08:30',e:'11:00',t:'פייתון לכלכלנים',k:'lec',r:''},
+ {d:3,s:'11:30',e:'13:00',t:"חשבונאות ב'",k:'tut',r:''},
+ {d:3,s:'13:30',e:'15:00',t:'הסקה סטטיסטית',k:'tut',r:''},
+ {d:3,s:'15:30',e:'17:00',t:"חשבונאות ב'",k:'lec',r:''},
+ {d:4,s:'08:30',e:'10:00',t:'פייתון לכלכלנים',k:'tut',r:'',every:2,from:'2027-02-25'}, // every two weeks, from the first Thursday (the owner's pick until confirmed)
+ {d:4,s:'10:15',e:'12:45',t:'מבוא למקרו',k:'lec',r:''},
+ {d:4,s:'13:00',e:'15:30',t:'הסקה סטטיסטית',k:'lec',r:''}
+];
+const BASE_BA=[ // track א', semester ב' (docs/timetables-tashpaz.md; the Wednesday move is only confirmed for track ב')
+ {d:0,s:'08:30',e:'10:00',t:"תורת המחירים א'",k:'tut',r:''},
+ {d:0,s:'10:30',e:'12:00',t:'מבוא למקרו',k:'tut',r:''},
+ {d:0,s:'12:30',e:'15:00',t:"מתמטיקה ב'",k:'lec',r:''},
+ {d:2,s:'08:30',e:'10:00',t:'מבוא לארגון וניהול',k:'lec',r:''},
+ {d:2,s:'10:30',e:'13:00',t:"תורת המחירים א'",k:'lec',r:''},
+ {d:2,s:'13:30',e:'16:00',t:'פייתון לכלכלנים',k:'lec',r:''},
+ {d:3,s:'11:30',e:'13:00',t:'הסקה סטטיסטית',k:'tut',r:''},
+ {d:3,s:'13:30',e:'15:00',t:"חשבונאות ב'",k:'tut',r:''},
+ {d:3,s:'15:30',e:'17:00',t:"חשבונאות ב'",k:'lec',r:''},
+ {d:4,s:'08:30',e:'10:00',t:'פייתון לכלכלנים',k:'tut',r:'',every:2,from:'2027-02-25'},
+ {d:4,s:'10:15',e:'12:45',t:'מבוא למקרו',k:'lec',r:''},
+ {d:4,s:'13:00',e:'15:30',t:'הסקה סטטיסטית',k:'lec',r:''}
+];
+const TERMS=[ // the semesters; outside their class days the planner is a plain calendar. start..end = classes, last = the last exam. k = the key prefix of a class (semester א' keeps 'b' because cancel docs and FLIP keys use it)
+ {id:'A',k:'b',name:"סמסטר א' תשפ\"ז",start:'2026-10-18',end:'2027-01-15',last:'2027-03-13',tracks:{a:BASE_A,b:BASE}},
+ {id:'B',k:'c',name:"סמסטר ב' תשפ\"ז",start:'2027-02-21',end:'2027-06-07',last:'2027-07-16',tracks:{a:BASE_BA,b:BASE_B}}
+];
+const COURSE={'הסתברות וסטטיסטיקה':'stat',"מתמטיקה א'":'math',"חשבונאות א'":'acc','מבוא למיקרו':'micro','כלי ניתוח נתונים ו-AI':'data','יסודות התנהגות ארגונית':'ob',"אנגלית מתקדמים א'":'eng',
+ "מתמטיקה ב'":'math',"חשבונאות ב'":'acc','הסקה סטטיסטית':'infer',"תורת המחירים א'":'price','מבוא לארגון וניהול':'org','פייתון לכלכלנים':'py','מבוא למקרו':'macro'}; // semester ב': a follow-up course keeps its colour (math, acc) or has its own id with the colour of its first part (infer = stat, price = micro, org = ob, py = data); macro is new
 const BKIND={lec:'שיעור',tut:'תרגיל',lab:'מעבדה',eng:''};
 const KINDS={
   open:{label:'משמרת פתיחה',short:'פתיחה',shift:1,color:'--open-bd'},
@@ -971,11 +1005,21 @@ const wkDiff=(a,b)=>Math.round(dayDiff(a,b)/7);
 const dm=iso=>iso.slice(8)+'.'+iso.slice(5,7);
 const todayIso=()=>{const p={};new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).forEach(x=>p[x.type]=x.value);return p.year+'-'+p.month+'-'+p.day};
 /* ---------- academic calendar: MTA תשפ"ז, locked like BASE ---------- */
-const SEM={start:'2026-10-18',end:'2027-01-15',last:'2027-03-13'};
 const CAL={
   '2026-10-27':{off:1,label:'בחירות לכנסת (משוער)'},
-  '2027-01-17':{as:2,label:'יום השלמה · מערכת של שלישי'}
+  '2027-01-17':{as:2,term:'A',label:'יום השלמה · מערכת של שלישי'},
+  // semester ב' (mta.ac.il/academic_calendar, read 2026-11-14)
+  '2027-03-23':{off:1,label:'פורים'},
+  '2027-04-18':{as:2,label:'פסח · יום השלמה · מערכת של שלישי'},
+  ...Object.fromEntries(Array.from({length:12},(_,i)=>['2027-04-'+String(19+i),{off:1,label:'פסח'}])),
+  '2027-05-11':{off:1,label:'יום הזיכרון'},'2027-05-12':{off:1,label:'יום העצמאות'},
+  '2027-06-06':{as:2,label:'יום השלמה · מערכת של שלישי'},'2027-06-07':{as:3,label:'יום השלמה · מערכת של רביעי'},
+  '2027-06-08':{off:1,label:'טקסי סיום'},'2027-06-09':{off:1,label:'טקסי סיום'},'2027-06-10':{off:1,label:'שבועות'},'2027-06-11':{off:1,label:'שבועות'}
 };
+const termOf=iso=>{const c=CAL[iso];return c&&c.term?TERMS.find(t=>t.id===c.term):TERMS.find(t=>iso>=t.start&&iso<=t.end)||null}; // the semester whose class days hold this date (a make-up day may name its own)
+const termLine=iso=>{const T=TERMS.find(t=>iso>=t.start&&iso<=t.end);if(T)return T.name+' · '+dmy(T.start)+'–'+dmy(T.end);const X=TERMS.find(t=>iso>t.end&&iso<=t.last);return X?'תקופת מבחנים · '+X.name:'חופשה · '+iso.slice(0,4)}; // the header line for the shown date
+const ERA={start:'2020-01-01',last:'2040-12-31'}; // the planner has no semester bounds; only a wide technical window so a broken date never loops for ages
+const REC0='2026-10-18'; // a weekly item without "from" (made before 2026-11-19) starts here
 const EXAMS=[ // mtamn.mta.ac.il exam search, תשפ"ז. Live system: dates can still move.
  {c:'מבוא למיקרו',m:'א',date:'2027-01-22',s:'09:00'},{c:'מבוא למיקרו',m:'ב',date:'2027-02-18',s:'09:00'},
  {c:'הסתברות וסטטיסטיקה',m:'א',date:'2027-01-27',s:'09:00'},{c:'הסתברות וסטטיסטיקה',m:'ב',date:'2027-02-22',s:'09:00'},
@@ -997,11 +1041,11 @@ function onboardDocs(a,now){ // the answers of the opening screens -> {profile, 
   return{profile,items:ok?[{kind:'other',title:'אנגלית'+(lv?' '+lv:''),day:e.d,start:e.s,end:e.e,week:'both',note:'',updated:now,skip:[]}]:[]};
 }
 const isRec=x=>x.week==='A'||x.week==='B'||x.week==='both'; // recurring every week (A/B are docs of the retired rotation)
-const lastSun=sunOf(SEM.last);
-const clampSun=s=>s<SEM.start?SEM.start:s>lastSun?lastSun:s; // own line: test.mjs exports only the first name per const
+const lastSun=sunOf(ERA.last);
+const clampSun=s=>s<sunOf(ERA.start)?sunOf(ERA.start):s>lastSun?lastSun:s; // own line: test.mjs exports only the first name per const
 /* ---------- month view helpers: ym = 'YYYY-MM' ---------- */
 const MONTHS=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-const CSHORT={stat:'הסתברות',math:'מתמטיקה',acc:'חשבונאות',micro:'מיקרו',data:'נתונים ו-AI',ob:'התנהגות ארגונית',eng:'אנגלית'};
+const CSHORT={stat:'הסתברות',math:'מתמטיקה',acc:'חשבונאות',micro:'מיקרו',data:'נתונים ו-AI',ob:'התנהגות ארגונית',eng:'אנגלית',infer:'הסקה',price:'תורת המחירים',org:'ארגון וניהול',py:'פייתון',macro:'מקרו'};
 const courseOk=c=>Object.values(COURSE).includes(c); // a known course colour id; anything else (or missing) means no course
 const dueName=x=>{const c=courseOk(x.course)?CSHORT[x.course]:'';return c&&x.title?c+' · '+x.title:c||x.title||''}; // a deadline's name: course short name, then the title
 const dueLbl=x=>{const n=dueName(x);return n?'הגשה: '+n:'הגשה'};
@@ -1010,7 +1054,7 @@ const TSTAT={todo:'לא בוצע',done:'בוצע'}; // the same two states for a
 const STAT={todo:'לא התחלתי',done:'הוגש'}; // a deadline's status: the doc stores only done:true/false (exports read it)
 const dueSt=x=>x&&x.done?'done':'todo';
 const dueLate=(x,today)=>x.kind==='due'&&isoOk(x.date)&&x.date<today&&dueSt(x)!=='done'; // past its date and not submitted
-const GUESS=[[/מאזן|פקודות יומן|חשבונ/,'acc'],[/עקומת|גורמי ייצור|תמורה|מיקרו/,'micro'],[/אקסל|excel|קובצי תרגול|מיון|סינון|תרשימים|ניתוח נתונים|עיבוד|\bAI\b/i,'data'],[/סטטיסט|הסתברות/,'stat'],[/מתמטיקה|אינפי/,'math'],[/התנהגות ארגונית/,'ob'],[/אנגלית/,'eng']]; // a first guess at the course from a Moodle title; the paste dialog lets the user fix it
+const GUESS=[[/הסקה/,'infer'],[/תורת המחירים/,'price'],[/מקרו|מאקרו/,'macro'],[/פייתון|python/i,'py'],[/ארגון וניהול/,'org'],[/מאזן|פקודות יומן|חשבונ/,'acc'],[/עקומת|גורמי ייצור|תמורה|מיקרו/,'micro'],[/אקסל|excel|קובצי תרגול|מיון|סינון|תרשימים|ניתוח נתונים|עיבוד|\bAI\b/i,'data'],[/סטטיסט|הסתברות/,'stat'],[/מתמטיקה|אינפי/,'math'],[/התנהגות ארגונית/,'ob'],[/אנגלית/,'eng']]; // a first guess at the course from a Moodle title; the paste dialog lets the user fix it
 const guessCourse=t=>{const g=GUESS.find(([r])=>r.test(t||''));return g?g[1]:''};
 function parseMoodle(txt){ // text of the Moodle month calendar -> [{date,title}]: a date line ("אירוע אחד, 15/11/2026") then "יש להגיש את '<name>'" lines (markdown link or plain)
   const out=[],seen=new Set();let date='';
@@ -1037,7 +1081,7 @@ const MDUE=[/^יש להגיש את\s+['"׳״‘’“”]?(.+?)['"׳״‘’“�
 const moodleTitle=s=>{for(const r of MDUE){const m=String(s||'').trim().match(r);if(m)return m[1].trim()}return''};
 function moodleMerge(evs,items,today){ // Moodle calendar events -> what to change: add new deadlines, move ones whose date moved (not submitted), tag a deadline added by hand with its uid; seen = every uid ever taken (a deleted one never comes back)
   const sd=items.find(x=>x.kind==='moodle'),seen=new Set(sd&&Array.isArray(sd.seen)?sd.seen:[]),n0=seen.size,dues=items.filter(x=>x.kind==='due'),nt=t=>String(t||'').trim().toLowerCase(),add=[],move=[],tag=[];
-  for(const e of evs){const title=moodleTitle(e.summary);if(!title||!isoOk(e.date)||e.date<today||e.date<SEM.start||e.date>SEM.last)continue;
+  for(const e of evs){const title=moodleTitle(e.summary);if(!title||!isoOk(e.date)||e.date<today||e.date>ERA.last)continue;
     const m=dues.find(x=>x.mid===e.uid);
     if(m){if(dueSt(m)!=='done'&&(m.date!==e.date||m.start!==e.time))move.push({id:m.id,date:e.date,start:e.time});seen.add(e.uid);continue}
     if(seen.has(e.uid))continue;seen.add(e.uid);
@@ -1048,15 +1092,15 @@ function moodleMerge(evs,items,today){ // Moodle calendar events -> what to chan
 }
 const ltr=t=>'\u2066'+t+'\u2069'; // isolate a range ("10:15–11:45", "15.11–21.11") so Hebrew text around it does not flip it
 const dmy=iso=>dm(iso)+'.'+iso.slice(2,4);
-const YM0=SEM.start.slice(0,7);
-const YM1=SEM.last.slice(0,7);
+const YM0=ERA.start.slice(0,7);
+const YM1=ERA.last.slice(0,7);
 const ymOf=iso=>iso.slice(0,7);
 const addMonths=(ym,n)=>{const t=Number(ym.slice(0,4))*12+Number(ym.slice(5))-1+n;return Math.floor(t/12)+'-'+pad(t%12+1)};
 const clampYm=ym=>ym<YM0?YM0:ym>YM1?YM1:ym;
 function monthSuns(ym){const out=[],end=sunOf(addDays(addMonths(ym,1)+'-01',-1));for(let s=sunOf(ym+'-01');s<=end;s=addDays(s,7))out.push(s);return out}
 /* ---------- phone day view helpers ---------- */
 const DAYI=['א','ב','ג','ד','ה','ו','ש'];
-const clampDay=d=>d<SEM.start?SEM.start:d>SEM.last?SEM.last:d; // the navigable days; own line like clampSun
+const clampDay=d=>d<ERA.start?ERA.start:d>ERA.last?ERA.last:d; // the navigable days; own line like clampSun
 const pickDay=(cur,lo,hi,today)=>clampDay(cur>=lo&&cur<=hi?cur:today>=lo&&today<=hi?today:lo); // day to land on when the period lo..hi (a week or month) is shown: the current pick if inside it, else today, else its first day
 const swipeDir=(dx,dy)=>Math.abs(dx)>=50&&Math.abs(dx)>=1.5*Math.abs(dy)?(dx>0?1:-1):0; // +1 next day / -1 previous / 0 none; Hebrew/RTL, as on iOS: a swipe to the right is the next day (the strip puts it on the left)
 
@@ -1067,14 +1111,15 @@ function baseDay(iso,items){
   if(offDoc(iso,items))return null;
   const c=CAL[iso];
   if(c&&c.as!=null)return c.as;
-  if(iso<SEM.start||iso>SEM.end||c&&c.off)return null;
+  if(!termOf(iso)||c&&c.off)return null;
   return dow(iso);
 }
 function evsForWeek(sun,items,skipId){
   const out=[];
   for(let d=0;d<7;d++){
     const date=addDays(sun,d),bd=baseDay(date,items);
-    if(bd!=null)baseOf(items).forEach((b,i)=>{if(b.d!==bd||b.self)return;const[s,e]=span(b.s,b.e);out.push({src:'base',key:'b'+i,i,d,date,s,e,title:b.t,course:COURSE[b.t],kind:b.k,room:b.r,...(cancelOf(date,i,items)&&{cancelled:true})})});
+    const T=bd!=null&&termOf(date);
+    if(T)T.tracks[trackOf(items)].forEach((b,i)=>{if(b.d!==bd||b.self||b.every&&(date<b.from||wkDiff(sunOf(b.from),sunOf(date))%b.every))return;const[s,e]=span(b.s,b.e);out.push({src:'base',key:T.k+i,i,d,date,s,e,title:b.t,course:COURSE[b.t],kind:b.k,room:b.r,...(cancelOf(date,i,items)&&{cancelled:true})})});
     EXAMS.forEach((x,i)=>{if(x.date!==date)return;const s=toMin(x.s);out.push({src:'exam',key:'x'+i,d,date,s,e:s+EXAM_MIN,title:x.c,course:COURSE[x.c],kind:'exam',moed:x.m,room:'מועד '+x.m+"'"})});
   }
   items.forEach(it=>{
@@ -1083,7 +1128,7 @@ function evsForWeek(sun,items,skipId){
     let d,date;
     if(isRec(it)){
       d=Number(it.day);if(!(d>=0&&d<=6))return;date=addDays(sun,d);
-      if(Array.isArray(it.skip)&&it.skip.includes(date))return;
+      if(Array.isArray(it.skip)&&it.skip.includes(date)||date<(isoOk(it.from)?it.from:REC0))return; // a weekly item shows from its first week on
     }else if(isoOk(it.date)&&sunOf(it.date)===sun){date=it.date;d=dow(date)}
     else return;
     const[s,e]=span(it.start,it.end),kind=KINDS[it.kind]?it.kind:'other';
@@ -1097,7 +1142,7 @@ const duesOfCourse=(items,course,today)=>courseOk(course)?items.filter(x=>x.kind
 const greet=m=>m>=300&&m<720?'בוקר טוב':m>=720&&m<900?'צהריים טובים':m>=900&&m<1080?'אחר צהריים טובים':m>=1080&&m<1320?'ערב טוב':'לילה טוב'; // m = minutes since midnight
 function nowNext(today,min,items){ // the class or exam going on now, and the next one (up to the end of the exams): {now,next}; cancelled classes and own items are left out
   let now=null,next=null;
-  for(let sun=sunOf(today);sun<=sunOf(SEM.last)&&!next;sun=addDays(sun,7)){
+  for(let sun=sunOf(today),k=0;k<18&&!next;sun=addDays(sun,7),k++){ // up to 18 weeks ahead: a break between semesters still finds the next exam or class
     const E=evsForWeek(sun,items).filter(e=>(e.src==='base'||e.src==='exam')&&!e.cancelled&&e.date>=today).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.s-b.s);
     for(const e of E){if(e.date===today&&e.s<=min&&min<e.e){if(!now)now={...e,minsLeft:e.e-min};continue}
       if(e.date>today||e.s>min){next={...e,daysAhead:dayDiff(today,e.date),...(e.date===today&&{minsTo:e.s-min})};break}}
@@ -1161,10 +1206,11 @@ function analyze(evs,nextSun=[]){ // nextSun: events of the following Sunday (d:
   });
   return{bad,soft,clash};
 }
-function shiftMonths(items){ // monthly totals of the user's own shift blocks (KINDS shift:1) up to SEM.last; one-off shifts count from the 1st of YM0 (past shifts typed in from the attendance report), recurring series only from SEM.start; evsForWeek already drops skipped ones; an overnight shift counts in the month it starts
-  const by={};
-  for(let sun=sunOf(YM0+'-01');sun<=SEM.last;sun=addDays(sun,7))evsForWeek(sun,items).forEach(e=>{if(e.src!=='user'||!KINDS[e.kind].shift||e.date<SEM.start&&e.week!=='date')return;const r=by[ymOf(e.date)]||(by[ymOf(e.date)]={min:0,n:0});r.min+=e.e-e.s;r.n++});
-  const rows=[];for(let ym=YM0;ym<=YM1;ym=addMonths(ym,1))rows.push({ym,min:(by[ym]||{}).min||0,n:(by[ym]||{}).n||0});
+function shiftMonths(items,today=todayIso()){ // monthly totals of the user's own shift blocks (KINDS shift:1), from the month of the first shift to the month after today (or the last one-off shift); evsForWeek already drops skipped and not-yet-started weekly ones; an overnight shift counts in the month it starts
+  const sh=items.filter(x=>KINDS[x.kind]&&KINDS[x.kind].shift&&okTime(x.start)&&okTime(x.end)),one=sh.filter(x=>!isRec(x)&&isoOk(x.date)).map(x=>x.date),rec=sh.filter(isRec).map(x=>isoOk(x.from)?x.from:REC0);
+  const ym1=[addMonths(ymOf(today),1),...one.map(ymOf)].sort().pop(),ym0=[...one,...rec].map(ymOf).sort()[0]||ymOf(today),by={};
+  for(let sun=sunOf(ym0+'-01');sun<=ym1+'-31';sun=addDays(sun,7))evsForWeek(sun,items).forEach(e=>{if(e.src!=='user'||!KINDS[e.kind].shift)return;const r=by[ymOf(e.date)]||(by[ymOf(e.date)]={min:0,n:0});r.min+=e.e-e.s;r.n++});
+  const rows=[];for(let ym=ym0;ym<=ym1;ym=addMonths(ym,1))rows.push({ym,min:(by[ym]||{}).min||0,n:(by[ym]||{}).n||0});
   return{rows,min:rows.reduce((a,r)=>a+r.min,0),n:rows.reduce((a,r)=>a+r.n,0)};
 }
 function stats(evs){
@@ -1180,18 +1226,18 @@ function toDoc(f,sun){
   if(f.kind==='task')return{...b,done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course})}; // no date, no times
   if(f.kind==='due')return{...b,date:date(),start:okTime(f.start)?f.start:'23:59',done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course}),...(f.mid&&{mid:f.mid})}; // f.status (the dialog's select) wins over f.done; mid = the Moodle uid of a synced deadline
   if(f.week==='date')return{...b,date:date(),start:f.start,end:f.end};
-  return{...b,day:f.day,start:f.start,end:f.end,week:f.week,skip:f.skip||[]};
+  return{...b,day:f.day,start:f.start,end:f.end,week:f.week,skip:f.skip||[],from:isoOk(f.from)?f.from:addDays(sun,f.day)}; // from = the first week it shows (a new series starts in the week it was added)
 }
 function detach(prev,f,sun,occ){ // editing one occurrence of a series into a one-off/deadline: new dated doc + skip on the series
   const{id,...rest}=prev;return{one:toDoc(f,sun),series:{...rest,skip:[...(prev.skip||[]),occ],updated:f.updated}};
 }
 /* ---------- calendar export: whole semester through the last exam ---------- */
-function semEvents(items){
-  const out=[];
-  for(let sun=SEM.start;sun<=SEM.last;sun=addDays(sun,7))evsForWeek(sun,items).filter(x=>!x.cancelled).forEach(x=>out.push({uid:x.key+'-'+x.date,date:x.date,s:x.s,e:x.e,
+function semEvents(items,T=TERMS[0]){ // one semester, from its first class to its last exam
+  const out=[],inT=d=>d>=T.start&&d<=T.last;
+  for(let sun=sunOf(T.start);sun<=T.last;sun=addDays(sun,7))evsForWeek(sun,items).filter(x=>!x.cancelled&&inT(x.date)&&(x.src!=='base'||termOf(x.date)===T)).forEach(x=>out.push({uid:x.key+'-'+x.date,date:x.date,s:x.s,e:x.e,
     summary:x.src==='base'?x.title+(BKIND[x.kind]?' · '+BKIND[x.kind]:''):x.src==='exam'?'מבחן: '+x.title+' · '+x.room:x.title,
     location:x.src==='base'?x.room:'',desc:x.note||''}));
-  items.filter(x=>x.kind==='due'&&isoOk(x.date)&&!x.done).forEach(x=>{const s=Math.max(30,toMin(okTime(x.start)?x.start:'23:59'));
+  items.filter(x=>x.kind==='due'&&isoOk(x.date)&&inT(x.date)&&!x.done).forEach(x=>{const s=Math.max(30,toMin(okTime(x.start)?x.start:'23:59'));
     out.push({uid:'u'+x.id+'-'+x.date,date:x.date,s:s-30,e:s,summary:dueLbl(x),location:'',desc:x.note||''})});
   return out;
 }
@@ -1207,9 +1253,9 @@ const VTZ=['BEGIN:VTIMEZONE','TZID:Asia/Jerusalem',
   'BEGIN:STANDARD','DTSTART:19701025T020000','TZOFFSETFROM:+0300','TZOFFSETTO:+0200','TZNAME:IST','RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU','END:STANDARD',
   'BEGIN:DAYLIGHT','DTSTART:19700327T020000','TZOFFSETFROM:+0200','TZOFFSETTO:+0300','TZNAME:IDT','RRULE:FREQ=YEARLY;BYMONTH=3;BYMONTHDAY=23,24,25,26,27,28,29;BYDAY=FR','END:DAYLIGHT',
   'END:VTIMEZONE'];
-function buildIcs(items,stamp){
-  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//weekplan//he','CALSCALE:GREGORIAN',"X-WR-CALNAME:סמסטר א' תשפ\"ז",...VTZ];
-  semEvents(items).forEach(x=>{
+function buildIcs(items,stamp,T=TERMS[0]){
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//weekplan//he','CALSCALE:GREGORIAN','X-WR-CALNAME:'+T.name,...VTZ];
+  semEvents(items,T).forEach(x=>{
     L.push('BEGIN:VEVENT','UID:'+x.uid+'@weekplan','DTSTAMP:'+stamp,'DTSTART;TZID=Asia/Jerusalem:'+icsDT(x.date,x.s),'DTEND;TZID=Asia/Jerusalem:'+icsDT(x.date,x.e),'SUMMARY:'+icsEsc(x.summary));
     if(x.location)L.push('LOCATION:'+icsEsc(x.location));if(x.desc)L.push('DESCRIPTION:'+icsEsc(x.desc));
     L.push('END:VEVENT');
@@ -1230,9 +1276,9 @@ function zip1(name,text){ // ponytail: one stored (uncompressed) file — .ics i
 }
 const usDate=iso=>iso.slice(5,7)+'/'+iso.slice(8)+'/'+iso.slice(0,4);
 const ampm=m=>{m%=1440;const h=Math.floor(m/60);return((h+11)%12+1)+':'+pad(m%60)+' '+(h<12?'AM':'PM')};
-function buildCsv(items){ // Google Calendar import format; times are read in the target calendar's zone (Israel)
+function buildCsv(items,T=TERMS[0]){ // Google Calendar import format; times are read in the target calendar's zone (Israel)
   const q=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
-  return['Subject,Start Date,Start Time,End Date,End Time,Description,Location'].concat(semEvents(items).map(x=>
+  return['Subject,Start Date,Start Time,End Date,End Time,Description,Location'].concat(semEvents(items,T).map(x=>
     [x.summary,usDate(x.date),ampm(x.s),usDate(addDays(x.date,Math.floor(x.e/1440))),ampm(x.e),x.desc,x.location].map(q).join(','))).join('\r\n')+'\r\n';
 }
 
@@ -1334,7 +1380,7 @@ function render0(){
   const rng=dm(viewSun)+'–'+dm(addDays(viewSun,6)), edit=canEdit();
   const lbl=mon?MONTHS[Number(viewYm.slice(5))-1]+' '+viewYm.slice(0,4):day?DAYS[dow(viewDay)]+' · '+dm(viewDay):rng;
   if($('#wkLabel').textContent!==lbl)$('#wkLabel').textContent=lbl;
-  $('#prev').disabled=mon?viewYm<=YM0:day?viewDay<=SEM.start:viewSun<=SEM.start;$('#next').disabled=mon?viewYm>=YM1:day?viewDay>=SEM.last:viewSun>=lastSun;
+  $('#prev').disabled=mon?viewYm<=YM0:day?viewDay<=ERA.start:viewSun<=sunOf(ERA.start);$('#next').disabled=mon?viewYm>=YM1:day?viewDay>=ERA.last:viewSun>=lastSun;$('#eyebrow').textContent=termLine(day?viewDay:mon?viewYm+'-15':addDays(viewSun,3));
   $('#prev').setAttribute('aria-label',mon?'חודש קודם':day?'יום קודם':'שבוע קודם');$('#next').setAttribute('aria-label',mon?'חודש הבא':day?'יום הבא':'שבוע הבא');
   $('#vWeek').setAttribute('aria-pressed',String(!mon));$('#vMonth').setAttribute('aria-pressed',String(mon));
   $('.nav').hidden=upv;
@@ -1693,10 +1739,10 @@ const kindPill=anim=>{const kc={open:'open',close:'close',study:'study',due:'bad
 const prePill=mkPill('prePill',$('#fPre'),()=>$('#fPre').querySelector('button.on'));
 function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true;if(!worksOn()&&!(KINDS[k]&&KINDS[k].shift))$('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=true);else $('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=false);kindPill(0)} // a student who works no shifts does not see the shift types (an existing shift keeps its own)
 function setWeek(w){$('#fRec').checked=w==='A'||w==='B'||w==='both'} // A/B docs of the retired rotation open as weekly
-const COURSE_OPTS=Object.entries(COURSE).map(([t,c])=>`<option value="${esc(c)}">${esc(t)}</option>`).join('');
+const COURSE_OPTS=[...new Set(Object.values(COURSE))].map(c=>`<option value="${esc(c)}">${esc(CSHORT[c]||c)}</option>`).join(''); // one option per course colour id (a follow-up course shares its id)
 $('#fCourse').innerHTML='<option value="">בלי מקצוע</option>'+COURSE_OPTS;
 $('#fStatus').innerHTML=Object.entries(STAT).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
-$('#fDate').min=SEM.start;$('#fDate').max=SEM.last;
+$('#fDate').min=ERA.start;$('#fDate').max=ERA.last;
 let dated=false; // true while the date field (not the weekday select) is the one in use: a deadline, or "only on this date"
 const isDated=()=>getKind()!=='task'&&(getKind()==='due'||getWeek()==='date'); // a task has no date at all
 let preKey='',endTouched=false,prevS='',prevE=''; // endTouched: the end was typed by hand, so changing the start no longer drags it along
@@ -1751,7 +1797,7 @@ function readForm(){
 }
 function validate(d){
   if(d.kind==='task')return d.title?'':'כתוב מה לעשות';
-  if((d.kind==='due'||d.week==='date')&&!(isoOk(d.date)&&d.date>=SEM.start&&d.date<=SEM.last))return`בחר תאריך בין ${dmy(SEM.start)} ל-${dmy(SEM.last)}`;
+  if((d.kind==='due'||d.week==='date')&&!(isoOk(d.date)&&d.date>=ERA.start&&d.date<=ERA.last))return'בחר תאריך';
   if(d.kind==='due')return'';
   if(!okTime(d.start)||!okTime(d.end))return'צריך שעת התחלה ושעת סיום.';
   if(d.start===d.end)return'שעת הסיום זהה לשעת ההתחלה.';
@@ -1800,7 +1846,7 @@ frm.addEventListener('submit',async x=>{
     const{one,series}=detach(prev,d,editSun,$('#fSkip').dataset.date);
     ok=await saveItem(null,one,dMsg(one.date,'נוסף ל-'+dm(one.date)))&&await saveItem(prev.id,series,dMsg(one.date,'הועבר ל-'+dm(one.date),' · הסדרה נשארה'));
   }else{
-    const doc=toDoc({...d,skip:prev&&isRec(prev)?prev.skip:undefined,mid:prev&&prev.mid},editSun);
+    const doc=toDoc({...d,skip:prev&&isRec(prev)?prev.skip:undefined,from:prev&&isRec(prev)?prev.from||REC0:undefined,mid:prev&&prev.mid},editSun);
     const m=editing?'עודכן':doc.kind==='task'?'נוספה משימה':doc.date?'נוסף ל-'+dm(doc.date):'נוסף ל'+WKN[doc.week];
     ok=await saveItem(editing,doc,doc.date?dMsg(doc.date,m):m);
   }
@@ -1814,7 +1860,7 @@ $('#fSkip').addEventListener('click',async()=>{
 
 /* ---------- paste deadlines from the Moodle calendar ---------- */
 let pRows=[]; // parsed rows: {date,title,dup,course,on}
-const pOk=r=>r.date>=SEM.start&&r.date<=SEM.last;
+const pOk=r=>r.date>=ERA.start&&r.date<=ERA.last;
 function pBtn(){const n=pRows.filter(r=>r.on).length;$('#pAdd').disabled=!n;$('#pAdd').textContent=n?n===1?'הוספת מטלה אחת':'הוספת '+n+' מטלות':'הוספה'}
 function pRender(){
   $('#pList').innerHTML=pRows.map((r,i)=>{const off=r.dup||!pOk(r);
@@ -1843,7 +1889,7 @@ $('#pFrm').addEventListener('submit',async x=>{
   x.preventDefault();const L=pRows.filter(r=>r.on);if(!L.length)return;
   $('#pAdd').disabled=true;let n=0;
   for(const r of L){ // one after another: each save refreshes the list
-    if(!await saveItem(null,toDoc({kind:'due',title:r.title,note:'',updated:Date.now(),date:r.date,start:'23:59',course:r.course,status:'todo'},SEM.start),'נוספה מטלה'))break;
+    if(!await saveItem(null,toDoc({kind:'due',title:r.title,note:'',updated:Date.now(),date:r.date,start:'23:59',course:r.course,status:'todo'},sunOf(r.date)),'נוספה מטלה'))break;
     n++;
   }
   toast(n===L.length?n===1?'נוספה מטלה אחת':'נוספו '+n+' מטלות':'נוספו '+n+' מתוך '+L.length+' מטלות');
@@ -1860,8 +1906,10 @@ async function offer(filename,data){
   if(dl){try{await dl.save({filename,data});toast('הקובץ ירד')}catch(e){const c=e&&e.code;if(c!=='declined')toast(c==='rate_limited'?'כבר פתוח חלון הורדה':'ההורדה לא זמינה כאן')}return}
   try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data]));a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}catch(e){toast('ההורדה לא זמינה כאן')}
 }
-$('#expCsv').addEventListener('click',()=>{offer('weekplan-semA.csv',buildCsv(items))});
-$('#expIcs').addEventListener('click',()=>{offer('weekplan-semA.zip',zip1('weekplan-semA.ics',buildIcs(items,new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z')))});
+$('#expTerm').innerHTML=TERMS.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');$('#expTerm').value=(TERMS.find(t=>todayIso()<=t.last)||TERMS[TERMS.length-1]).id; // the current semester, or the next one
+const expT=()=>TERMS.find(t=>t.id===$('#expTerm').value)||TERMS[0];
+$('#expCsv').addEventListener('click',()=>{const T=expT();offer('weekplan-sem'+T.id+'.csv',buildCsv(items,T))});
+$('#expIcs').addEventListener('click',()=>{const T=expT();offer('weekplan-sem'+T.id+'.zip',zip1('weekplan-sem'+T.id+'.ics',buildIcs(items,new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z',T)))});
 
 /* ---------- print the shown week or month ---------- */
 const PRINT_H=700; // usable A4-landscape height in CSS px, minus slack for a wrapped legend

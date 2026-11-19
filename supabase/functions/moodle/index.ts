@@ -1,6 +1,8 @@
 // WeekPlan Edge Function "moodle" (2026-11-18): returns the signed-in user's Moodle calendar (ICS).
 // The page cannot read mama.mta.ac.il itself (no CORS), so this reads it on the server side.
 // It reads the link with the caller's own JWT (RLS: only their row), fetches only the college's calendar export, stores nothing and logs nothing.
+// Deploy with "Verify JWT with legacy secret" OFF: the Google sign-in tokens are not legacy-signed, the gateway would answer 401 and the page treats a 401 as an ended session.
+// Auth is still enforced: PostgREST checks the JWT and RLS returns no row to anyone else, so a call without a valid session gets 404 and fetches nothing.
 const OK = /^https:\/\/mama\.mta\.ac\.il\/calendar\/export_execute\.php\?[^\s]*$/;
 const CORS = {
   'Access-Control-Allow-Origin': '*',
