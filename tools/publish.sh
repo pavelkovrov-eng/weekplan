@@ -4,6 +4,9 @@
 # GitHub noreply address, and pushes it as origin/main. Local main keeps its full history untouched.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# test gate: nothing is published while a test fails
+node --test test.mjs >/dev/null 2>&1 || { echo "הבדיקות של node נכשלו (node --test test.mjs). לא פורסם." >&2; exit 1; }
+python3 -m unittest -q test_server.py >/dev/null 2>&1 || { echo "הבדיקות של השרת נכשלו (python3 -m unittest -q test_server.py). לא פורסם." >&2; exit 1; }
 NAME=pavelkovrov-eng
 MAIL=269754249+pavelkovrov-eng@users.noreply.github.com
 TREE=$(git rev-parse main^{tree})

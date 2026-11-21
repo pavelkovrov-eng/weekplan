@@ -719,3 +719,13 @@ test('stage 1 fixes (2026-11-21): weekly from is a week, export windows, exams b
   const an=core.analyze(core.evsForWeek('2026-11-15',[{id:'c',kind:'open',date:'2026-11-16',start:'10:00',end:'11:00'}]));
   assert.ok(an.bad[0].includes(core.ltr('10:00–11:00')));
 });
+
+test('restorePlan: backup file (#setBackup / store format) against the app items',()=>{
+  const items=[{id:'a',kind:'open',day:1,start:'08:00'},{id:'b',kind:'due',title:'x',date:'2026-11-01'},{id:'z',kind:'study'}];
+  const file={v:1,items:{a:{kind:'open',start:'08:00',day:1},b:{kind:'due',title:'y',date:'2026-11-01'},c:{id:'zzz',kind:'task',title:'t'},d:{kind:'nope'},e:'x'}};
+  const p=core.restorePlan(JSON.parse(JSON.stringify(file)),items);
+  assert.equal(p.ok,true);assert.deepEqual([p.add,p.replace,p.same,p.bad],[1,1,1,2]);
+  assert.deepEqual(p.ops,[{id:'b',doc:{kind:'due',title:'y',date:'2026-11-01'}},{id:'c',doc:{kind:'task',title:'t'}}]); // id field stripped, z (only in app) untouched
+  const own=core.restorePlan(core.itemsToStore(items),items);assert.deepEqual([own.add,own.replace,own.same,own.ops.length],[0,0,3,0]);
+  for(const bad of [null,undefined,'x',[],{},{v:2,items:{}},{items:{}}]){const r=core.restorePlan(bad,items);assert.equal(r.ok,false);assert.deepEqual(r.ops,[])}
+});

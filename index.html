@@ -267,7 +267,7 @@ html:not(.ph) #setDlg{width:min(620px,calc(100% - 32px))} /* on a phone it is th
 .store{padding:0;width:42px;height:42px;justify-content:center;border-radius:50%;font-size:18px;line-height:1}
 .store i{display:none}
 .store[hidden]{display:none}.who .btn.ib{color:var(--text-main)}.who .btn.ib svg{width:22px;height:22px;transition:transform .4s var(--ez-spring)}.who .btn.ib:active svg{transform:scale(.85);transition-duration:.1s}.who svg.flip{transform:scaleX(-1)}.who .btn.ib:active svg.flip{transform:scaleX(-.85) scaleY(.85)} /* the header's line icons: the tab bar's style; the exit arrow points out to the left (RTL) */
-#outDlg::backdrop{background:rgb(0 0 0/.5)}
+#outDlg::backdrop,#rsDlg::backdrop{background:rgb(0 0 0/.5)}
 .btn.ib,.ph .btn.ib{width:42px;height:42px;min-height:42px;padding:0;border-radius:50%;font-size:18px;line-height:1;display:inline-grid;place-items:center}
 .btn.out.armed{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad-tx)}
 .welcome{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:var(--bg-app)}
@@ -826,6 +826,16 @@ dialog{border-radius:24px}.btn{border-radius:14px}.upgo{border-radius:16px}.dstr
     </div>
   </div>
 </dialog>
+<dialog id="rsDlg" tabindex="-1" aria-labelledby="rsT">
+  <div class="dlg">
+    <h3 id="rsT">לשחזר מקובץ גיבוי?</h3>
+    <div class="hint" id="rsTxt"></div>
+    <div class="actions">
+      <button type="button" class="btn" id="rsYes">שחזור</button>
+      <button type="button" class="btn" id="rsNo">ביטול</button>
+    </div>
+  </div>
+</dialog>
 <dialog id="setDlg" autofocus aria-labelledby="setTitle">
   <div class="dlg">
     <div class="sethead"><h3 id="setTitle">הגדרות</h3><button type="button" class="btn ib" id="setClose" title="סגירה" aria-label="סגירה">✕</button></div>
@@ -855,7 +865,7 @@ dialog{border-radius:24px}.btn{border-radius:14px}.upgo{border-radius:16px}.dstr
 </details>
     <details class="card setsec" id="setData"><summary><h2>הנתונים שלי</h2><span class="upsum">גיבוי ומחיקה</span></summary>
       <p class="lead">קובץ עם כל המשמרות, ההגשות והפריטים שלך, או מחיקה שלהם.</p>
-      <div class="setrow"><button type="button" class="btn" id="setBackup">ייצוא כל הנתונים (JSON)</button><button type="button" class="btn del" id="setWipe">מחיקת כל הנתונים שלי</button></div>
+      <div class="setrow"><button type="button" class="btn" id="setBackup">ייצוא כל הנתונים (JSON)</button><button type="button" class="btn" id="setRestore">שחזור מקובץ גיבוי</button><input type="file" id="setFile" accept=".json,application/json" hidden><button type="button" class="btn del" id="setWipe">מחיקת כל הנתונים שלי</button></div>
       <p class="lead" id="setWipeNote">מחיקה מסירה את כל הפריטים שלך ומנתקת אותך. כדי למחוק גם את רשומת ההתחברות, פנה דרך עמוד הפרטיות.</p>
     </details>
     <details class="card setsec" id="setAcct"><summary><h2>החשבון והפרטיות</h2><span class="upsum" id="setAcctSum"></span></summary>
@@ -1322,6 +1332,15 @@ const sbMsg=why=>why==='auth'?'ההתחברות פגה או לא תקפה. הת�
   :why==='table'?'הטבלה items לא קיימת ב-Supabase. הרץ את ה-SQL מהמסמך ב-SQL Editor.'
   :why==='grant'?'אין הרשאה לטבלה items. בדוק שהרצת את שורת ה-grant ושה-RLS מוגדר.':'';
 function opNoop(store,op){return JSON.stringify(applyOp(store,op))===JSON.stringify(store)} // store must be normalised ({v:1,items} as itemsToStore makes it)
+function canon(v){return JSON.stringify(v,(k,x)=>x&&typeof x==='object'&&!Array.isArray(x)?Object.fromEntries(Object.entries(x).sort(([a],[b])=>a<b?-1:1)):x)} // key order never makes two docs "different"
+function restorePlan(data,items){ // a backup file ({v:1,items:{id:doc}}, what #setBackup writes) against the app's items -> the ops to write; nothing is ever deleted
+  const r={ok:false,ops:[],add:0,replace:0,same:0,bad:0};if(!storeValid(data))return r;r.ok=true;
+  const have=new Map((items||[]).map(({id,...d})=>[id,canon(d)]));
+  for(const[id,d]of Object.entries(data.items)){
+    if(!id||!d||typeof d!=='object'||Array.isArray(d)||!(Object.hasOwn(KINDS,d.kind)||Object.hasOwn(SPECIAL,d.kind))){r.bad++;continue}
+    const{id:_,...doc}=d,h=have.get(id);
+    if(h===undefined){r.add++;r.ops.push({id,doc})}else if(h!==canon(doc)){r.replace++;r.ops.push({id,doc})}else r.same++}
+  return r}
 </script>
 <script>
 const still=()=>matchMedia('(prefers-reduced-motion:reduce)').matches; // WAAPI animations ignore the CSS reduced-motion rule, so they ask this
@@ -2188,7 +2207,7 @@ $('#mdSave').addEventListener('click',async()=>{const u=$('#mdUrl').value.trim()
   catch(e){mdMsg(e&&e.status?'השמירה לא הצליחה ('+e.status+'). אם זו הפעם הראשונה, צריך להריץ את supabase/moodle_link.sql.':'אין חיבור לאינטרנט.')}finally{$('#mdSave').disabled=false}});
 $('#mdNow').addEventListener('click',()=>mdSync(true));
 $('#mdOff').addEventListener('click',async()=>{try{await sbFetch('/rest/v1/moodle_link?user_id=eq.'+encodeURIComponent(sbSub()),{method:'DELETE',headers:{Prefer:'return=minimal'}});const d=mdDoc();if(d)await sbPutMany([{id:d.id,doc:{...strip(d),on:false,err:''}}]);mdMsg('');toast('המודל נותק · ההגשות שנוספו נשארות')}catch(e){mdMsg('הניתוק לא הצליח. נסה שוב.')}mdCard()});
-function setFill(){mdCard();
+function setFill(){mdCard();$('#setRestore').disabled=!canEdit();
   const pf=profileOf(items),email=(()=>{try{const t=JSON.parse(localStorage.getItem(SB_LS));const p=t&&sbPayload(t.access);return p&&p.email||''}catch(e){return''}})();
   $('#setProfSum').textContent=pf?[TRACKS[trackOf(items)].label,pf.name||'',pf.works===false?'בלי משמרות':'עם משמרות'].filter(Boolean).join(' · '):'מקבץ ב\'';
   $('#setAcctTxt').textContent=email?'מחובר כ-'+email:mode==='sb'?'מחובר':'לא מחובר לחשבון Google';
@@ -2200,13 +2219,25 @@ setDlg.addEventListener('click',x=>{if(x.target===setDlg)setDlg.close()});
 $('#obLink').addEventListener('click',()=>{setDlg.close();openOb(false)});
 for(const id of ['#sbLink','#ghLink'])$(id).addEventListener('click',()=>setDlg.close()); // their own dialogs open on top
 $('#setBackup').addEventListener('click',()=>offer('weekplan-backup-'+todayIso()+'.json',JSON.stringify(itemsToStore(items),null,2)+'\n'));
+
+/* restore from a backup file: restorePlan (core) decides, one confirm, then one batch (sb) or one save at a time */
+const rsDlg=$('#rsDlg');let rsPlan=null;
+function restoreText(txt){let d=null;try{d=JSON.parse(txt)}catch{}const p=restorePlan(d,items);if(!p.ok||!p.ops.length&&!p.same){toast('הקובץ הזה אינו קובץ גיבוי של האפליקציה');return}
+  rsPlan=p;$('#rsTxt').textContent='בקובץ '+(p.add+p.replace+p.same)+' פריטים: '+p.add+' חדשים, '+p.replace+' יוחלפו בגרסה מהקובץ, '+p.same+' זהים'+(p.bad?', '+p.bad+' לא תקינים (ידולגו)':'')+'. פריטים שאינם בקובץ לא ייגעו.';
+  $('#rsYes').disabled=!p.ops.length;setDlg.close();rsDlg.showModal();rsDlg.focus()}
+$('#setRestore').addEventListener('click',()=>{if(canEdit())$('#setFile').click()});
+$('#setFile').addEventListener('change',async x=>{const f=x.target.files[0];x.target.value='';if(f)restoreText(await f.text())});
+$('#rsNo').addEventListener('click',()=>rsDlg.close());rsDlg.addEventListener('click',x=>{if(x.target===rsDlg)rsDlg.close()});
+$('#rsYes').addEventListener('click',async()=>{const p=rsPlan;if(!p||!canEdit())return;rsDlg.close();let ok=true;
+  try{if(mode==='sb')await sbPutMany(p.ops);else for(const o of p.ops)if(!await saveItem(mode==='gh'||items.some(x=>x.id===o.id)?o.id:null,o.doc,' '))throw 0}catch(e){ok=false;toast('השחזור נכשל')} // ' ' = no toast per item; a new id is made where the store cannot take ours (srv, local)
+  if(ok)toast('שוחזרו '+p.ops.length+' פריטים')});
 let wipeArm=0;
 $('#setWipe').addEventListener('click',async()=>{ // two clicks: the first arms it for 4 s
   const b=$('#setWipe');
   if(!wipeArm){wipeArm=Date.now();b.classList.add('armed');b.textContent='לחץ שוב: זה מוחק הכול';shake(b);setTimeout(()=>{wipeArm=0;b.classList.remove('armed');b.textContent='מחיקת כל הנתונים שלי'},4000);return}
   wipeArm=0;b.disabled=true;
   try{
-    if(mode==='sb'){await sbFetch('/rest/v1/items?id=not.is.null',{method:'DELETE',headers:{Prefer:'return=minimal'}});try{await sbFetch('/rest/v1/moodle_link?user_id=eq.'+encodeURIComponent(sbSub()),{method:'DELETE',headers:{Prefer:'return=minimal'}})}catch(e){}await sbSignOut();return} // the Moodle link (its key) goes too
+    if(mode==='sb'){await sbFetch('/rest/v1/items?id=not.is.null',{method:'DELETE',headers:{Prefer:'return=minimal'}});for(const t of ['moodle_link','items_log'])try{await sbFetch('/rest/v1/'+t+'?user_id=eq.'+encodeURIComponent(sbSub()),{method:'DELETE',headers:{Prefer:'return=minimal'}})}catch(e){}await sbSignOut();return} // the Moodle link (its key) and the change log go too (after the items: their deletion is logged first)
     for(const it of [...items])if(!await removeItem(it.id,' '))break;
     toast('הנתונים נמחקו');setDlg.close();
   }catch(e){toast('המחיקה לא הצליחה. נסה שוב.');b.disabled=false;b.classList.remove('armed');b.textContent='מחיקת כל הנתונים שלי'}
