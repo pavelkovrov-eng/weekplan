@@ -548,7 +548,9 @@ dialog{border-radius:24px}.btn{border-radius:14px}.dstrip button{border-radius:1
 .ph #dayHead h2{font-size:32px;line-height:1.15;color:inherit}.ph #dayHead small{color:inherit;opacity:.75;font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* one line: a long holiday label never makes the header taller */
 .ph #dstrip{position:relative;margin:-50px 10px 14px;gap:6px}
 .ph #dstrip button{background:var(--bg-card);border:0;box-shadow:0 8px 18px -12px rgba(0,0,0,.4)}
-.ph #dstrip button[aria-pressed=true]{background:var(--ink);transform:translateY(-4px);box-shadow:0 0 0 3px var(--bg-app),0 10px 20px -10px rgba(0,0,0,.5)}
+.ph #dstrip button[aria-pressed=true]{background:none;transform:translateY(-4px);box-shadow:none} /* its dark chip is #dPill, which glides to the picked day */
+.ph #dPill{position:absolute;background:var(--ink);border-radius:16px;transform:translateY(-4px);box-shadow:0 0 0 3px var(--bg-app),0 10px 20px -10px rgba(0,0,0,.5);pointer-events:none}.ph #dstrip :is(small,b){position:relative} /* the pill paints over the other chips' cards, under every chip's text */
+.ph body{overflow-x:clip}.ph #dayCard{touch-action:pan-y} /* a day dragged aside never makes the page scroll sideways; a horizontal drag is the script's */
 .ph #dstrip b{font:700 20px var(--font-serif)}
 .dplan{background:var(--bg-card);border-radius:24px;padding:16px 18px;margin-bottom:6px;box-shadow:0 12px 30px -20px rgba(20,32,24,.35),0 1px 2px var(--shadow)}
 .dplan h3{margin:0;font:700 21px var(--font-serif);color:var(--ink)}.dplan small{color:var(--text-muted);font-size:13px}
@@ -1317,8 +1319,18 @@ function go(sun){viewSun=clampSun(sun);render();if(document.activeElement?.match
 function goMonth(ym){viewYm=clampYm(ym);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goDay(d){viewDay=clampDay(d);viewSun=sunOf(viewDay);viewYm=clampYm(ymOf(viewDay));render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()} // the three stay in step, so week and month tabs open on the picked day
 const emptyDay=(date,edit)=>{const off=!!(offDoc(date,items)||CAL[date]&&CAL[date].off);return`<li class="none"><span class="em" aria-hidden="true">${off?'🎉':dow(date)===6?'😴':'🌤️'}</span><b>${off?'לימודים בוטלו':'יום פנוי'}</b>${edit?'<button type="button" class="btn" data-add>הוספה ליום הזה</button>':''}</li>`}; // an empty day, with the add button in it
-const slide=d=>{if(still()||!d||!PHQ.matches)return;for(const e of view==='day'?[...$('#dayHead').children,$('#dayPlan'),$('#dayList')]:view==='month'?[$('#month')]:view==='week'?[$('#grid')]:[])e.animate([{opacity:0,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:220,easing:EZ.snap})}; // the new day enters from the side the finger came from
-const step=n=>view==='month'?goMonth(addMonths(viewYm,n)):view==='day'?goDay(addDays(viewDay,n)):go(addDays(viewSun,7*n));
+const slide=d=>{if(still()||!d||!PHQ.matches)return;for(const e of view==='month'?[$('#month')]:view==='week'?[$('#grid')]:[])e.animate([{opacity:0,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:220,easing:EZ.snap})}; // the new day enters from the side the finger came from
+const step=n=>view==='month'?goMonth(addMonths(viewYm,n)):view==='day'?dayTo(addDays(viewDay,n)):go(addDays(viewSun,7*n));
+/* phone day view paging: the old day leaves to one side, the new one comes in from the other (like iOS Calendar); a drag (below) moves it with the finger first */
+let dPillA=0,dPg=null,dT=0; // dPillA: the strip's chip glides on the next renderDay; dPg: a page change under way {t,an}; dT: when a horizontal drag ended (its click is not a tap)
+const dayEls=wk=>[...$('#dayHead').children,$('#dayPlan'),$('#dayList'),...(wk?$('#dstrip').children:[])]; // what moves; the strip too when the week changes
+function dayTo(t,x=0){t=clampDay(t);if(dPg){dPg.an.forEach(a=>a.cancel());const o=dPg.t;dPg=null;if(o!==viewDay)goDay(o)} // a second change cuts the first short
+  const d=t>viewDay?1:t<viewDay?-1:0,wk=sunOf(t)!==viewSun,f=$('#dstrip').contains(document.activeElement),fo=()=>f&&$('#dstrip [aria-pressed=true]')?.focus({preventScroll:true});
+  if(!d||still()||!PHQ.matches||view!=='day'){dPillA=1;goDay(t);fo();return}
+  const W=$('#dayCard').clientWidth||innerWidth,op=v=>1-Math.min(1,Math.abs(v)/W)*.6;
+  const an=dayEls(wk).map(e=>{e.style.transform=e.style.opacity='';return e.animate([{transform:`translateX(${x}px)`,opacity:op(x)},{transform:`translateX(${d*W*.45}px)`,opacity:0}],{duration:Math.max(90,170*(1-Math.abs(x)/(W*.45))),easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'})}); // out, to the side the finger went
+  dPg={t,an};Promise.all(an.map(a=>a.finished)).then(()=>{if(!dPg||dPg.an!==an)return;dPg=null;dPillA=!wk;goDay(t);an.forEach(a=>a.cancel());fo();
+    for(const e of dayEls(wk))e.animate([{transform:`translateX(${-d*W*.2}px)`,opacity:0},{transform:'none',opacity:1}],{duration:400,easing:EZ.spring})},()=>{})} // in, from the other side, with a small spring
 function setView(v,date){ // v: day|week|month|up (day and up only on a phone); date: open the day view on that date
   if(v===view&&date==null)return;
   if(v==='month'){viewYm=clampYm(ymOf(view==='day'?viewDay:viewSun));monthSel=''} // monthSel='' : the month opens on the day that was picked
@@ -1512,6 +1524,7 @@ function renderDay(evs,an){ // phone day view: the week strip, the day's notes, 
   const dn=L.filter(l=>l.src==='due'?l.st==='done':l.date<today||l.date===today&&l.e<=nm).length,pc=L.length?Math.round(dn*100/L.length):0,dp=$('#dayPlan');
   dp.hidden=!PHQ.matches;dp.innerHTML=`<h3>${date===today?'התוכנית להיום':'התוכנית ליום הזה'}</h3><small>${L.length?dn+' מתוך '+L.length+' הושלמו':'אין שיעורים או פריטים'}</small><div class="bar"${L.length?'':' style="visibility:hidden"'}><i style="--p:${pc}%"></i><b>${pc}%</b></div>`; // always shown (an empty day keeps the card, its bar only hidden), so the page never jumps between days // what is over (or submitted) out of the day's lines
   $('#dayList').innerHTML=dayL.length?dayL.map(l=>dayLi(l,an.clash,edit,today)).join(''):emptyDay(date,edit);
+  if(!dPillA)dPill.reset();dPill(dPillA);dPillA=0; // the chip glides only on a change of day inside the week (dayTo); else it is just placed
 }
 function dayLi(l,clash,edit,today){ // one line of a day as the home's row: a circle on the timeline (a deadline's circle is its check), the name over a grey line, the time in a soft box (day view, month day list, agenda)
   const now=l.date===today?nowMin():-1,cur=now>=0&&l.src!=='due'&&!l.cancelled&&l.s<=now&&now<l.e,past=l.src!=='due'&&!l.cancelled&&(now>=0&&l.e<=now||l.date<today); // today's row: muted with a soft ✓ when over, ringed while on
@@ -1680,6 +1693,7 @@ const mkPill=(id,box,pick,r)=>{let el=null,cur=null;const f=anim=>{ // same moti
 const kindPill0=mkPill('kindPill',$('#kindChips'),()=>$('#kindChips').querySelector('label:has(input:checked)'));
 const kindPill=anim=>{const kc={open:'open',close:'close',study:'study',due:'bad',task:'other',other:'other'}[getKind()];if(kc)frm.style.setProperty('--kc',`var(--${kc}-bd)`);kindPill0(anim)}; // the pills are beige; only the dot in the title carries the kind's colour
 const prePill=mkPill('prePill',$('#fPre'),()=>$('#fPre').querySelector('button.on'));
+const dPill=mkPill('dPill',$('#dstrip'),()=>$('#dstrip [aria-pressed=true]')); // the day strip's dark chip
 function setKind(k){const r=$('#fk_'+k);if(r)r.checked=true;if(!worksOn()&&!(KINDS[k]&&KINDS[k].shift))$('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=true);else $('#kindChips').querySelectorAll('[data-shift="1"]').forEach(l=>l.hidden=false);kindPill(0)} // a student who works no shifts does not see the shift types (an existing shift keeps its own)
 function setWeek(w){$('#fRec').checked=w==='A'||w==='B'||w==='both'} // A/B docs of the retired rotation open as weekly
 const COURSE_OPTS=[...new Set(Object.values(COURSE))].map(c=>`<option value="${esc(c)}">${esc(CSHORT[c]||c)}</option>`).join(''); // one option per course colour id (a follow-up course shares its id)
@@ -2295,13 +2309,13 @@ async function removeItem(id,msg){flipArm=Date.now();
 }
 
 $('#prev').addEventListener('click',()=>{step(-1);slide(-1)});$('#next').addEventListener('click',()=>{step(1);slide(1)});
-$('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?goDay(todayIso()):go(sunOf(todayIso())));
+$('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?dayTo(todayIso()):go(sunOf(todayIso())));
 $('#tabAdd').addEventListener('click',()=>$('#addBtn').click()); // same per-view logic as the desktop add button
 $('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(!b)return;const o=view;setView(b.dataset.v);scrollTo(0,0);if(view!==o&&!still())b.querySelector('svg').animate([{transform:'scale(1)'},{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:380,delay:330,easing:EZ.spring})}); // an instant cut; only the tab bar moves: the pill travels, then the icon pops
 addEventListener('resize',()=>tabPill(0));
 $('#grid').addEventListener('click',x=>{const b=x.target.closest('[data-more]');if(!b)return;x.stopPropagation();const d=b.dataset.more;dueMore.has(d)?dueMore.delete(d):dueMore.add(d);render()});
-$('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b){const o=viewDay;goDay(b.dataset.day);slide(b.dataset.day>o?1:b.dataset.day<o?-1:0);$('#dstrip [aria-pressed=true]').focus({preventScroll:true})}}); // the strip is redrawn: keep the focus on the picked day
-$('#dayList').addEventListener('click',x=>{if(x.target.closest('[data-add]')){openAdd({day:dow(viewDay)});return} // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
+$('#dstrip').addEventListener('click',x=>{const b=x.target.closest('[data-day]');if(b&&Date.now()-dT>400){b.focus({preventScroll:true});dayTo(b.dataset.day)}}); // dayTo keeps the focus on the picked day (the strip is redrawn)
+$('#dayList').addEventListener('click',x=>{if(Date.now()-dT<400)return;if(x.target.closest('[data-add]')){openAdd({day:dow(viewDay)});return} // a class asks to cancel, an own item or a deadline opens the editor; exams do nothing
   const b=x.target.closest('[data-key]'),l=b&&dayL.find(e=>e.key===b.dataset.key);if(!l)return;
   if(l.src==='base')openCancel(l);else openEdit(l.id);
 });
@@ -2446,9 +2460,19 @@ addEventListener('touchstart',x=>{const a=PHQ.matches&&x.touches.length===1&&!dr
 addEventListener('touchend',x=>{const w=sw1;sw1=null;if(!w||(w.a==='m'&&view!=='month')||(w.a==='w'&&view!=='week'))return;const t=x.changedTouches[0],d=swipeDir(t.clientX-w.x,t.clientY-w.y);
   if(!d||(w.sc&&Math.abs(scL(w.sc)-w.l)>3)||document.querySelector('dialog[open]'))return; // the grid moved: that was a scroll
   step(d);slide(d)},{passive:true});
-let swipe0=null; // swipe on the day card: a finger moving right is the next day (RTL, see swipeDir)
-$('#dayCard').addEventListener('touchstart',x=>{swipe0=x.touches.length===1?[x.touches[0].clientX,x.touches[0].clientY]:null},{passive:true});
-$('#dayCard').addEventListener('touchend',x=>{if(!swipe0)return;const t=x.changedTouches[0],d=swipeDir(t.clientX-swipe0[0],t.clientY-swipe0[1]);swipe0=null;if(d){step(d);slide(d)}},{passive:true});
+/* drag the day aside (a phone): it follows the finger, past a quarter of the width or with a flick the next day pages in (dayTo), else it springs back; a finger moving right is the next day (RTL, see swipeDir); mostly vertical after 8px = the page scrolls */
+let dd=null; // {x0,y0,W,els,ax:'x'|'y'|null,x,v,lx,lt}
+const ddX=dx=>{const n=addDays(viewDay,dx>0?1:-1);return clampDay(n)===n?dx:dx/(1+Math.abs(dx)/dd.W*3)*.5}; // rubber band at the ends of ERA
+$('#dayCard').addEventListener('touchstart',x=>{const t=x.touches[0];dd=x.touches.length===1&&PHQ.matches&&view==='day'&&!still()?{x0:t.clientX,y0:t.clientY,W:$('#dayCard').clientWidth,els:null,ax:null,x:0,v:0,lx:t.clientX,lt:x.timeStamp}:null},{passive:true});
+$('#dayCard').addEventListener('touchmove',x=>{if(!dd||dd.ax==='y')return;const t=x.touches[0],dx=t.clientX-dd.x0,dy=t.clientY-dd.y0;
+  if(!dd.ax){if(Math.abs(dx)<8&&Math.abs(dy)<8){if(Math.abs(dx)>Math.abs(dy))x.preventDefault();return}dd.ax=Math.abs(dx)>Math.abs(dy)?'x':'y';if(dd.ax==='y'){dd=null;return}
+    if(dPg){dayTo(dPg.t);dd=null;return}dd.els=dayEls(false)} // a drag during a page change only finishes that change
+  x.preventDefault();if(x.timeStamp>dd.lt)dd.v=.6*(t.clientX-dd.lx)/(x.timeStamp-dd.lt)+.4*dd.v;dd.lx=t.clientX;dd.lt=x.timeStamp;
+  const v=dd.x=ddX(dx),o=String(1-Math.min(1,Math.abs(v)/dd.W)*.6);for(const e of dd.els){e.style.transform=`translateX(${v}px)`;e.style.opacity=o}},{passive:false});
+const ddEnd=x=>{const g=dd;dd=null;if(!g||g.ax!=='x')return;dT=Date.now();const d=g.x>0?1:-1,n=addDays(viewDay,d),fresh=x&&x.timeStamp-g.lt<120;
+  if(clampDay(n)===n&&(Math.abs(g.x)>g.W*.25||fresh&&g.v*d>.45)){dayTo(n,g.x);return}
+  for(const e of g.els){e.style.transform=e.style.opacity='';e.animate([{transform:`translateX(${g.x}px)`,opacity:1-Math.min(1,Math.abs(g.x)/g.W)*.6},{transform:'none',opacity:1}],{duration:420,easing:EZ.spring})}}; // back to its place
+$('#dayCard').addEventListener('touchend',ddEnd,{passive:true});$('#dayCard').addEventListener('touchcancel',()=>ddEnd(),{passive:true});
 PHQ.addEventListener('change',()=>{if(!PHQ.matches&&(view==='day'||view==='up'))view='week';render()}); // e.g. an iPhone turned sideways is wider than 600px: desktop layout
 $('#vWeek').addEventListener('click',()=>setView('week'));$('#vMonth').addEventListener('click',()=>setView('month'));
 $('#mLegend').innerHTML=$('#gridCard .legend').innerHTML;
