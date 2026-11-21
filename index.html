@@ -545,7 +545,7 @@ dialog{border-radius:24px}.btn{border-radius:14px}.dstrip button{border-radius:1
 .ph .ups{background:var(--bg-card);border-radius:24px;padding:16px 16px 12px;margin-top:14px;box-shadow:0 12px 30px -20px rgba(20,32,24,.35),0 1px 2px var(--shadow)}
 .ph .htop+.ups{margin-top:16px}
 .ph #dayHead{background:var(--accent-fill);color:var(--accent-ink);border-radius:28px;padding:20px 22px 62px;display:grid;gap:2px}
-.ph #dayHead h2{font-size:32px;line-height:1.15;color:inherit}.ph #dayHead small{color:inherit;opacity:.75;font-weight:500;font-size:14px}
+.ph #dayHead h2{font-size:32px;line-height:1.15;color:inherit}.ph #dayHead small{color:inherit;opacity:.75;font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* one line: a long holiday label never makes the header taller */
 .ph #dstrip{position:relative;margin:-50px 10px 14px;gap:6px}
 .ph #dstrip button{background:var(--bg-card);border:0;box-shadow:0 8px 18px -12px rgba(0,0,0,.4)}
 .ph #dstrip button[aria-pressed=true]{background:var(--ink);transform:translateY(-4px);box-shadow:0 0 0 3px var(--bg-app),0 10px 20px -10px rgba(0,0,0,.5)}
@@ -1317,7 +1317,7 @@ function go(sun){viewSun=clampSun(sun);render();if(document.activeElement?.match
 function goMonth(ym){viewYm=clampYm(ym);render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()}
 function goDay(d){viewDay=clampDay(d);viewSun=sunOf(viewDay);viewYm=clampYm(ymOf(viewDay));render();if(document.activeElement?.matches('button:disabled'))$('#todayBtn').focus()} // the three stay in step, so week and month tabs open on the picked day
 const emptyDay=(date,edit)=>{const off=!!(offDoc(date,items)||CAL[date]&&CAL[date].off);return`<li class="none"><span class="em" aria-hidden="true">${off?'🎉':dow(date)===6?'😴':'🌤️'}</span><b>${off?'לימודים בוטלו':'יום פנוי'}</b>${edit?'<button type="button" class="btn" data-add>הוספה ליום הזה</button>':''}</li>`}; // an empty day, with the add button in it
-const slide=d=>{if(still()||!d||!PHQ.matches)return;for(const e of view==='day'?[$('#dayHead'),$('#dayList')]:view==='month'?[$('#month')]:view==='week'?[$('#grid')]:[])e.animate([{opacity:0,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:220,easing:EZ.snap})}; // the new day enters from the side the finger came from
+const slide=d=>{if(still()||!d||!PHQ.matches)return;for(const e of view==='day'?[...$('#dayHead').children,$('#dayPlan'),$('#dayList')]:view==='month'?[$('#month')]:view==='week'?[$('#grid')]:[])e.animate([{opacity:0,transform:`translateX(${-d*28}px)`},{opacity:1,transform:'none'}],{duration:220,easing:EZ.snap})}; // the new day enters from the side the finger came from
 const step=n=>view==='month'?goMonth(addMonths(viewYm,n)):view==='day'?goDay(addDays(viewDay,n)):go(addDays(viewSun,7*n));
 function setView(v,date){ // v: day|week|month|up (day and up only on a phone); date: open the day view on that date
   if(v===view&&date==null)return;
@@ -1508,9 +1508,9 @@ function renderDay(evs,an){ // phone day view: the week strip, the day's notes, 
   const L=dayL.filter(l=>!l.cancelled),nm=nowMin(),cnt=(n,one,many)=>n?n===1?one:n+' '+many:'';
   const sh=L.filter(l=>l.src==='user'&&KINDS[l.kind]&&KINDS[l.kind].shift).length,own=L.filter(l=>l.src==='user').length-sh;
   const what=[cnt(L.filter(l=>l.src==='base').length,'שיעור אחד','שיעורים'),cnt(L.filter(l=>l.src==='exam').length,'מבחן','מבחנים'),cnt(sh,'משמרת','משמרות'),cnt(L.filter(l=>l.src==='due').length,'הגשה','הגשות'),cnt(own,'עוד פריט','פריטים נוספים')].filter(Boolean).join(' · ');
-  $('#dayHead').innerHTML=`<h2>יום ${DAYS[dow(date)]}</h2><small>${dmy(date)}${what?' · '+what:''}</small>`+(c?`<small>${esc(c.label)}</small>`:'')+(off?'<small>לימודים בוטלו</small>':''); // the dark header: when, the day, what is in it
+  $('#dayHead').innerHTML=`<h2>יום ${DAYS[dow(date)]}</h2><small>${[dmy(date),c&&esc(c.label),off&&'לימודים בוטלו',what].filter(Boolean).join(' · ')}</small>`; // the dark header: always two lines (a holiday or a note joins the date line), so changing the day never changes its height
   const dn=L.filter(l=>l.src==='due'?l.st==='done':l.date<today||l.date===today&&l.e<=nm).length,pc=L.length?Math.round(dn*100/L.length):0,dp=$('#dayPlan');
-  dp.hidden=!L.length||!PHQ.matches;dp.innerHTML=`<h3>${date===today?'התוכנית להיום':'התוכנית ליום הזה'}</h3><small>${dn} מתוך ${L.length} הושלמו</small><div class="bar"><i style="--p:${pc}%"></i><b>${pc}%</b></div>`; // what is over (or submitted) out of the day's lines
+  dp.hidden=!PHQ.matches;dp.innerHTML=`<h3>${date===today?'התוכנית להיום':'התוכנית ליום הזה'}</h3><small>${L.length?dn+' מתוך '+L.length+' הושלמו':'אין שיעורים או פריטים'}</small><div class="bar"${L.length?'':' style="visibility:hidden"'}><i style="--p:${pc}%"></i><b>${pc}%</b></div>`; // always shown (an empty day keeps the card, its bar only hidden), so the page never jumps between days // what is over (or submitted) out of the day's lines
   $('#dayList').innerHTML=dayL.length?dayL.map(l=>dayLi(l,an.clash,edit,today)).join(''):emptyDay(date,edit);
 }
 function dayLi(l,clash,edit,today){ // one line of a day as the home's row: a circle on the timeline (a deadline's circle is its check), the name over a grey line, the time in a soft box (day view, month day list, agenda)
