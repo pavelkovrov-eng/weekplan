@@ -148,7 +148,7 @@ h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;line-height:1.12;margin:0 0 
 .blk .tm{direction:ltr;unicode-bidi:isolate;text-align:right;font-family:var(--font-mono);font-size:10.5px;opacity:.85;margin-top:2px}
 .blk .rm{font-size:10.5px;opacity:.8;margin-top:1px}
 .blk.tight .rm{display:none}
-.c-stat{--cc:var(--c-stat)} .c-math{--cc:var(--c-math)} .c-acc{--cc:var(--c-acc)} .c-micro{--cc:var(--c-micro)} .c-data{--cc:var(--c-data)} .c-ob{--cc:var(--c-ob)} .c-eng{--cc:var(--c-eng)} .c-infer{--cc:var(--c-infer)} .c-price{--cc:var(--c-price)} .c-org{--cc:var(--c-org)} .c-py{--cc:var(--c-py)} .c-macro{--cc:var(--c-macro)}
+.c-stat{--cc:var(--c-stat)} .c-math{--cc:var(--c-math)} .c-acc{--cc:var(--c-acc)} .c-micro{--cc:var(--c-micro)} .c-data{--cc:var(--c-data)} .c-ob{--cc:var(--c-ob)} .lgcs{display:contents} .c-eng{--cc:var(--c-eng)} .c-infer{--cc:var(--c-infer)} .c-price{--cc:var(--c-price)} .c-org{--cc:var(--c-org)} .c-py{--cc:var(--c-py)} .c-macro{--cc:var(--c-macro)}
 .blk.base{cursor:default;background:color-mix(in srgb,var(--cc) 8%,var(--bg-card));border-color:color-mix(in srgb,var(--cc) 16%,var(--bg-card));border-left-color:var(--cc);color:color-mix(in srgb,var(--cc) 35%,var(--ink))} /* quiet: the timetable is a soft tint with a course-colour edge, the user's own blocks and the exams stand out */
 .blk.base .nm{color:var(--ink)}
 .blk.k-tut{background:color-mix(in srgb,var(--cc) 6%,var(--bg-card));border-style:dashed;border-color:color-mix(in srgb,var(--cc) 55%,var(--bg-card));border-left-style:solid}
@@ -671,12 +671,7 @@ dialog{border-radius:24px}.btn{border-radius:14px}.upgo{border-radius:16px}.dstr
   <div class="ghead"><h2 id="gridTitle">השבוע</h2><div class="printbar"><button type="button" class="btn" id="printBtn">הדפסה</button><button type="button" class="edit-link" id="printFile">קובץ להדפסה</button></div></div>
   <details class="mleg" open><summary>מקרא</summary>
   <div class="legend">
-    <span class="c-stat"><i style="background:var(--cc);border-color:var(--cc)"></i>הסתברות</span>
-    <span class="c-math"><i style="background:var(--cc);border-color:var(--cc)"></i>מתמטיקה</span>
-    <span class="c-acc"><i style="background:var(--cc);border-color:var(--cc)"></i>חשבונאות</span>
-    <span class="c-micro"><i style="background:var(--cc);border-color:var(--cc)"></i>מיקרו</span>
-    <span class="c-data"><i style="background:var(--cc);border-color:var(--cc)"></i>ניתוח נתונים ו-AI</span>
-    <span class="c-ob"><i style="background:var(--cc);border-color:var(--cc)"></i>התנהגות ארגונית</span>
+    <span class="lgcs"></span>
     <span class="sep"></span>
     <span class="nu"><i style="background:color-mix(in srgb,var(--cc) 14%,var(--bg-card));border-color:var(--cc)"></i>שיעור</span>
     <span class="nu"><i style="background:color-mix(in srgb,var(--cc) 6%,var(--bg-card));border-color:var(--cc);border-style:dashed"></i>תרגיל</span>
@@ -1017,16 +1012,16 @@ const CAL={
   '2027-06-08':{off:1,label:'טקסי סיום'},'2027-06-09':{off:1,label:'טקסי סיום'},'2027-06-10':{off:1,label:'שבועות'},'2027-06-11':{off:1,label:'שבועות'}
 };
 const termOf=iso=>{const c=CAL[iso];return c&&c.term?TERMS.find(t=>t.id===c.term):TERMS.find(t=>iso>=t.start&&iso<=t.end)||null}; // the semester whose class days hold this date (a make-up day may name its own)
-const termLine=iso=>{const T=TERMS.find(t=>iso>=t.start&&iso<=t.end);if(T)return T.name+' · '+dmy(T.start)+'–'+dmy(T.end);const X=TERMS.find(t=>iso>t.end&&iso<=t.last);return X?'תקופת מבחנים · '+X.name:'חופשה · '+iso.slice(0,4)}; // the header line for the shown date
+const termLine=iso=>{const T=termOf(iso);if(T)return T.name+' · '+ltr(dmy(T.start)+'–'+dmy(T.end));const X=TERMS.find(t=>iso>t.end&&iso<=t.last);return X?'תקופת מבחנים · '+X.name:'חופשה · '+iso.slice(0,4)}; // the header line for the shown date
 const ERA={start:'2020-01-01',last:'2040-12-31'}; // the planner has no semester bounds; only a wide technical window so a broken date never loops for ages
 const REC0='2026-10-18'; // a weekly item without "from" (made before 2026-11-19) starts here
 const EXAMS=[ // mtamn.mta.ac.il exam search, תשפ"ז. Live system: dates can still move.
- {c:'מבוא למיקרו',m:'א',date:'2027-01-22',s:'09:00'},{c:'מבוא למיקרו',m:'ב',date:'2027-02-18',s:'09:00'},
- {c:'הסתברות וסטטיסטיקה',m:'א',date:'2027-01-27',s:'09:00'},{c:'הסתברות וסטטיסטיקה',m:'ב',date:'2027-02-22',s:'09:00'},
- {c:"מתמטיקה א'",m:'א',date:'2027-02-01',s:'09:00'},{c:"מתמטיקה א'",m:'ב',date:'2027-02-26',s:'09:00'},
- {c:'כלי ניתוח נתונים ו-AI',m:'א',date:'2027-02-05',s:'09:00'},{c:'כלי ניתוח נתונים ו-AI',m:'ב',date:'2027-03-01',s:'14:00'},
- {c:"חשבונאות א'",m:'א',date:'2027-02-10',s:'09:00'},{c:"חשבונאות א'",m:'ב',date:'2027-03-05',s:'09:00'},
- {c:'יסודות התנהגות ארגונית',m:'א',date:'2027-02-14',s:'14:00'},{c:'יסודות התנהגות ארגונית',m:'ב',date:'2027-03-08',s:'14:00'},
+ {t:'A',c:'מבוא למיקרו',m:'א',date:'2027-01-22',s:'09:00'},{t:'A',c:'מבוא למיקרו',m:'ב',date:'2027-02-18',s:'09:00'},
+ {t:'A',c:'הסתברות וסטטיסטיקה',m:'א',date:'2027-01-27',s:'09:00'},{t:'A',c:'הסתברות וסטטיסטיקה',m:'ב',date:'2027-02-22',s:'09:00'},
+ {t:'A',c:"מתמטיקה א'",m:'א',date:'2027-02-01',s:'09:00'},{t:'A',c:"מתמטיקה א'",m:'ב',date:'2027-02-26',s:'09:00'},
+ {t:'A',c:'כלי ניתוח נתונים ו-AI',m:'א',date:'2027-02-05',s:'09:00'},{t:'A',c:'כלי ניתוח נתונים ו-AI',m:'ב',date:'2027-03-01',s:'14:00'},
+ {t:'A',c:"חשבונאות א'",m:'א',date:'2027-02-10',s:'09:00'},{t:'A',c:"חשבונאות א'",m:'ב',date:'2027-03-05',s:'09:00'},
+ {t:'A',c:'יסודות התנהגות ארגונית',m:'א',date:'2027-02-14',s:'14:00'},{t:'A',c:'יסודות התנהגות ארגונית',m:'ב',date:'2027-03-08',s:'14:00'},
 ];
 const EXAM_MIN=180; // ponytail: assumed 3h; the listing gives start time only
 const SPECIAL={due:1,task:1,off:1,anchor:1,cancel:1,profile:1,moodle:1};
@@ -1038,7 +1033,7 @@ function onboardDocs(a,now){ // the answers of the opening screens -> {profile, 
   const profile={kind:'profile',track:t,works:a.works!==false,...(name&&{name}),updated:now};
   const ok=e&&Number.isInteger(e.d)&&e.d>=0&&e.d<=6&&okTime(e.s)&&okTime(e.e)&&e.s!==e.e;
   const lv=ok?String(e.level||'').trim().slice(0,30):'';
-  return{profile,items:ok?[{kind:'other',title:'אנגלית'+(lv?' '+lv:''),day:e.d,start:e.s,end:e.e,week:'both',note:'',updated:now,skip:[]}]:[]};
+  return{profile,items:ok?[{kind:'other',title:'אנגלית'+(lv?' '+lv:''),day:e.d,start:e.s,end:e.e,week:'both',note:'',updated:now,skip:[],from:sunOf(new Date(now).toISOString().slice(0,10))}]:[]}; // from: the week the student joined
 }
 const isRec=x=>x.week==='A'||x.week==='B'||x.week==='both'; // recurring every week (A/B are docs of the retired rotation)
 const lastSun=sunOf(ERA.last);
@@ -1079,17 +1074,18 @@ function parseIcs(txt){ // an iCalendar file (the Moodle calendar export) -> [{u
 }
 const MDUE=[/^יש להגיש את\s+['"׳״‘’“”]?(.+?)['"׳״‘’“”]?$/,/^תאריך הגשה\s+(.+)$/,/^(.+?)\s+is due$/i,/^(.+?)\s+closes$/i,/^(.+?)\s+\((?:תאריך הגשה|סגירה|closes)\)$/i]; // the names Moodle gives a deadline (assignment due, quiz close); opening and other events are not deadlines
 const moodleTitle=s=>{for(const r of MDUE){const m=String(s||'').trim().match(r);if(m)return m[1].trim()}return''};
-function moodleMerge(evs,items,today){ // Moodle calendar events -> what to change: add new deadlines, move ones whose date moved (not submitted), tag a deadline added by hand with its uid; seen = every uid ever taken (a deleted one never comes back)
-  const sd=items.find(x=>x.kind==='moodle'),seen=new Set(sd&&Array.isArray(sd.seen)?sd.seen:[]),n0=seen.size,dues=items.filter(x=>x.kind==='due'),nt=t=>String(t||'').trim().toLowerCase(),add=[],move=[],tag=[];
+function moodleMerge(evs,items,today){ // Moodle calendar events -> what to change: add new deadlines, move a not-submitted one when Moodle moved it (mat = the date and time Moodle last gave, so the user's own change is kept), tag a deadline added by hand with its uid; seen = every uid ever taken (a deleted one never comes back)
+  const sd=items.find(x=>x.kind==='moodle'),seen=new Set(sd&&Array.isArray(sd.seen)?sd.seen:[]),n0=seen.size,dues=items.filter(x=>x.kind==='due'),nt=t=>String(t||'').trim().toLowerCase(),add=[],move=[],tag=[],mark=[];
   for(const e of evs){const title=moodleTitle(e.summary);if(!title||!isoOk(e.date)||e.date<today||e.date>ERA.last)continue;
-    const m=dues.find(x=>x.mid===e.uid);
-    if(m){if(dueSt(m)!=='done'&&(m.date!==e.date||m.start!==e.time))move.push({id:m.id,date:e.date,start:e.time});seen.add(e.uid);continue}
+    const m=dues.find(x=>x.mid===e.uid),at=e.date+' '+e.time;
+    if(m){if(m.mat!==at){if(m.mat&&dueSt(m)!=='done')move.push({id:m.id,date:e.date,start:e.time,mat:at});else mark.push({id:m.id,mat:at})}seen.add(e.uid);continue} // no mat yet (synced before 2026-11-21): only remember it, never move
     if(seen.has(e.uid))continue;seen.add(e.uid);
-    const h=dues.find(x=>!x.mid&&x.date===e.date&&nt(x.title)===nt(title));if(h){tag.push({id:h.id,mid:e.uid});continue}
+    const h=dues.find(x=>!x.mid&&x.date===e.date&&nt(x.title)===nt(title));if(h){tag.push({id:h.id,mid:e.uid,mat:at});continue}
     const c=COURSE[e.cat]||guessCourse(e.cat)||guessCourse(title);
-    add.push({kind:'due',title,note:'',date:e.date,start:e.time,done:false,mid:e.uid,...(c&&{course:c})})}
-  return{add,move,tag,seen:seen.size>n0?[...seen]:null};
+    add.push({id:mdId(e.uid),kind:'due',title,note:'',date:e.date,start:e.time,done:false,mid:e.uid,mat:at,...(c&&{course:c})})}
+  return{add,move,tag,mark,seen:seen.size>n0?[...seen]:null};
 }
+const mdId=uid=>'md'+String(uid).replace(/[^\w]/g,'_').slice(0,60); // the id of a synced deadline comes from its Moodle uid, so two devices syncing at once write the same row
 const ltr=t=>'\u2066'+t+'\u2069'; // isolate a range ("10:15–11:45", "15.11–21.11") so Hebrew text around it does not flip it
 const dmy=iso=>dm(iso)+'.'+iso.slice(2,4);
 const YM0=ERA.start.slice(0,7);
@@ -1120,7 +1116,7 @@ function evsForWeek(sun,items,skipId){
     const date=addDays(sun,d),bd=baseDay(date,items);
     const T=bd!=null&&termOf(date);
     if(T)T.tracks[trackOf(items)].forEach((b,i)=>{if(b.d!==bd||b.self||b.every&&(date<b.from||wkDiff(sunOf(b.from),sunOf(date))%b.every))return;const[s,e]=span(b.s,b.e);out.push({src:'base',key:T.k+i,i,d,date,s,e,title:b.t,course:COURSE[b.t],kind:b.k,room:b.r,...(cancelOf(date,i,items)&&{cancelled:true})})});
-    EXAMS.forEach((x,i)=>{if(x.date!==date)return;const s=toMin(x.s);out.push({src:'exam',key:'x'+i,d,date,s,e:s+EXAM_MIN,title:x.c,course:COURSE[x.c],kind:'exam',moed:x.m,room:'מועד '+x.m+"'"})});
+    EXAMS.forEach((x,i)=>{if(x.date!==date)return;const s=toMin(x.s);out.push({src:'exam',key:'x'+i,term:x.t,d,date,s,e:s+EXAM_MIN,title:x.c,course:COURSE[x.c],kind:'exam',moed:x.m,room:'מועד '+x.m+"'"})});
   }
   items.forEach(it=>{
     if(it.id===skipId||SPECIAL[it.kind])return;
@@ -1128,7 +1124,7 @@ function evsForWeek(sun,items,skipId){
     let d,date;
     if(isRec(it)){
       d=Number(it.day);if(!(d>=0&&d<=6))return;date=addDays(sun,d);
-      if(Array.isArray(it.skip)&&it.skip.includes(date)||date<(isoOk(it.from)?it.from:REC0))return; // a weekly item shows from its first week on
+      if(Array.isArray(it.skip)&&it.skip.includes(date)||sun<sunOf(isoOk(it.from)?it.from:REC0))return; // a weekly item shows from the week of its first occurrence on (a week, so moving it to an earlier weekday keeps that week)
     }else if(isoOk(it.date)&&sunOf(it.date)===sun){date=it.date;d=dow(date)}
     else return;
     const[s,e]=span(it.start,it.end),kind=KINDS[it.kind]?it.kind:'other';
@@ -1183,7 +1179,7 @@ function analyze(evs,nextSun=[]){ // nextSun: events of the following Sunday (d:
     if(a.s<b.e&&b.s<a.e){
       clash.add(a.key);clash.add(b.key);
       const u=a.src==='user'?a:b,o=u===a?b:a;
-      bad.push(`חפיפה ב${DAYS[u.d]}: ${u.title} ${tr(u.s,u.e)} ו${o.title}${lbl(o)} ${tr(o.s,o.e)}`);
+      bad.push(`חפיפה ב${DAYS[u.d]}: ${u.title} ${ltr(tr(u.s,u.e))} · ${o.title}${lbl(o)} ${ltr(tr(o.s,o.e))}`);
     }
   }
   evs.filter(e=>e.src==='user').forEach(u=>{
@@ -1224,7 +1220,7 @@ function stats(evs){
 function toDoc(f,sun){
   const b={kind:f.kind,title:f.title,note:f.note,updated:f.updated},date=()=>isoOk(f.date)?f.date:addDays(sun,f.day); // f.date = the picked date; without one, the weekday in the dialog's week
   if(f.kind==='task')return{...b,done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course})}; // no date, no times
-  if(f.kind==='due')return{...b,date:date(),start:okTime(f.start)?f.start:'23:59',done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course}),...(f.mid&&{mid:f.mid})}; // f.status (the dialog's select) wins over f.done; mid = the Moodle uid of a synced deadline
+  if(f.kind==='due')return{...b,date:date(),start:okTime(f.start)?f.start:'23:59',done:STAT[f.status]?f.status==='done':!!f.done,...(courseOk(f.course)&&{course:f.course}),...(f.mid&&{mid:f.mid}),...(f.mat&&{mat:f.mat})}; // f.status (the dialog's select) wins over f.done; mid = the Moodle uid of a synced deadline
   if(f.week==='date')return{...b,date:date(),start:f.start,end:f.end};
   return{...b,day:f.day,start:f.start,end:f.end,week:f.week,skip:f.skip||[],from:isoOk(f.from)?f.from:addDays(sun,f.day)}; // from = the first week it shows (a new series starts in the week it was added)
 }
@@ -1233,8 +1229,9 @@ function detach(prev,f,sun,occ){ // editing one occurrence of a series into a on
 }
 /* ---------- calendar export: whole semester through the last exam ---------- */
 function semEvents(items,T=TERMS[0]){ // one semester, from its first class to its last exam
-  const out=[],inT=d=>d>=T.start&&d<=T.last;
-  for(let sun=sunOf(T.start);sun<=T.last;sun=addDays(sun,7))evsForWeek(sun,items).filter(x=>!x.cancelled&&inT(x.date)&&(x.src!=='base'||termOf(x.date)===T)).forEach(x=>out.push({uid:x.key+'-'+x.date,date:x.date,s:x.s,e:x.e,
+  const nx=TERMS.find(t=>t.start>T.start),hi=nx&&nx.start<=T.last?addDays(nx.start,-1):T.last,inT=d=>d>=T.start&&d<=hi; // own items and deadlines: up to the next semester's start, so two exports never overlap
+  const out=[];
+  for(let sun=sunOf(T.start);sun<=T.last;sun=addDays(sun,7))evsForWeek(sun,items).filter(x=>!x.cancelled&&x.date>=T.start&&x.date<=T.last&&(x.src==='base'?termOf(x.date)===T:x.src==='exam'?x.term===T.id:inT(x.date))).forEach(x=>out.push({uid:x.key+'-'+x.date,date:x.date,s:x.s,e:x.e,
     summary:x.src==='base'?x.title+(BKIND[x.kind]?' · '+BKIND[x.kind]:''):x.src==='exam'?'מבחן: '+x.title+' · '+x.room:x.title,
     location:x.src==='base'?x.room:'',desc:x.note||''}));
   items.filter(x=>x.kind==='due'&&isoOk(x.date)&&inT(x.date)&&!x.done).forEach(x=>{const s=Math.max(30,toMin(okTime(x.start)?x.start:'23:59'));
@@ -1373,14 +1370,19 @@ function setView(v,date){ // v: day|week|month|up (day and up only on a phone); 
 let agAuto=0,legAuto=0,agL={},wkSeen=''; // wkSeen: the week whose grid was last scrolled to the picked day
 let agAuto0; // agL: the phone agenda's lines by date|key, for taps
 function render(){const f=flipPrep();render0();flipRun(f);if(cdlg.open)cDues()} // the lists animate only after the user's own change (flipArm)
+function legendFor(d){ // the course colours of the semester on screen (in its exam period too); none in a break
+  const T=termOf(d)||TERMS.find(t=>d>t.end&&d<=t.last),ids=T?[...new Set(T.tracks[trackOf(items)].filter(b=>!b.self).map(b=>COURSE[b.t]).filter(Boolean))]:[];
+  const h=ids.map(c=>`<span class="c-${c}"><i style="background:var(--cc);border-color:var(--cc)"></i>${esc(CSHORT[c]||c)}</span>`).join('');
+  document.querySelectorAll('.legend .lgcs').forEach(e=>{if(e.innerHTML!==h)e.innerHTML=h});
+}
 function render0(){
   const ph=PHQ.matches; if(ph&&!legAuto){legAuto=1;document.querySelectorAll('.mleg').forEach(m=>m.open=false)} // the long legend starts folded on a phone
   const day=ph&&view==='day', upv=ph&&view==='up', mon=view==='month', wkv=!mon&&!day&&!upv; // phone views: day, week, month, up (what's coming)
   document.documentElement.classList.toggle('ph',ph);if(!wkv)wkSeen='';
-  const rng=dm(viewSun)+'–'+dm(addDays(viewSun,6)), edit=canEdit();
+  const rng=ltr(dm(viewSun)+'–'+dm(addDays(viewSun,6))), edit=canEdit();
   const lbl=mon?MONTHS[Number(viewYm.slice(5))-1]+' '+viewYm.slice(0,4):day?DAYS[dow(viewDay)]+' · '+dm(viewDay):rng;
   if($('#wkLabel').textContent!==lbl)$('#wkLabel').textContent=lbl;
-  $('#prev').disabled=mon?viewYm<=YM0:day?viewDay<=ERA.start:viewSun<=sunOf(ERA.start);$('#next').disabled=mon?viewYm>=YM1:day?viewDay>=ERA.last:viewSun>=lastSun;$('#eyebrow').textContent=termLine(day?viewDay:mon?viewYm+'-15':addDays(viewSun,3));
+  $('#prev').disabled=mon?viewYm<=YM0:day?viewDay<=ERA.start:viewSun<=sunOf(ERA.start);$('#next').disabled=mon?viewYm>=YM1:day?viewDay>=ERA.last:viewSun>=lastSun;const shownD=day?viewDay:mon?viewYm+'-15':addDays(viewSun,3);$('#eyebrow').textContent=termLine(shownD);legendFor(shownD);
   $('#prev').setAttribute('aria-label',mon?'חודש קודם':day?'יום קודם':'שבוע קודם');$('#next').setAttribute('aria-label',mon?'חודש הבא':day?'יום הבא':'שבוע הבא');
   $('#vWeek').setAttribute('aria-pressed',String(!mon));$('#vMonth').setAttribute('aria-pressed',String(mon));
   $('.nav').hidden=upv;
@@ -1396,8 +1398,8 @@ function render0(){
     const evs=evsForWeek(viewSun,items), an=analyze(evs,evsForWeek(addDays(viewSun,7),items).filter(e=>e.d===0));
     if(day)renderDay(evs,an);
     else{
-      $('#gridTitle').textContent='שבוע '+ltr(rng);
-      $('#agLead').textContent=`כל מה שמתוכנן בשבוע ${ltr(rng)}, לפי סדר.`;
+      $('#gridTitle').textContent='שבוע '+rng;
+      $('#agLead').textContent=`כל מה שמתוכנן בשבוע ${rng}, לפי סדר.`;
       renderSum(stats(evs),an); renderAtt(an); renderGrid(evs,an.clash); renderAgenda(evs,an.clash);
       if(ph&&wkSeen!==viewSun){wkSeen=viewSun;gridTo(viewDay>=viewSun&&viewDay<=addDays(viewSun,6)?viewDay:todayIso()>=viewSun&&todayIso()<=addDays(viewSun,6)?todayIso():viewSun)} // only on entering the tab or a new week, never on a data refresh
     }
@@ -1636,7 +1638,7 @@ function renderShifts(){
   $('#shSum').textContent=cm?MONTHS[Number(cm.ym.slice(5))-1]+': '+hrs(cm.min)+' שעות · '+(cm.n===1?'משמרת אחת':cm.n+' משמרות'):''; // this month's line while the card is closed
   $('#shTbl').innerHTML='<thead><tr><th>חודש</th><th>שעות</th><th>משמרות</th></tr></thead><tbody>'
     +S.rows.map(r=>`<tr><td>${MONTHS[Number(r.ym.slice(5))-1]} ${r.ym.slice(0,4)}</td>${r.n?`<td>${hrs(r.min)}</td><td>${r.n}</td>`:'<td class="z">—</td><td class="z">0</td>'}</tr>`).join('')
-    +`</tbody><tfoot><tr><td>סה"כ בסמסטר</td><td>${hrs(S.min)}</td><td>${S.n}</td></tr></tfoot>`;
+    +`</tbody><tfoot><tr><td>סה"כ</td><td>${hrs(S.min)}</td><td>${S.n}</td></tr></tfoot>`;
 }
 let exAll=false,homeEv={}; // exAll: every exam shown; homeEv: the now/next events, for taps
 const inMin=m=>{if(m<60)return m+" דק'";const h=Math.floor(m/60),r=m%60;return(h===1?'שעה':h===2?'שעתיים':h+' שעות')+(r?` ו-${r} דק'`:'')}; // 75 -> שעה ו-15 דק'
@@ -1844,9 +1846,9 @@ frm.addEventListener('submit',async x=>{
   $('#fSave').disabled=true;let ok;
   if(prev&&isRec(prev)&&d.kind!=='task'&&(d.week==='date'||d.kind==='due')){
     const{one,series}=detach(prev,d,editSun,$('#fSkip').dataset.date);
-    ok=await saveItem(null,one,dMsg(one.date,'נוסף ל-'+dm(one.date)))&&await saveItem(prev.id,series,dMsg(one.date,'הועבר ל-'+dm(one.date),' · הסדרה נשארה'));
+    ok=await saveItem(prev.id,series,' ')&&await saveItem(null,one,dMsg(one.date,'הועבר ל-'+dm(one.date),' · הסדרה נשארה')); // the series (with its skip) first: if the one-off then fails, a retry detaches again without a twin
   }else{
-    const doc=toDoc({...d,skip:prev&&isRec(prev)?prev.skip:undefined,from:prev&&isRec(prev)?prev.from||REC0:undefined,mid:prev&&prev.mid},editSun);
+    const doc=toDoc({...d,skip:prev&&isRec(prev)?prev.skip:undefined,from:prev&&isRec(prev)?prev.from||REC0:undefined,mid:prev&&prev.mid,mat:prev&&prev.mat},editSun);
     const m=editing?'עודכן':doc.kind==='task'?'נוספה משימה':doc.date?'נוסף ל-'+dm(doc.date):'נוסף ל'+WKN[doc.week];
     ok=await saveItem(editing,doc,doc.date?dMsg(doc.date,m):m);
   }
@@ -1864,7 +1866,7 @@ const pOk=r=>r.date>=ERA.start&&r.date<=ERA.last;
 function pBtn(){const n=pRows.filter(r=>r.on).length;$('#pAdd').disabled=!n;$('#pAdd').textContent=n?n===1?'הוספת מטלה אחת':'הוספת '+n+' מטלות':'הוספה'}
 function pRender(){
   $('#pList').innerHTML=pRows.map((r,i)=>{const off=r.dup||!pOk(r);
-    return`<li class="${off?'skip':''}"><input type="checkbox" data-pi="${i}" aria-label="${esc(r.title)}"${r.on?' checked':''}${off?' disabled':''}><span class="pd">${dm(r.date)}</span><span class="pt">${esc(r.title)}</span><select data-pc="${i}" aria-label="קורס: ${esc(r.title)}"><option value="">ללא קורס</option>${COURSE_OPTS}</select>${r.dup?'<span class="pn">כבר קיימת במתכנן</span>':!pOk(r)?`<span class="pn">מחוץ לסמסטר (${dmy(SEM.start)} עד ${dmy(SEM.last)})</span>`:''}</li>`}).join('');
+    return`<li class="${off?'skip':''}"><input type="checkbox" data-pi="${i}" aria-label="${esc(r.title)}"${r.on?' checked':''}${off?' disabled':''}><span class="pd">${dm(r.date)}</span><span class="pt">${esc(r.title)}</span><select data-pc="${i}" aria-label="קורס: ${esc(r.title)}"><option value="">ללא קורס</option>${COURSE_OPTS}</select>${r.dup?'<span class="pn">כבר קיימת במתכנן</span>':!pOk(r)?`<span class="pn">מחוץ לטווח (${dmy(ERA.start)} עד ${dmy(ERA.last)})</span>`:''}</li>`}).join('');
   $('#pList').querySelectorAll('select').forEach(sel=>sel.value=pRows[Number(sel.dataset.pc)].course);
   const h=$('#pSum');h.hidden=!$('#pTxt').value.trim();
   h.textContent=pRows.length?`זוהו ${pRows.length} מטלות${pRows.some(r=>r.dup)?', חלקן כבר במתכנן':''}. מסומנות יתווספו עם סטטוס "לא התחלתי" ועד 23:59.`:'לא זוהו מטלות. צריכות להיות שורות כמו "אירוע אחד, 15/11/2026" ואחריהן "יש להגיש את \'שם המטלה\'".';
@@ -2158,17 +2160,18 @@ async function sbPutMany(ops){ // several docs in one upsert (the sync), then on
 }
 const mdWhy=e=>e&&e.status===404?'אין קישור שמור.':e&&e.status===422?'הקישור של המודל כבר לא עובד (המפתח אופס או שגוי). צור קישור חדש והדבק אותו.':e&&e.status?'המודל לא ענה. נסה שוב מאוחר יותר.':'אין חיבור לאינטרנט.';
 async function mdSync(manual){ // manual: the button (says what happened); auto: on load, at most every 3 hours, silent on failure
-  const d0=mdDoc();if(mode!=='sb'||mdBusy||!manual&&(!d0||!d0.on||Date.now()-(d0.at||0)<MD_EVERY))return;mdBusy=true;if(manual)mdMsg('מסנכרן…');
+  const d0=mdDoc();if(mode!=='sb'||mdBusy||!manual&&(!d0||!d0.on||d0.err==='key'||Date.now()-Math.max(d0.at||0,d0.tried||0)<MD_EVERY))return; // auto: every 3 h, also after a failure (tried), never with a dead keymdBusy=true;if(manual)mdMsg('מסנכרן…');
   try{
     const ics=await(await sbFetch('/functions/v1/moodle',{method:'POST',body:'{}'})).text(),r=moodleMerge(parseIcs(ics),items,todayIso()),u=Date.now(),by=id=>items.find(x=>x.id===id),ops=[];
-    for(const a of r.add)ops.push({id:newId(),doc:{...a,updated:u}});
-    for(const m of r.move)ops.push({id:m.id,doc:{...strip(by(m.id)),date:m.date,start:m.start,updated:u}});
-    for(const t of r.tag)ops.push({id:t.id,doc:{...strip(by(t.id)),mid:t.mid}});
+    for(const a of r.add){const{id,...d}=a;ops.push({id,doc:{...d,updated:u}})}
+    for(const m of r.move)ops.push({id:m.id,doc:{...strip(by(m.id)),date:m.date,start:m.start,mat:m.mat,updated:u}});
+    for(const t of r.tag)ops.push({id:t.id,doc:{...strip(by(t.id)),mid:t.mid,mat:t.mat}});
+    for(const k of r.mark)ops.push({id:k.id,doc:{...strip(by(k.id)),mat:k.mat}});
     const d=mdDoc();ops.push({id:d?d.id:newId(),doc:{...(d?strip(d):{kind:'moodle'}),on:true,seen:r.seen||(d&&d.seen)||[],at:u,err:''}});
     await sbPutMany(ops);
     const msg=[r.add.length?r.add.length===1?'נוספה מטלה מהמודל: '+r.add[0].title:'נוספו '+r.add.length+' מטלות מהמודל':'',r.move.length?(r.move.length===1?'עודכן תאריך: '+by(r.move[0].id).title+' ← '+dm(r.move[0].date):'עודכנו '+r.move.length+' תאריכים מהמודל'):''].filter(Boolean).join(' · ');
     if(msg)toast(msg);else if(manual)toast('אין מטלות חדשות במודל');mdMsg('');
-  }catch(e){if(manual){mdMsg(mdWhy(e));toast(mdWhy(e))}const d=mdDoc();if(d&&e&&e.status===422&&!d.err)await sbSave({id:d.id,doc:{...strip(d),err:'key'}})} // a dead key is remembered, so the settings card says so
+  }catch(e){if(manual){mdMsg(mdWhy(e));toast(mdWhy(e))}const d=mdDoc();if(d)await sbSave({id:d.id,doc:{...strip(d),tried:Date.now(),...(e&&e.status===422&&{err:'key'})}})} // a dead key is remembered, so the settings card says so
   finally{mdBusy=false;mdCard()}
 }
 const mdMsg=t=>{$('#mdMsg').textContent=t};
@@ -2203,7 +2206,7 @@ $('#setWipe').addEventListener('click',async()=>{ // two clicks: the first arms 
   if(!wipeArm){wipeArm=Date.now();b.classList.add('armed');b.textContent='לחץ שוב: זה מוחק הכול';shake(b);setTimeout(()=>{wipeArm=0;b.classList.remove('armed');b.textContent='מחיקת כל הנתונים שלי'},4000);return}
   wipeArm=0;b.disabled=true;
   try{
-    if(mode==='sb'){await sbFetch('/rest/v1/items?id=not.is.null',{method:'DELETE',headers:{Prefer:'return=minimal'}});await sbSignOut();return}
+    if(mode==='sb'){await sbFetch('/rest/v1/items?id=not.is.null',{method:'DELETE',headers:{Prefer:'return=minimal'}});try{await sbFetch('/rest/v1/moodle_link?user_id=eq.'+encodeURIComponent(sbSub()),{method:'DELETE',headers:{Prefer:'return=minimal'}})}catch(e){}await sbSignOut();return} // the Moodle link (its key) goes too
     for(const it of [...items])if(!await removeItem(it.id,' '))break;
     toast('הנתונים נמחקו');setDlg.close();
   }catch(e){toast('המחיקה לא הצליחה. נסה שוב.');b.disabled=false;b.classList.remove('armed');b.textContent='מחיקת כל הנתונים שלי'}
@@ -2324,10 +2327,10 @@ async function saveItem(id,data,msg){flipArm=Date.now();
 }
 async function fast(op,msg){ // one-tap actions: in sb mode the change shows at once, the save runs in the background and the change is taken back if it fails; other modes save as before. op: {id (null = new), doc (null = delete)}
   if(mode!=='sb')return op.doc==null?removeItem(op.id,msg):saveItem(op.id,op.doc,msg);
-  const id=op.id||newId(),prev=items;sbSeq++;flipArm=Date.now(); // sbSeq: a load that started before this tap must not overwrite it
+  const id=op.id||newId(),old=items.find(x=>x.id===id);sbSeq++;flipArm=Date.now(); // sbSeq: a load that started before this tap must not overwrite it
   items=storeToItems(applyOp(itemsToStore(items),{id,doc:op.doc}));render();
   if(await sbSave({id,doc:op.doc})){toast(msg);return true}
-  items=prev;render();return false;
+  items=storeToItems(applyOp(itemsToStore(items),{id,doc:old?strip(old):null}));render();return false; // take back only this change: another tap meanwhile stays
 }
 async function removeItem(id,msg){flipArm=Date.now();
   if(mode==='sb'){const ok=await sbSave({id,doc:null});if(ok)toast(msg||'נמחק');return ok}
@@ -2458,7 +2461,7 @@ async function gEnd(cancel){const g=gDrag;if(!g)return;gDrag=null;gT=Date.now();
   const before=new Set(items.map(x=>x.id)),{id,...rest}=it;let ok;
   if(!isRec(it))ok=await fast({id,doc:{...rest,date,start:st,end:en,updated:now}},msg);
   else if(scope==='all')ok=await fast({id,doc:{...rest,day:g.d,start:st,end:en,week:'both',updated:now}},msg);
-  else{const{one,series}=detach(it,{kind:it.kind,title:it.title,note:it.note||'',updated:now,week:'date',date,day:g.d,start:st,end:en},viewSun,ev.date);ok=await fast({id:null,doc:one},msg)&&await fast({id,doc:series},msg)}
+  else{const{one,series}=detach(it,{kind:it.kind,title:it.title,note:it.note||'',updated:now,week:'date',date,day:g.d,start:st,end:en},viewSun,ev.date);ok=await fast({id,doc:series},msg)&&await fast({id:null,doc:one},msg)}
   if(!ok){render();return}
   toast(msg,{label:'בטל',fn:async()=>{const add=items.find(x=>!before.has(x.id));if(add)await fast({id:add.id,doc:null},'בוטל');await fast({id,doc:{...rest,updated:Date.now()}},'ההזזה בוטלה')}})}
 const gGrid=$('#grid'),gBlk=t=>t.closest&&t.closest('#grid .blk[data-key]');

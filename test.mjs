@@ -124,7 +124,7 @@ test('ics',()=>{
   assert.ok(ics.includes('SUMMARY:הגשה: מטלה\\, 1'));
   assert.ok(ics.includes('DTSTART;TZID=Asia/Jerusalem:20261105T232900'));
   assert.ok(!ics.includes('DTSTART;TZID=Asia/Jerusalem:20261027T'),'no classes on election day');
-  assert.equal(ics.match(/BEGIN:VEVENT/g).length,143+12+21+1);
+  assert.equal(ics.match(/BEGIN:VEVENT/g).length,143+12+18+1); // the weekly Thursday shift: 22.10–18.02 (from 21.02 it belongs to semester ב's export)
   const early=core.semEvents([{id:'e',kind:'due',date:'2026-11-05',start:'00:15'}]).find(x=>x.uid==='ue-2026-11-05');
   assert.ok(early.s>=0&&early.e>early.s);
 });
@@ -144,7 +144,7 @@ test('csv',()=>{
   assert.equal(lines[0],'Subject,Start Date,Start Time,End Date,End Time,Description,Location');
   assert.ok(lines.includes('"סגירה ""ערב""","10/22/2026","6:00 PM","10/23/2026","2:00 AM","",""'));
   assert.ok(lines.includes('"מבחן: מבוא למיקרו · מועד א\'","01/22/2027","9:00 AM","01/22/2027","12:00 PM","",""'));
-  assert.equal(lines.length,1+143+12+21);
+  assert.equal(lines.length,1+143+12+18);
   assert.equal(core.ampm(0),'12:00 AM');assert.equal(core.ampm(720),'12:00 PM');
 });
 test('detach',()=>{
@@ -561,7 +561,7 @@ test('tracks: the profile picks the timetable, track ב\' is the default',()=>{
 test('onboardDocs: answers -> profile + a personal English class',()=>{
   const d=core.onboardDocs({track:'a',name:'  נבו  ',works:false,eng:{d:3,s:'16:00',e:'19:30',level:"מתקדמים א'"}},5);
   assert.deepEqual(d.profile,{kind:'profile',track:'a',works:false,name:'נבו',updated:5});
-  assert.deepEqual(d.items,[{kind:'other',title:"אנגלית מתקדמים א'",day:3,start:'16:00',end:'19:30',week:'both',note:'',updated:5,skip:[]}]);
+  assert.deepEqual(d.items,[{kind:'other',title:"אנגלית מתקדמים א'",day:3,start:'16:00',end:'19:30',week:'both',note:'',updated:5,skip:[],from:'1969-12-28'}]); // from = the week of `now` (5 ms after the epoch)
   const e=core.onboardDocs({},7);
   assert.deepEqual(e.profile,{kind:'profile',track:'b',works:true,updated:7});assert.deepEqual(e.items,[]);            // empty answers: safe defaults
   assert.deepEqual(core.onboardDocs(undefined,1).items,[]);
@@ -664,16 +664,18 @@ test('Moodle: parseIcs and moodleTitle',()=>{
 test('Moodle: moodleMerge adds, moves, tags, never re-adds',()=>{
   const ev=(uid,summary,date,time='23:59',cat='')=>({uid,summary,date,time,cat});
   const evs=[ev('a',"יש להגיש את 'מטלה 2'",'2026-11-23'),ev('b',"יש להגיש את 'תרגיל 5'",'2026-11-25','23:59','מבוא למיקרו כלכלה'),ev('c','נפתח ב בוחן','2026-11-20'),ev('d',"יש להגיש את 'ישן'",'2026-11-01'),ev('e',"יש להגיש את 'מחוקה'",'2026-11-26'),ev('f',"יש להגיש את 'זזה'",'2026-11-28','12:00')];
-  const items=[{id:'1',kind:'due',title:'מטלה 2',date:'2026-11-23',start:'23:59',done:false},{id:'2',kind:'due',title:'זזה',date:'2026-11-27',start:'23:59',done:false,mid:'f'},{id:'3',kind:'moodle',seen:['e','f']}];
+  const items=[{id:'1',kind:'due',title:'מטלה 2',date:'2026-11-23',start:'23:59',done:false},{id:'2',kind:'due',title:'זזה',date:'2026-11-27',start:'23:59',done:false,mid:'f',mat:'2026-11-27 23:59'},{id:'3',kind:'moodle',seen:['e','f']}];
   const r=core.moodleMerge(evs,items,'2026-11-18');
-  assert.deepEqual(r.tag,[{id:'1',mid:'a'}]);
-  assert.deepEqual(r.add.map(x=>[x.title,x.mid,x.course]),[['תרגיל 5','b','micro']]);
-  assert.deepEqual(r.move,[{id:'2',date:'2026-11-28',start:'12:00'}]);
+  assert.deepEqual(r.tag,[{id:'1',mid:'a',mat:'2026-11-23 23:59'}]);
+  assert.deepEqual(r.add.map(x=>[x.title,x.mid,x.course,x.id,x.mat]),[['תרגיל 5','b','micro','mdb','2026-11-25 23:59']]); // the id comes from the uid: two devices write one row
+  assert.deepEqual(r.move,[{id:'2',date:'2026-11-28',start:'12:00',mat:'2026-11-28 12:00'}]); // Moodle moved it
+  const own=core.moodleMerge(evs,[{...items[1],date:'2026-12-03',mat:'2026-11-28 12:00'},items[2]],'2026-11-18');assert.deepEqual([own.move,own.mark],[[],[]]); // the user moved it (an extension): Moodle did not change, so it stays
+  const old=core.moodleMerge(evs,[{...items[1],mat:undefined},items[2]],'2026-11-18');assert.deepEqual([old.move,old.mark],[[],[{id:'2',mat:'2026-11-28 12:00'}]]); // synced before mat existed: only remembered
   assert.deepEqual(r.seen.sort(),['a','b','e','f']);
-  const done=core.moodleMerge(evs,[{...items[1],done:true},items[2]],'2026-11-18');assert.deepEqual(done.move,[]); // a submitted one is not moved
+  const done=core.moodleMerge(evs,[{...items[1],done:true},items[2]],'2026-11-18');assert.deepEqual(done.move,[]);assert.equal(done.mark.length,1); // a submitted one is not moved, only remembered
   const again=core.moodleMerge(evs,[...items,{id:'4',kind:'due',title:'תרגיל 5',date:'2026-11-25',start:'23:59',mid:'b'},{id:'3',kind:'moodle',seen:['a','b','e','f']}].filter((x,i,A)=>x.kind!=='moodle'||x.seen.length===4),'2026-11-18');
   assert.deepEqual(again.add,[]);assert.equal(again.seen,null);
-  assert.equal(core.toDoc({kind:'due',title:'x',note:'',updated:1,date:'2026-11-23',start:'23:59',status:'todo',mid:'b'},'2026-11-22').mid,'b');
+  const td=core.toDoc({kind:'due',title:'x',note:'',updated:1,date:'2026-11-23',start:'23:59',status:'todo',mid:'b',mat:'2026-11-23 23:59'},'2026-11-22');assert.equal(td.mid,'b');assert.equal(td.mat,'2026-11-23 23:59');
   assert.equal(core.evsForWeek('2026-11-22',[{kind:'moodle',seen:[]}]).filter(e=>e.src==='user').length,0);
 });
 test('Moodle: real export shape (tab folds, blank fold lines, course code in CATEGORIES)',()=>{
@@ -702,6 +704,18 @@ test('semesters: terms, semester B timetable, holidays, biweekly tutorial, weekl
   // export per semester: semester ב' has only its own classes
   const sb=core.semEvents([],core.TERMS[1]);assert.ok(sb.length>100);assert.ok(sb.every(x=>x.date>='2027-02-21'&&x.date<='2027-07-16'));assert.ok(!sb.some(x=>x.summary.startsWith('מבוא למיקרו')));
   assert.ok(core.buildIcs([],'20261119T000000Z',core.TERMS[1]).includes("X-WR-CALNAME:סמסטר ב' תשפ\"ז"));
-  assert.equal(core.termLine('2026-11-19'),"סמסטר א' תשפ\"ז · 18.10.26–15.01.27");assert.equal(core.termLine('2027-02-01'),"תקופת מבחנים · סמסטר א' תשפ\"ז");assert.equal(core.termLine('2027-08-01'),'חופשה · 2027');
+  assert.equal(core.termLine('2026-11-19'),"סמסטר א' תשפ\"ז · "+core.ltr('18.10.26–15.01.27'));assert.ok(core.termLine('2027-01-17').startsWith("סמסטר א'")); // the make-up day is a class dayassert.equal(core.termLine('2027-02-01'),"תקופת מבחנים · סמסטר א' תשפ\"ז");assert.equal(core.termLine('2027-08-01'),'חופשה · 2027');
   assert.equal(core.guessCourse('מטלה 2 במאקרו'),'macro');assert.equal(core.guessCourse('תרגיל הסקה סטטיסטית'),'infer');assert.equal(core.guessCourse('מטלה במיקרו'),'micro');
+});
+test('stage 1 fixes (2026-11-21): weekly from is a week, export windows, exams by semester, clash text isolated',()=>{
+  const ev=f=>core.evsForWeek('2026-11-22',[{id:'w',kind:'open',start:'08:00',end:'16:00',week:'both',...f}]).filter(e=>e.src==='user').length;
+  assert.equal(ev({day:1,from:'2026-11-25'}),1); // created on Wednesday 25.11, moved to Monday: still shows in its first week
+  assert.equal(ev({day:1,from:'2026-11-30'}),0);
+  const A=core.semEvents([],core.TERMS[0]),B=core.semEvents([],core.TERMS[1]);
+  assert.ok(!B.some(x=>x.summary.startsWith('מבחן:')),'no semester א exams in semester ב'); assert.ok(A.some(x=>x.date==='2027-03-08'&&x.summary.startsWith('מבחן:')));
+  const it=[{id:'s',kind:'open',day:0,start:'08:00',end:'09:00',week:'both'},{id:'d',kind:'due',date:'2027-03-01',start:'23:59',title:'x'}];
+  const a=core.semEvents(it,core.TERMS[0]).filter(x=>x.uid.startsWith('u')),b=core.semEvents(it,core.TERMS[1]).filter(x=>x.uid.startsWith('u'));
+  assert.ok(a.every(x=>x.date<'2027-02-21'));assert.ok(b.every(x=>x.date>='2027-02-21'));assert.ok(b.some(x=>x.uid==='ud-2027-03-01')); // own items and deadlines never in both
+  const an=core.analyze(core.evsForWeek('2026-11-15',[{id:'c',kind:'open',date:'2026-11-16',start:'10:00',end:'11:00'}]));
+  assert.ok(an.bad[0].includes(core.ltr('10:00–11:00')));
 });
