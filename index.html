@@ -21,10 +21,10 @@
   --accent:#3c5c48; --accent-fill:#2f4a3a; --accent-ink:#f3f0e8; --accent-soft:#dfe5d9; --accent-text:#2f4a3a; /* forest (default since 2026-11-18): fill = the dark green of the + and the home card, soft = sage tint, accent = lines and rings */
   --c-stat:#1d4ed8; --c-math:#15803d; --c-acc:#be123c; --c-micro:#7e22ce; --c-data:#c2410c; --c-ob:#a21caf; --c-eng:#4d7c0f; --c-macro:#0f766e; --on-course:#ffffff;
   --c-infer:var(--c-stat); --c-price:var(--c-micro); --c-org:var(--c-ob); --c-py:var(--c-data); /* semester ב': a follow-up course borrows its first part's colour (resolves per theme) */
-  --open-bg:#fffbeb; --open-bd:#f59e0b; --open-tx:#92400e;
-  --close-bg:#eef2ff; --close-bd:#6366f1; --close-tx:#3730a3;
-  --study-bg:#ecfeff; --study-bd:#06b6d4; --study-tx:#155e75;
-  --other-bg:#f8fafc; --other-bd:#94a3b8; --other-tx:#334155;
+  --open-bg:#f8f1e1; --open-bd:#c79a45; --open-tx:#74531a;
+  --close-bg:#eceef5; --close-bd:#7c84b4; --close-tx:#3d4470;
+  --study-bg:#e7f1ef; --study-bd:#5b9a92; --study-tx:#2b5a54;
+  --other-bg:#f1f0eb; --other-bd:#a3a499; --other-tx:#474a42; /* shifts and own blocks: muted to sit with the forest palette (2026-11-22), still told apart from each other and from the courses */
   --bad-bg:#fef2f2; --bad-bd:#ef4444; --bad-tx:#991b1b;
   --soft-bg:#fffbeb; --soft-bd:#f59e0b; --soft-tx:#92400e;
   --ok-tx:#047857;
@@ -39,10 +39,10 @@
   --border-light:#252d27; --border-dark:#36403a;
   --accent:#9cc0a5; --accent-fill:#33503f; --accent-ink:#eef1ea; --accent-soft:#25302a; --accent-text:#bcd6c2;
   --c-stat:#60a5fa; --c-math:#4ade80; --c-acc:#fb7185; --c-micro:#c084fc; --c-data:#fb923c; --c-ob:#e879f9; --c-eng:#a3e635; --c-macro:#2dd4bf; --on-course:#0b111c;
-  --open-bg:#2a1d06; --open-bd:#fbbf24; --open-tx:#fde68a;
-  --close-bg:#1b1d3f; --close-bd:#818cf8; --close-tx:#c7d2fe;
-  --study-bg:#082a30; --study-bd:#22d3ee; --study-tx:#a5f3fc;
-  --other-bg:#172033; --other-bd:#64748b; --other-tx:#cbd5e1;
+  --open-bg:#29231a; --open-bd:#c9a35a; --open-tx:#e8d6aa;
+  --close-bg:#1f2130; --close-bd:#8b93c4; --close-tx:#ced2ec;
+  --study-bg:#162523; --study-bd:#6aaaa2; --study-tx:#bddcd7;
+  --other-bg:#1f211e; --other-bd:#7c7f76; --other-tx:#d0d2ca;
   --bad-bg:#2b0d0d; --bad-bd:#f87171; --bad-tx:#fecaca;
   --soft-bg:#271c08; --soft-bd:#f59e0b; --soft-tx:#fcd34d;
   --ok-tx:#6ee7b7;
@@ -56,10 +56,10 @@
   --border-light:#252d27; --border-dark:#36403a;
   --accent:#9cc0a5; --accent-fill:#33503f; --accent-ink:#eef1ea; --accent-soft:#25302a; --accent-text:#bcd6c2;
   --c-stat:#60a5fa; --c-math:#4ade80; --c-acc:#fb7185; --c-micro:#c084fc; --c-data:#fb923c; --c-ob:#e879f9; --c-eng:#a3e635; --c-macro:#2dd4bf; --on-course:#0b111c;
-  --open-bg:#2a1d06; --open-bd:#fbbf24; --open-tx:#fde68a;
-  --close-bg:#1b1d3f; --close-bd:#818cf8; --close-tx:#c7d2fe;
-  --study-bg:#082a30; --study-bd:#22d3ee; --study-tx:#a5f3fc;
-  --other-bg:#172033; --other-bd:#64748b; --other-tx:#cbd5e1;
+  --open-bg:#29231a; --open-bd:#c9a35a; --open-tx:#e8d6aa;
+  --close-bg:#1f2130; --close-bd:#8b93c4; --close-tx:#ced2ec;
+  --study-bg:#162523; --study-bd:#6aaaa2; --study-tx:#bddcd7;
+  --other-bg:#1f211e; --other-bd:#7c7f76; --other-tx:#d0d2ca;
   --bad-bg:#2b0d0d; --bad-bd:#f87171; --bad-tx:#fecaca;
   --soft-bg:#271c08; --soft-bd:#f59e0b; --soft-tx:#fcd34d;
   --ok-tx:#6ee7b7;
@@ -114,6 +114,8 @@ h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;line-height:1.12;margin:0 0 
 .card .lead{font-size:13.5px;color:var(--text-muted);margin:0 0 16px}
 .ghead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;margin-bottom:4px}
 .ghead h2{margin:0}
+.mnav{display:none}.ph .mnav{display:flex;align-items:center;gap:4px}.mnav button{border:0;background:none;min-width:40px;min-height:40px;border-radius:50%;font:700 17px var(--font-body);color:var(--text-muted);cursor:pointer}.mnav #mToday{border-radius:999px;padding-inline:12px;font-size:13.5px;background:var(--accent-soft);color:var(--accent-text);min-height:32px}.mnav button:disabled{opacity:.3;cursor:default} /* phone month: arrows and today beside the title (the week bar is hidden there) */
+.dtoday{position:absolute;top:18px;inset-inline-end:18px;border:0;border-radius:999px;padding:6px 14px;min-height:34px;font:700 13.5px var(--font-body);background:color-mix(in srgb,var(--accent-ink) 16%,transparent);color:var(--accent-ink);cursor:pointer}#dayHead{position:relative} /* the day header's way back to today (the week bar is hidden in the phone day view) */
 .printbar{display:flex;align-items:center;gap:8px}
 .printbar .btn{padding:5px 14px;font-size:13px}
 .legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12.5px;color:var(--text-muted);margin:0 0 16px}
@@ -137,19 +139,20 @@ h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;line-height:1.12;margin:0 0 
 .col .freel{position:absolute;inset-inline:0;top:40px;text-align:center;font-size:12.5px;color:var(--text-muted);pointer-events:none}
 
 .blk{position:absolute;border-radius:6px;padding:6px 8px;overflow:hidden;text-align:right;
-  border:1px solid transparent;border-left:4px solid;box-shadow:0 2px 4px var(--shadow);line-height:1.3}
+  border:1px solid transparent;border-inline-start:4px solid;box-shadow:0 2px 4px var(--shadow);line-height:1.3}
 .blk .nm{font-size:12.5px;font-weight:700;display:flex;gap:4px;align-items:flex-start;justify-content:space-between}
 .blk .nm span{min-width:0}
 .blk .nm svg{flex:none;width:11px;height:11px;opacity:.55;margin-top:2px}
+.blk .nm.lk{display:block}.blk .nm.lk svg{float:inline-end;width:9px;height:9px;margin:3px 0 0;margin-inline-start:4px;opacity:.4} /* the lock floats in the corner: only the first line of the title steps aside */
 .blk .tm{direction:ltr;unicode-bidi:isolate;text-align:right;font-variant-numeric:tabular-nums;font-size:10.5px;opacity:.85;margin-top:2px}
 .blk .rm{font-size:10.5px;opacity:.8;margin-top:1px}
 .blk.tight .rm{display:none}
 .c-stat{--cc:var(--c-stat)} .c-math{--cc:var(--c-math)} .c-acc{--cc:var(--c-acc)} .c-micro{--cc:var(--c-micro)} .c-data{--cc:var(--c-data)} .c-ob{--cc:var(--c-ob)} .lgcs{display:contents} .c-eng{--cc:var(--c-eng)} .c-infer{--cc:var(--c-infer)} .c-price{--cc:var(--c-price)} .c-org{--cc:var(--c-org)} .c-py{--cc:var(--c-py)} .c-macro{--cc:var(--c-macro)}
-.blk.base{cursor:default;background:color-mix(in srgb,var(--cc) 8%,var(--bg-card));border-color:color-mix(in srgb,var(--cc) 16%,var(--bg-card));border-left-color:var(--cc);color:color-mix(in srgb,var(--cc) 35%,var(--ink))} /* quiet: the timetable is a soft tint with a course-colour edge, the user's own blocks and the exams stand out */
+.blk.base{cursor:default;background:color-mix(in srgb,var(--cc) 8%,var(--bg-card));border-color:color-mix(in srgb,var(--cc) 16%,var(--bg-card));border-inline-start-color:var(--cc);color:color-mix(in srgb,var(--cc) 35%,var(--ink))} /* quiet: the timetable is a soft tint with a course-colour edge, the user's own blocks and the exams stand out */
 .blk.base .nm{color:var(--ink)}
-.blk.k-tut{background:color-mix(in srgb,var(--cc) 6%,var(--bg-card));border-style:dashed;border-color:color-mix(in srgb,var(--cc) 55%,var(--bg-card));border-left-style:solid}
-button.blk{font:inherit;cursor:pointer;border-width:1.5px;border-left-width:4px;transition:transform .12s}
-button.blk.base{cursor:pointer;line-height:1.3;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;border-width:1px 1px 1px 4px} /* button{font:inherit} resets line-height, and a button centers its content vertically: keep the div look */
+.blk.k-tut{background:color-mix(in srgb,var(--cc) 6%,var(--bg-card));border-style:dashed;border-color:color-mix(in srgb,var(--cc) 55%,var(--bg-card));border-inline-start-style:solid}
+button.blk{font:inherit;cursor:pointer;border-width:1.5px;border-inline-start-width:4px;transition:transform .12s}
+button.blk.base{cursor:pointer;line-height:1.3;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;border-width:1px;border-inline-start-width:4px} /* button{font:inherit} resets line-height, and a button centers its content vertically: keep the div look */
 @media (hover:hover){button.blk:hover{transform:translateY(-1px);z-index:4}}
 .blk .kd{display:block;font-size:10px;font-weight:700;letter-spacing:.03em;opacity:.8}
 .blk.u-open{background:var(--open-bg);border-color:var(--open-bd);color:var(--open-tx)}
@@ -159,16 +162,17 @@ button.blk.base{cursor:pointer;line-height:1.3;display:flex;flex-direction:colum
 .blk.k-exam{background:var(--cc);border-color:var(--cc);color:var(--on-course)}
 .blk.k-exam .nm{color:var(--on-course)}
 .blk.k-exam .tm,.blk.k-exam .rm{opacity:1}
-.blk.k-exam.m2{opacity:1;background:color-mix(in srgb,var(--cc) 25%,var(--bg-card));border-style:dashed;border-left-style:solid;border-left-color:var(--cc)}
+.blk.k-exam.m2{opacity:1;background:color-mix(in srgb,var(--cc) 25%,var(--bg-card));border-style:dashed;border-inline-start-style:solid;border-inline-start-color:var(--cc)}
 .blk.k-exam.m2,.blk.k-exam.m2 .nm{color:var(--ink)}
 .dh .cal{display:block;font-size:10.5px;font-weight:600;color:var(--soft-tx)}
-.dh .hl{display:block;margin:0 auto;border:0;background:none;padding:4px 6px;font-size:10.5px;font-weight:600;color:var(--accent-text);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.dh .hl{display:block;margin:0 auto;border:0;background:none;padding:4px 6px;font-size:10px;font-weight:500;color:var(--text-muted);text-decoration:none;cursor:pointer;opacity:.8}@media (hover:hover){.dh .hl:hover{color:var(--accent-text);text-decoration:underline;text-underline-offset:2px;opacity:1}} /* quiet: cancelling a day is rare */
 .uplist .none{color:var(--text-muted);font-size:14px}
 #frm.task :is(#fTime,#fPre,.fwhen,#fWeekF){display:none}
 .cdues{display:grid;text-align:start}.cdues h4{margin:2px 0 0;font:700 17px var(--font-serif);color:var(--ink)}
 .cdmore{display:flex;align-items:center;gap:6px;min-height:44px;border:0;background:none;color:var(--accent-text);font:inherit;font-size:14px;font-weight:700;padding:0;cursor:pointer;justify-self:start}
 .cdues .cdmore{justify-self:stretch;border-top:1px solid var(--border-light)}.cdues .cdmore::after{content:'←'} /* "ועוד N": a full link row under the rows */
-.ups{margin-top:22px}.ups>h3{margin:0 0 8px;font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:baseline;gap:6px}.ups>h3 small{font-size:12.5px;font-weight:700;color:var(--text-muted)}.ups>h3 small.lt{color:var(--bad-tx)}
+.ups{margin-top:22px}.ups>h3{margin:0 0 8px;font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:baseline;gap:6px}.ups>h3 small{display:inline-flex;align-items:center;gap:7px;align-self:center}.ups>h3 small .n{display:inline-grid;place-items:center;min-width:22px;height:22px;padding-inline:7px;border-radius:999px;background:var(--bg-sunk);font:700 12px/1 var(--font-body);color:var(--text-muted);font-variant-numeric:tabular-nums}.ups>h3 small .lt{font:600 12px var(--font-body);color:var(--bad-tx)}
+.uplist li.addt .upgo{color:var(--accent-text)}.uplist li.addt i{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;border:1.5px dashed var(--accent);font:600 16px/1 var(--font-body);font-style:normal;color:var(--accent)}.uplist li.addt .tx b{font-weight:600;color:var(--accent-text)} /* the empty task list: a row that adds one */
 .htop{display:grid;gap:8px;margin:2px 0 6px}.hello{margin:0 0 2px;font-size:22px;font-weight:800;color:var(--ink)}
 .hrow{display:grid;gap:2px;text-align:start;border:0;border-inline-start:4px solid var(--cc,var(--accent));background:color-mix(in srgb,var(--cc,var(--accent)) 12%,var(--bg-card));border-radius:12px;padding:10px 12px;min-height:44px;font:inherit;color:inherit;cursor:pointer}
 .hrow.nx{background:var(--bg-sunk)}.hrow small{font-size:11.5px;font-weight:800;letter-spacing:.05em;color:var(--text-muted)}.hrow b{font-size:16px}.hrow span{font-size:13px;color:var(--text-muted)}
@@ -291,11 +295,10 @@ textarea{width:100%;background:var(--bg-sunk);border:1px solid var(--border-dark
 .mc{min-height:110px;min-width:0;display:flex;flex-direction:column;gap:2px;padding:5px 6px;background:var(--bg-sunk);border:1px solid var(--border-light);border-radius:8px;cursor:pointer}
 @media (hover:hover){.mc:hover{border-color:var(--border-dark)}}
 .mc.out{opacity:.45}
-.mc.today{outline:2px solid var(--accent);outline-offset:-1px}
 .mtop{display:flex;align-items:baseline;gap:6px;margin-bottom:2px}
 .mn{border:0;background:none;padding:0;cursor:pointer;font-weight:700;font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
 @media (hover:hover){.mn:hover{text-decoration:underline}}
-.mc.today .mn{color:var(--accent-text)}
+.mc.today .mn{display:inline-grid;place-items:center;min-width:24px;height:24px;padding-inline:4px;border-radius:999px;background:var(--accent-fill);color:var(--accent-ink)}.ph .mc.today .mn{min-width:28px;height:28px} /* today = the number in a filled circle; the picked day (.sel) = a ring on a soft tint */
 .mtop small{min-width:0;font-size:10.5px;font-weight:600;line-height:1.25;color:var(--soft-tx)}
 .ml{display:flex;align-items:center;gap:4px;width:100%;padding:0;background:none;border:0;border-inline-start:3px solid transparent;text-align:start;cursor:pointer;font-size:12px;line-height:1.4;color:var(--text-main)} /* a button: reset the chrome, keep the div look */
 @media (hover:hover){.ml:hover{background:var(--border-light)}}
@@ -376,7 +379,7 @@ input[type=time],input[type=date]{font-variant-numeric:tabular-nums;direction:lt
 #frm .ftime .arw{font-size:22px;color:var(--text-faint)}#frm .ftime .fld{display:block}
 #frm .ftime.due .arw{display:none}#frm .ftime.due::before{content:'עד';font-size:18px;font-weight:700;color:var(--text-muted)}
 #frm #fHint{background:none;padding:0;text-align:center;margin-top:-10px;height:20px;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* always one line: a clash never changes the window's height */
-#frm #fHint.bad{color:var(--bad-tx);font-weight:700;cursor:pointer}#frm #fHint.full{height:auto;white-space:normal}
+#frm.task #fHint{margin-top:0}#frm #fHint.bad{color:var(--bad-tx);font-weight:700;cursor:pointer}#frm #fHint.full{height:auto;white-space:normal}
 #frm .pre{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;background:var(--bg-app);border-radius:12px;padding:3px;min-height:44px;align-items:center} /* the quick times: one segmented row like the kinds; the picked one sits in the travelling #prePill, the others are dimmer */#frm .pre button{position:relative;z-index:1;min-width:0;padding:7px 4px;white-space:nowrap;min-height:40px;border:0;background:none;border-radius:9px;color:var(--text-muted);opacity:.7;transition:color .3s,opacity .3s}#frm .pre button.on{color:var(--accent-ink);opacity:1;font-weight:800}#dlgTitle::before{content:'';display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:8px;background:var(--kc,transparent);transition:background-color .35s}
 #frm .fwhen{display:grid;gap:6px}
 #frm .fdays{display:flex;align-items:center;gap:6px}#frm #fDays{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
@@ -386,7 +389,7 @@ input[type=time],input[type=date]{font-variant-numeric:tabular-nums;direction:lt
 #frm .fcal svg{width:20px;height:20px}#frm .fcal input{position:absolute;inset:0;width:100%;height:100%;min-height:0;opacity:0;padding:0;border:0;cursor:pointer}
 #frm .fwcap{text-align:center;font-size:14px;font-weight:600;color:var(--text-muted)}
 #frm .fslot{min-height:46px;display:grid;align-items:center} /* one row, always there: the weekly switch, or a deadline's course and status */
-#frm .due2{grid-template-columns:repeat(2,minmax(0,1fr))}#frm .due2:not(:has(.fld:not([hidden]))){display:none}
+#frm .due2{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}#frm .due2:not(:has(.fld:not([hidden]))){display:none}
 #frm .swrow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;font-weight:600;cursor:pointer}#frm .swrow[hidden]{display:none}
 #frm .sw{-webkit-appearance:none;appearance:none;flex:none;width:50px;height:30px;border-radius:999px;background:var(--border-dark);position:relative;cursor:pointer;transition:background-color .2s;margin:0}
 #frm .sw::after{content:'';position:absolute;top:3px;inset-inline-start:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgb(0 0 0/.3);transition:inset-inline-start .25s var(--ez-spring)}
@@ -422,12 +425,12 @@ input[type=time],input[type=date]{font-variant-numeric:tabular-nums;direction:lt
 .wkbar{margin-bottom:12px}
 .ph .wrap{padding-inline:12px;padding-bottom:calc(var(--tabh) + 24px + env(safe-area-inset-bottom,0px))}
 .ph #miniTop{position:fixed;inset-inline:0;top:0;z-index:19;display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:calc(env(safe-area-inset-top,0px) + 8px) 18px 9px;background:color-mix(in srgb,var(--bg-card) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--border-light);opacity:0;transform:translateY(-100%);pointer-events:none;transition:transform .35s var(--ez-out),opacity .25s}
-.ph #miniTop.on{opacity:1;transform:none;pointer-events:auto}#miniTop b{font-size:16px;font-weight:800;color:var(--ink)}#miniTop span{font:600 13px var(--font-body);font-variant-numeric:tabular-nums;color:var(--text-muted);direction:ltr}
+.ph #miniTop.on{opacity:1;transform:none;pointer-events:auto}#miniTop b{font:700 17px var(--font-serif);color:var(--ink)}#miniTop span{font:600 13px var(--font-body);font-variant-numeric:tabular-nums;color:var(--text-muted);direction:ltr}
 #miniTop{display:none}.ph #miniTop{display:flex} /* the big header scrolls away; this frosted strip takes its place (a fixed copy: the page itself never changes height, so there is no jitter at the threshold) */
 .ph .top{flex-wrap:nowrap;align-items:center;gap:10px;padding-block:14px 10px}
 .ph h1{font-size:24px;margin:0}
 .ph .sub,.ph .eyebrow,.ph .seg{display:none}
-.ph .bar{margin-bottom:12px}
+.ph .bar{margin-bottom:12px}.ph .bar.nonav{margin:0}
 .ph .nav{width:100%;flex-wrap:nowrap;justify-content:space-between}
 .ph .nav .wkl{flex:1;text-align:center}
 .ph .nav>button{min-width:44px;min-height:44px}
@@ -516,6 +519,7 @@ button.dlb{cursor:pointer}
   .card{box-shadow:none;border:0;margin:0;padding:0;zoom:var(--ps,1);break-inside:avoid}
   .scroller{overflow:visible;margin:0;padding:0}
   .grid,.month{min-width:0}
+  #grid .blk.past{opacity:1!important}.nowl{display:none!important} /* paper shows the plan, not the hour it was printed */
 }
 
 /* day rows take the colour of their course; today's rows dim when over and ring while on; a line marks the time in today's grid column */
@@ -606,7 +610,7 @@ dialog{border-radius:24px}.btn{border-radius:14px}.dstrip button{border-radius:1
   <ul class="dlist" id="dayList"></ul>
 </section>
 <section class="card" id="monthCard" hidden>
-  <div class="ghead"><h2 id="monthTitle"></h2></div>
+  <div class="ghead"><h2 id="monthTitle"></h2><span class="mnav" id="mNav"><button type="button" id="mToday">היום</button><button type="button" id="mPrev" aria-label="חודש קודם">→</button><button type="button" id="mNext" aria-label="חודש הבא">←</button></span></div>
   <details class="mleg" open><summary>מקרא</summary><div class="legend" id="mLegend"></div></details>
   <div class="scroller"><div class="month" id="month"></div></div>
   <div class="mhandle" id="mHandle" role="button" tabindex="0" aria-expanded="false" aria-label="הרחבת רשימת היום" hidden><i></i></div>
@@ -1358,7 +1362,8 @@ function render0(){
   $('#prev').disabled=mon?viewYm<=YM0:day?viewDay<=ERA.start:viewSun<=sunOf(ERA.start);$('#next').disabled=mon?viewYm>=YM1:day?viewDay>=ERA.last:viewSun>=lastSun;const shownD=day?viewDay:mon?viewYm+'-15':addDays(viewSun,3);$('#eyebrow').textContent=termLine(shownD);legendFor(shownD);
   $('#prev').setAttribute('aria-label',mon?'חודש קודם':day?'יום קודם':'שבוע קודם');$('#next').setAttribute('aria-label',mon?'חודש הבא':day?'יום הבא':'שבוע הבא');
   $('#vWeek').setAttribute('aria-pressed',String(!mon));$('#vMonth').setAttribute('aria-pressed',String(mon));
-  $('.nav').hidden=upv;
+  $('.nav').hidden=upv||ph&&(day||mon);$('.bar').classList.toggle('nonav',ph&&(day||mon)); // on a phone the day header/strip and the month title carry their own navigation
+  if(mon){$('#mPrev').disabled=$('#prev').disabled;$('#mNext').disabled=$('#next').disabled;$('#mToday').style.visibility=viewYm===ymOf(todayIso())?'hidden':''}
   $('#upCard').hidden=ph&&!upv;if(upv)$('#upCard').open=true;$('#upCard h2').textContent=ph?'בית':'מה מתקרב';document.documentElement.classList.toggle('vup',ph&&upv);$('#sum').hidden=$('#att').hidden=!wkv;$('#monthCard').hidden=!mon;$('#dayCard').hidden=!day;document.querySelectorAll('.lg-sh').forEach(l=>l.hidden=!worksOn());$('#shCard').hidden=!worksOn();
   $('#gridCard').hidden=!wkv;$('#agCard').hidden=!wkv;$('#wkBar').hidden=true; // the phone week tab shows the two-day grid, the agenda is a closed card below it
   $('#addLbl').textContent=mon?'הוספה':day?'הוספה ליום זה':'הוספה לשבוע';$('#addBtn').hidden=upv;
@@ -1460,7 +1465,7 @@ function renderGrid(evs,clash){
       if(ev.src!=='user'){
         const kl=ev.src==='exam'?'מבחן':BKIND[ev.kind];
         b.title=`${ev.cancelled?'בוטל · ':''}${ev.title}${kl?' · '+kl:''} · ${ltr(tr(ev.s,ev.e))} · ${ev.room}`;if(ev.cancelled)b.classList.add('cancelled');
-        b.innerHTML=`<div class="nm"><span>${esc(ev.title)}${kl?' · '+kl:''}</span>${LOCK}</div><div class="tm">${tr(ev.s,ev.e)}</div><div class="rm">${esc(ev.room)}</div>`;
+        b.innerHTML=`<div class="nm lk">${LOCK}<span>${esc(ev.title)}${kl?' · '+kl:''}</span></div><div class="tm">${tr(ev.s,ev.e)}</div><div class="rm">${esc(ev.room)}</div>`;
       }else{
         const showTitle=ev.title!==KINDS[ev.kind].label;
         b.title=`${ev.title} · ${ltr(tr(ev.s,ev.e))}${ev.note?' · '+ev.note:''} · ${WKN[ev.week]} · לחיצה לעריכה`;
@@ -1520,7 +1525,7 @@ function renderDay(evs,an){ // phone day view: the week strip, the day's notes, 
   const L=dayL.filter(l=>!l.cancelled),nm=nowMin(),cnt=(n,one,many)=>n?n===1?one:n+' '+many:'';
   const sh=L.filter(l=>l.src==='user'&&KINDS[l.kind]&&KINDS[l.kind].shift).length,own=L.filter(l=>l.src==='user').length-sh;
   const what=[cnt(L.filter(l=>l.src==='base').length,'שיעור אחד','שיעורים'),cnt(L.filter(l=>l.src==='exam').length,'מבחן','מבחנים'),cnt(sh,'משמרת','משמרות'),cnt(L.filter(l=>l.src==='due').length,'הגשה','הגשות'),cnt(own,'עוד פריט','פריטים נוספים')].filter(Boolean).join(' · ');
-  $('#dayHead').innerHTML=`<h2>יום ${DAYS[dow(date)]}</h2><small>${[dmy(date),c&&esc(c.label),off&&'לימודים בוטלו',what].filter(Boolean).join(' · ')}</small>`; // the dark header: always two lines (a holiday or a note joins the date line), so changing the day never changes its height
+  $('#dayHead').innerHTML=(date!==today?'<button type="button" class="dtoday" data-today>היום</button>':'')+`<h2>יום ${DAYS[dow(date)]}</h2><small>${[dmy(date),c&&esc(c.label),off&&'לימודים בוטלו',what].filter(Boolean).join(' · ')}</small>`; // the dark header: always two lines (a holiday or a note joins the date line), so changing the day never changes its height
   const dn=L.filter(l=>l.src==='due'?l.st==='done':l.date<today||l.date===today&&l.e<=nm).length,pc=L.length?Math.round(dn*100/L.length):0,dp=$('#dayPlan');
   dp.hidden=!PHQ.matches;dp.innerHTML=`<h3>${date===today?'התוכנית להיום':'התוכנית ליום הזה'}</h3><small>${L.length?dn+' מתוך '+L.length+' הושלמו':'אין שיעורים או פריטים'}</small><div class="bar"${L.length?'':' style="visibility:hidden"'}><i style="--p:${pc}%"></i><b>${pc}%</b></div>`; // always shown (an empty day keeps the card, its bar only hidden), so the page never jumps between days // what is over (or submitted) out of the day's lines
   $('#dayList').innerHTML=dayL.length?dayL.map(l=>dayLi(l,an.clash,edit,today)).join(''):emptyDay(date,edit);
@@ -1616,12 +1621,12 @@ function renderUp(){
   const late=L.filter(x=>x.late).length,nx=L.find(x=>!x.late);
   $('#upSum').innerHTML=[late?`<b class="lt">${late} באיחור</b>`:'',nx?'הבא: '+dm(nx.date)+' · '+esc(nx.title):'',TK.length?(TK.length===1?'משימה אחת':TK.length+' משימות'):''].filter(Boolean).join(' · ')||'אין הגשות קרובות'; // the line next to the title while the card is closed
   const Xc=X.filter(x=>!x.past),dl0=D.filter(x=>x.late).length;
-  $('#upTN').textContent=TK.length||'';$('#upDN').textContent=D.length?D.length+(dl0?` · ${dl0} באיחור`:''):'';$('#upDN').classList.toggle('lt',!!dl0);$('#upXN').textContent=Xc.length||'';
+  const cnt=(n,lt)=>n?`<span class="n">${n}</span>`+(lt?`<span class="lt">${lt} באיחור</span>`:''):'';$('#upTN').innerHTML=cnt(TK.length);$('#upDN').innerHTML=cnt(D.length,dl0);$('#upXN').innerHTML=cnt(Xc.length); // the count is a quiet chip after the serif heading, the late part a small red word
   const cc=x=>x.exam&&COURSE[x.title]?'cd c-'+COURSE[x.title]:dueCls(x),dl=dlBox;
   const row=x=>`<li class="${cc(x)}${x.late?' late':''}${x.past?' past':''}">${x.id?stCk(x,edit,x.title):'<i class="xdot"></i>'}<button type="button" class="upgo" data-go="${x.date}"><span class="tx"><b>${esc(x.title)}</b><span class="dt">${dm(x.date)} · ${esc(x.time)}${x.exam?' · '+esc(x.tag):''}</span></span><span class="dl">${dl(x)}</span></button></li>`; // one quiet row: check (or a course dot for an exam), name over date, the days box
   const grouped=A=>A.map(row).join('');
   const doneL=A=>A.map(x=>`<li class="${dueCls(x)}">${stCk(x,edit,x.title)}<b>${esc(x.title)}</b>${x.date?`<span class="dt">${dm(x.date)}</span>`:''}</li>`).join('');
-  $('#upT').innerHTML=TK.length?TK.map(x=>`<li class="${dueCls(x)}">${stCk(x,edit,x.title)}<button type="button" class="upgo" data-edit="${esc(x.id)}"><span class="tx"><b>${esc(x.title)}</b></span></button></li>`).join(''):'<li class="none">אין משימות פתוחות.</li>';
+  $('#upT').innerHTML=TK.length?TK.map(x=>`<li class="${dueCls(x)}">${stCk(x,edit,x.title)}<button type="button" class="upgo" data-edit="${esc(x.id)}"><span class="tx"><b>${esc(x.title)}</b></span></button></li>`).join(''):edit?'<li class="addt"><button type="button" class="upgo" data-addtask><i aria-hidden="true">+</i><span class="tx"><b>הוספת משימה</b></span></button></li>':'<li class="none">אין משימות פתוחות.</li>'; // no tasks: one tappable row that opens the window on a task
   $('#upTD').hidden=!TD.length;$('#upTDN').textContent='הושלמו ('+TD.length+')';$('#upTDL').innerHTML=doneL(TD);
   $('#up').innerHTML=D.length?grouped(D):'<li class="none">אין מטלות פתוחות.</li>';
   $('#upDone').hidden=!S.length;$('#upDoneN').textContent='הוגשו ('+S.length+')';$('#upDoneL').innerHTML=doneL(S);
@@ -1640,7 +1645,7 @@ async function setSt(id,s){
   }finally{stBusy.delete(id)}
   const b=document.querySelector(`[data-st="${id}"]`);if(b)b.focus(); // the lists are redrawn: keep the keyboard on the same button
 }
-$('#upCard').addEventListener('click',x=>{const t=x.target.closest('[data-edit]');if(t){openEdit(t.dataset.edit);return}const b=x.target.closest('[data-go]');if(!b)return;if(PHQ.matches){setView('day',b.dataset.go);scrollTo(0,0);return}if(view==='month')viewYm=clampYm(ymOf(b.dataset.go));go(sunOf(b.dataset.go))});
+$('#upCard').addEventListener('click',x=>{if(x.target.closest('[data-addtask]')){openAdd({kind:'task'});return}const t=x.target.closest('[data-edit]');if(t){openEdit(t.dataset.edit);return}const b=x.target.closest('[data-go]');if(!b)return;if(PHQ.matches){setView('day',b.dataset.go);scrollTo(0,0);return}if(view==='month')viewYm=clampYm(ymOf(b.dataset.go));go(sunOf(b.dataset.go))});
 document.addEventListener('click',x=>{const b=x.target.closest('[data-st]');if(b&&!b.disabled){const id=b.dataset.st;setSt(id,b.dataset.s==='done'?'todo':'done');pop(document.querySelector(`[data-st="${id}"]`))}}); // sb redraws at once, so the pop lands on the new pill // one tap flips the status (there are only two)
 $('#agenda').addEventListener('click',x=>{
   const k=x.target.closest('[data-key]'),kl=k&&agL[k.dataset.date+'|'+k.dataset.key];
@@ -1715,7 +1720,7 @@ function preMark(anim=1){if(getKind()==='task')return;const s=$('#fStart').value
 function syncFields(){
   const task=getKind()==='task',due=getKind()==='due',dt=isDated(),fd=$('#fDate'),fy=$('#fDay'),rp=()=>isoOk(fd.value)&&dow(fd.value)===Number(fy.value)?fd.value:clampDay(addDays(editSun,Number(fy.value))); // rp: the date "only on this date" takes from a recurring form (the picked date while its weekday still matches)
   if(dt!==dated){dated=dt;if(dt)fd.value=rp();else if(isoOk(fd.value))fy.value=String(dow(fd.value))} // switching mode keeps the day and the date in step (a picked date survives a round trip)
-  frm.classList.toggle('task',task);renderPre();$('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due||task;$('#fCourseF').hidden=$('#fStatusF').hidden=!(due||task);for(const o of $('#fStatus').options)o.textContent=(task?TSTAT:STAT)[o.value];$('#fDayF').hidden=true;$('#fDateF').hidden=!dt;
+  frm.classList.toggle('task',task);renderPre();$('#fEnd').closest('.fld').hidden=due;$('#fWeekF').hidden=due||task;$('#fCourseF').hidden=!(due||task);$('#fStatusF').hidden=!(due||task)||!editing;for(const o of $('#fStatus').options)o.textContent=(task?TSTAT:STAT)[o.value];$('#fDayF').hidden=true;$('#fDateF').hidden=!dt;
   $('#fTime').classList.toggle('due',due);$('#fTitle').placeholder=task?'מה לעשות?':due?'שם המטלה':getKind()==='other'?'מה זה?':'כותרת (לא חובה)';daysSync();
 }
 function openAdd(pre={}){
@@ -1733,6 +1738,7 @@ function openAdd(pre={}){
   $('#dlgTitle').textContent='הוספה';$('#fDel').hidden=true;$('#fSkip').hidden=true;resetDel();$('#fErr').hidden=true;
   syncFields();hint();dlg.showModal();lockH();
 }
+const reH=()=>{if(!PHQ.matches||!dlg.open)return;const h0=dlg.offsetHeight;lockH();const h1=dlg.offsetHeight;if(h0!==h1&&!still())dlg.animate([{height:h0+'px'},{height:h1+'px'}],{duration:320,easing:EZ.out})}; // a kind change (task hides the time rows) re-fits the locked height, smoothly
 const lockH=()=>{dlg.style.height='';if(PHQ.matches)dlg.style.height=dlg.offsetHeight+'px'}; // the window keeps the height it opened with: an opened note or an error scrolls inside. offsetHeight, not the rect: the open animation may already scale the window (no button to grow from, e.g. a tap on the grid), and a scaled rect locked it at 30%
 function openEdit(id,sun=viewSun){ // sun: the week of the clicked occurrence
   const it=items.find(x=>x.id===id);if(!it)return;
@@ -1765,7 +1771,7 @@ function hint(){preMark();
   const d=readForm(),h=$('#fHint');h.classList.remove('full');
   if(d.kind==='task'){h.className='hint';h.textContent='בלי תאריך · ברשימת המשימות';return}
   if(isDated()&&!isoOk(d.date)){h.className='hint';h.textContent='בחר תאריך';return}
-  if(d.kind==='due'){h.className='hint';h.textContent=`הגשה ב-${dm(d.date)} עד ${okTime(d.start)?d.start:'23:59'}`;return}
+  if(d.kind==='due'){const n=dayDiff(todayIso(),d.date);h.className='hint';h.textContent=n===0?'הגשה היום':n===1?'הגשה מחר':n>1?`בעוד ${n} ימים`:n===-1?'אתמול':`לפני ${-n} ימים`;return} // the date itself is only in the caption under the days
   if(!okTime(d.start)||!okTime(d.end)||d.start===d.end){h.className='hint';h.textContent='בחר שעת התחלה וסיום. סיום מוקדם מההתחלה נחשב עד אחרי חצות.';return}
   const[s,e]=span(d.start,d.end);
   const hits=[],pv=editing&&items.find(x=>x.id===editing),det=pv&&isRec(pv)&&d.week==='date',its=det?items.map(x=>x===pv?{...x,skip:[...(x.skip||[]),$('#fSkip').dataset.date]}:x):items; // detaching one occurrence: compare with the items as they will be saved (the series stays, minus that date); otherwise the edited item itself is left out
@@ -1780,7 +1786,7 @@ frm.addEventListener('input',x=>{
   if(x.target.id==='fStart'||x.target.id==='fEnd')timesTouched=true;
   if(x.target.id==='fEnd')endTouched=true;
   if(x.target.id==='fStart'&&!endTouched&&getKind()!=='due'&&okTime(prevS)&&okTime(prevE)&&okTime($('#fStart').value)){const[a,b]=span(prevS,prevE);$('#fEnd').value=fm((toMin($('#fStart').value)+b-a)%1440)}
-  if(x.target.name==='fKind')kindPill(1);
+  if(x.target.name==='fKind'){kindPill(1);requestAnimationFrame(reH)} // after syncFields below
   if(x.target.name==='fKind'&&!editing){const l=lastOf(getKind());if(getKind()==='due')$('#fStart').value='23:59';else if(!timesTouched&&firstPre()){const f=firstPre();$('#fStart').value=f.s;$('#fEnd').value=f.e}else if(addTimes&&$('#fStart').value==='23:59'){$('#fStart').value=addTimes.s;$('#fEnd').value=addTimes.e}}
   prevS=$('#fStart').value;prevE=$('#fEnd').value;syncFields();hint();
 });
@@ -1874,7 +1880,7 @@ const printCard=()=>$(view==='month'?'#monthCard':'#gridCard');
 const printScale=()=>{const c=printCard();return Math.min(1,PRINT_H/(['h2','.legend','.scroller'].reduce((a,q)=>a+c.querySelector(q).offsetHeight,0)+30))};
 function printHtml(){ // standalone page: same styles + the shown card as it is now; prints itself on load
   const c=printCard().cloneNode(true),css=[...document.querySelectorAll('style')].map(x=>x.outerHTML).join(''),f=document.querySelector('link[href*="fonts.googleapis.com/css2"]');
-  c.querySelectorAll('.printbar,.hl').forEach(x=>x.remove());
+  c.querySelectorAll('.printbar,.hl,.nowl').forEach(x=>x.remove());c.querySelectorAll('.past').forEach(x=>x.classList.remove('past')); // paper: no now line, nothing faded
   return`<!doctype html><html lang="he" dir="rtl" data-theme="light" style="--ps:${printScale().toFixed(3)}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(c.querySelector('h2').textContent)}</title>${f?f.outerHTML:''}${css}</head><body><div class="wrap">${c.outerHTML}</div><script>onload=()=>(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>print())<\/script></body></html>`;
 }
 $('#printBtn').addEventListener('click',()=>window.print());
@@ -2309,6 +2315,7 @@ async function removeItem(id,msg){flipArm=Date.now();
 }
 
 $('#prev').addEventListener('click',()=>{step(-1);slide(-1)});$('#next').addEventListener('click',()=>{step(1);slide(1)});
+$('#mPrev').addEventListener('click',()=>$('#prev').click());$('#mNext').addEventListener('click',()=>$('#next').click());$('#mToday').addEventListener('click',()=>$('#todayBtn').click());$('#dayHead').addEventListener('click',x=>{if(x.target.closest('[data-today]'))$('#todayBtn').click()}); // the phone's own month arrows and day "today" stand in for the hidden week bar
 $('#todayBtn').addEventListener('click',()=>view==='month'?goMonth(ymOf(todayIso())):view==='day'?dayTo(todayIso()):go(sunOf(todayIso())));
 $('#tabAdd').addEventListener('click',()=>$('#addBtn').click()); // same per-view logic as the desktop add button
 $('#tabs').addEventListener('click',x=>{const b=x.target.closest('[data-v]');if(!b)return;const o=view;setView(b.dataset.v);scrollTo(0,0);if(view!==o&&!still())b.querySelector('svg').animate([{transform:'scale(1)'},{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:380,delay:330,easing:EZ.spring})}); // an instant cut; only the tab bar moves: the pill travels, then the icon pops
@@ -2449,7 +2456,7 @@ gGrid.addEventListener('mousedown',x=>{if(x.button||!canEdit())return;const b=gB
 addEventListener('keydown',x=>{if(x.key==='Escape'&&gDrag)gEnd(1)});
 addEventListener('pointerdown',x=>{if(gSel&&!(x.target.closest&&x.target.closest('#grid .blk.sel,#mvDlg,#toast'))){gSel='';document.querySelectorAll('#grid .blk.sel').forEach(b=>b.classList.remove('sel'))}},true); // a tap elsewhere drops the pick
 const miniTop=$('#miniTop');let miniRaf=0;
-function miniSync(){miniRaf=0;const on=PHQ.matches&&scrollY>90&&!document.querySelector('dialog[open]');if(on){miniTop.firstChild.textContent=$('h1').textContent;miniTop.lastChild.textContent=$('#wkLabel').textContent}miniTop.classList.toggle('on',on)}
+function miniSync(){miniRaf=0;const on=PHQ.matches&&scrollY>90&&!document.querySelector('dialog[open]');if(on){const up=view==='up';miniTop.firstChild.textContent=up?$('#hello').textContent:$('h1').textContent;miniTop.lastChild.textContent=up?'':$('#wkLabel').textContent}miniTop.classList.toggle('on',on)} // home: the greeting is the title there
 addEventListener('scroll',()=>{if(!miniRaf)miniRaf=requestAnimationFrame(miniSync)},{passive:true});miniTop.addEventListener('click',()=>scrollTo({top:0,behavior:still()?'auto':'smooth'})); // a tap on the strip goes back to the top, like the iOS status bar
 document.addEventListener('close',miniSync,true);
 /* swipe between weeks and months (a phone): the month swipes anywhere on the calendar; the week grid swipes only when it cannot scroll any further that way (it scrolls by days first), so the day columns keep working */
