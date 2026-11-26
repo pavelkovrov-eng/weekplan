@@ -1069,6 +1069,7 @@ function baseDay(iso,items){
   if(!termOf(iso)||c&&c.off)return null;
   return dow(iso);
 }
+const uCourse=t=>COURSE[t]||(/^אנגלית/.test(t||'')?'eng':''); // an own item named like a course (a student's English class) is drawn in that course's colour
 function evsForWeek(sun,items,skipId){
   const out=[];
   for(let d=0;d<7;d++){
@@ -1087,7 +1088,7 @@ function evsForWeek(sun,items,skipId){
     }else if(isoOk(it.date)&&sunOf(it.date)===sun){date=it.date;d=dow(date)}
     else return;
     const[s,e]=span(it.start,it.end),kind=KINDS[it.kind]?it.kind:'other';
-    out.push({src:'user',key:'u'+it.id,id:it.id,d,date,s,e,title:it.title||KINDS[kind].label,kind,note:it.note||'',week:isRec(it)?it.week:'date'});
+    out.push({src:'user',key:'u'+it.id,id:it.id,d,date,s,e,title:it.title||KINDS[kind].label,kind,note:it.note||'',week:isRec(it)?it.week:'date',...(uCourse(it.title)&&{course:uCourse(it.title)})});
   });
   return out;
 }
@@ -1124,8 +1125,8 @@ function dayLines(date,items,evs=evsForWeek(sunOf(date),items)){ // everything o
 }
 function lineTxt(e){ // {col: css var of the line's colour, ttl, meta} for a day-list / agenda line
   if(e.src==='due')return{col:courseOk(e.course)?'--c-'+e.course:'--bad-bd',ttl:dueLbl(e),meta:e.note||''};
-  const u=e.src==='user',kl=u?KINDS[e.kind].short:e.src==='exam'?'מבחן':(BKIND[e.kind]||'אנגלית');
-  return{col:u?KINDS[e.kind].color:'--c-'+e.course,ttl:u&&e.title===KINDS[e.kind].label?e.title:e.title+' · '+kl,
+  const u=e.src==='user',kl=u?(e.course?'שיעור':KINDS[e.kind].short):e.src==='exam'?'מבחן':(BKIND[e.kind]||'אנגלית');
+  return{col:u&&!e.course?KINDS[e.kind].color:'--c-'+e.course,ttl:u&&e.title===KINDS[e.kind].label?e.title:e.title+' · '+kl,
     meta:u?[e.week==='date'?'חד-פעמי':'כל שבוע',e.note].filter(Boolean).join(' · '):e.room};
 }
 function analyze(evs,nextSun=[]){ // nextSun: events of the following Sunday (d:0), used for Saturday late nights
@@ -1454,7 +1455,7 @@ function renderGrid(evs,clash){
     list.forEach(ev=>{
       const s=Math.max(ev.s,lo),e=Math.min(ev.e,hi),hgt=(e-s)*PPM-2;
       const bb=ev.src==='base'&&!ro,b=document.createElement(ev.src==='user'||bb?'button':'div');
-      if(ev.src==='user'){b.type='button';b.className='blk u-'+ev.kind+(ev.key===gSel?' sel':'');b.dataset.key=ev.key;b._ev=ev;b.addEventListener('click',x=>{x.stopPropagation();if(Date.now()-gT>500)openEdit(ev.id)})} // a click right after a drag is the drag's own
+      if(ev.src==='user'){b.type='button';b.className='blk '+(ev.course?'base k-lec c-'+ev.course:'u-'+ev.kind)+(ev.key===gSel?' sel':'');b.dataset.key=ev.key;b._ev=ev;b.addEventListener('click',x=>{x.stopPropagation();if(Date.now()-gT>500)openEdit(ev.id)})} // a click right after a drag is the drag's own
       else{b.className='blk base k-'+ev.kind+' c-'+ev.course+(ev.moed==='ב'?' m2':'');
         if(bb){b.type='button';b.setAttribute('aria-label',`${ev.title} · ${BKIND[ev.kind]||'אנגלית'} · ${tr(ev.s,ev.e)} · לחיצה ל${ev.cancelled?'החזרה':'ביטול'}`);b.addEventListener('click',x=>{x.stopPropagation();openCancel(ev)})}}
       if(clash.has(ev.key))b.classList.add('clash');
@@ -1469,7 +1470,7 @@ function renderGrid(evs,clash){
       }else{
         const showTitle=ev.title!==KINDS[ev.kind].label;
         b.title=`${ev.title} · ${ltr(tr(ev.s,ev.e))}${ev.note?' · '+ev.note:''} · ${WKN[ev.week]} · לחיצה לעריכה`;
-        b.innerHTML=`<span class="kd">${KINDS[ev.kind].short}${ev.week!=='date'?' <span class="wk">· כל שבוע</span>':''}</span>`+
+        b.innerHTML=(ev.course?'':`<span class="kd">${KINDS[ev.kind].short}${ev.week!=='date'?' <span class="wk">· כל שבוע</span>':''}</span>`)+
           `<div class="nm"><span>${esc(showTitle?ev.title:KINDS[ev.kind].label)}</span></div><div class="tm">${tr(ev.s,ev.e)}</div>`+
           (ev.note?`<div class="rm">${esc(ev.note)}</div>`:'')+(ro?'':'<i class="rsz" aria-hidden="true"></i>'); // the handle that drags the end (shown on a picked block)
       }
@@ -1573,7 +1574,7 @@ function monthCell(date,evs,today){
     if(e.src==='base'){const kl=BKIND[e.kind]||'אנגלית';return{s:e.s,h:`<button type="button" class="ml c-${e.course} k-${e.kind}${e.cancelled?' cancelled':''}" data-kind="base" ${at} data-i="${e.i}" ${ta((e.cancelled?'בוטל · ':'')+e.title+' · '+kl+' · '+tr(e.s,e.e)+' · '+e.room,edit&&'לחיצה ל'+(e.cancelled?'החזרה':'ביטול'))}><i></i><span><b>${fm(e.s)}</b> ${esc(CSHORT[e.course])}</span></button>`}}
     if(e.src==='exam')return{s:e.s,h:`<button type="button" class="ml x c-${e.course}${e.moed==='ב'?' m2':''}" data-kind="exam" ${at} data-i="${e.key.slice(1)}" ${ta('מבחן · '+e.title+' · '+e.room+' · '+fm(e.s))}><span>מבחן ${esc(CSHORT[e.course])} ${e.moed}'</span></button>`};
     const nm=e.title===KINDS[e.kind].label?KINDS[e.kind].short:e.title;
-    return{s:e.s,h:`<button type="button" class="ml" data-kind="user" ${at} data-id="${esc(e.id)}" ${ta(e.title+' · '+tr(e.s,e.e)+(e.note?' · '+e.note:''),edit&&'לחיצה לעריכה')}><i style="background:var(${KINDS[e.kind].color})"></i><span><b>${fm(e.s)}</b> ${esc(nm)}</span></button>`};
+    return{s:e.s,h:`<button type="button" class="ml" data-kind="user" ${at} data-id="${esc(e.id)}" ${ta(e.title+' · '+tr(e.s,e.e)+(e.note?' · '+e.note:''),edit&&'לחיצה לעריכה')}><i style="background:var(${e.course?'--c-'+e.course:KINDS[e.kind].color})"></i><span><b>${fm(e.s)}</b> ${esc(nm)}</span></button>`};
   }).concat(items.filter(x=>x.kind==='due'&&x.date===date).map(x=>({s:toMin(okTime(x.start)?x.start:'23:59'),
     h:`<button type="button" class="ml d${x.done?' done':''}${dueLate(x,today)?' late':''} ${dueCls(x)}" data-kind="due" data-date="${date}" data-id="${esc(x.id)}" ${ta(dueLbl(x)+' · עד '+(okTime(x.start)?x.start:'23:59')+(dueLate(x,today)?' · באיחור':''),edit&&'לחיצה לעריכה')}><span>${esc(dueLbl(x))}</span></button>`})))
     .sort((a,b)=>a.s-b.s);
